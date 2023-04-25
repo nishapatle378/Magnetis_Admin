@@ -1,0 +1,109 @@
+fury-view-all-system-parameter {
+  .system-parameter {
+    .add-sp-btn {
+      height: 24px;
+      width: 24px;
+      align-items: center;
+      display: flex;
+    }
+
+    .add-sp-btn-icon {
+      font-size: 24px;
+      align-self: center;
+      margin-top: -1px;
+    }
+
+    .sp-title-text {
+      background-color: #17366e;
+      color: #fff;
+      font-size: 16px;
+      font-weight: 500;
+      padding: 3px 0px 3px 6px;
+    }
+
+    .sp-card-view {
+      width: 20%;
+      padding: 0px;
+      margin-right: 7px;
+      border-radius: 10px;
+      overflow: hidden;
+    }
+
+    .sp-card-view-header {
+      width: 100%;
+      background-color: #d3d3d3;
+      box-sizing: border-box;
+      display: flex;
+      place-content: stretch space-between;
+      align-items: stretch;
+      padding: 6px 6px 6px 7px;
+      border-top-right-radius: 5px;
+      border-top-left-radius: 5px;
+      color: #333;
+      font-weight: 500;
+    }
+    .sp-data-row-s {
+      background: #ccc;
+    }
+    .mat-form-field-underline {
+      bottom: 0 !important;
+    }
+    .mat-form-field {
+      width: 70%;
+      margin-bottom: 0px;
+    }
+    .mat-form-field-flex {
+      align-items: flex-start !important;
+    }
+    .mat-form-field-infix {
+      border-top: 0.84375em solid transparent;
+    }
+    .mat-form-field-label-wrapper {
+      top: -0.75em;
+      padding-top: 0.84375em;
+    }
+    .mat-form-field-wrapper {
+      margin-right: 5px !important;
+      padding-bottom: 0px;
+    }
+    .status-filter {
+      border: 1px solid #dedede;
+    }
+    .mat-card {
+      border: 1px solid #e5e5e5;
+    }
+
+    .mat-card-header .mat-card-title {
+      margin-bottom: 0px;
+      color: #1b5691;
+      font-size: 15px;
+    }
+    th.mat-header-cell:first-of-type,
+    td.mat-cell:first-of-type,
+    td.mat-footer-cell:first-of-type {
+      padding-left: 10px;
+    }
+    th.mat-header-cell:last-of-type,
+    td.mat-cell:last-of-type,
+    td.mat-footer-cell:last-of-type {
+      padding-right: 10px;
+    }
+    .mat-icon-button {
+      padding: 0;
+      min-width: 0;
+      width: 30px;
+      height: 30px;
+      flex-shrink: 0;
+      line-height: 30px;
+      border-radius: 50%;
+    }
+    tr.mat-row,
+    tr.mat-footer-row {
+      height: 48px;
+      cursor: pointer;
+    }
+    .mat-paginator-page-size-select.mat-form-field-appearance-fill {
+      width: 64px !important;
+    }
+  }
+}

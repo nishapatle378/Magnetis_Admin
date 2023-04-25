@@ -1,0 +1,93 @@
+<div mat-dialog-title>Country</div>
+
+<mat-dialog-content style="height: 100% !important;">
+
+
+    <form [formGroup]="firstFormGroup" [ngStyle]="{'margin-top': '7px'}">
+
+        <div fxLayout="column" fxLayout.gt-sm="row" fxLayoutGap.gt-sm="24px">
+
+            <mat-form-field  fxFlex>
+                <mat-label>Country Name *</mat-label>
+                <input type="text" formControlName="COUNTRY_NAME" matInput>
+                <mat-error *ngIf="firstFormGroup.get('COUNTRY_NAME').hasError('required')">Country name is required</mat-error>
+            </mat-form-field>
+
+            <mat-form-field  fxFlex>
+                <mat-label>Continent</mat-label>
+                <input type="text" formControlName="CONTINENT" matInput>
+                <mat-error *ngIf="firstFormGroup.get('CONTINENT').hasError('required')">Continent is required</mat-error>
+            </mat-form-field>
+
+        </div>
+
+        <div fxLayout="column" fxLayout.gt-sm="row" fxLayoutGap.gt-sm="24px">
+  
+            <mat-form-field  fxFlex>
+                <mat-label>Capital</mat-label>
+                <input type="text" formControlName="CAPITAL" matInput>
+                <mat-error *ngIf="firstFormGroup.get('CAPITAL').hasError('required')">Capital is required</mat-error>
+            </mat-form-field>
+
+            <mat-form-field  fxFlex>
+                <mat-label>IDD Code</mat-label>
+                <input type="text" formControlName="IDD_CODE" (input)="ValidNumberInput('IDD_CODE', $event.target.value)" maxlength="3" matInput>
+                <mat-error *ngIf="firstFormGroup.get('IDD_CODE').hasError('required')">IDD code is required</mat-error>
+            </mat-form-field>
+
+        </div>
+
+        <div fxLayout="column" fxLayout.gt-sm="row" fxLayoutGap.gt-sm="24px">
+
+            <mat-form-field  fxFlex>
+                <mat-label>ISO Code 2-CHAR</mat-label>
+                <input type="text" formControlName="ISO_CODE_2CHAR" maxlength="2" matInput>
+                <mat-error *ngIf="firstFormGroup.get('ISO_CODE_2CHAR').hasError('required')">ISO code 2-char is required</mat-error>
+            </mat-form-field>
+
+            <mat-form-field  fxFlex>
+                <mat-label>ISO Code 3-CHAR</mat-label>
+                <input type="text" formControlName="ISO_CODE_3CHAR" maxlength="3" matInput>
+                <mat-error *ngIf="firstFormGroup.get('ISO_CODE_3CHAR').hasError('required')">ISO code 3-char is required</mat-error>
+            </mat-form-field>
+
+        </div>
+        
+        <div fxLayout="column" fxLayout.gt-sm="row" fxLayoutGap.gt-sm="24px">
+  
+            <mat-form-field  fxFlex>
+                <mat-label>Timezone</mat-label>
+                <mat-select formControlName="TIME_ZONE">
+                    <mat-option>
+                      <ngx-mat-select-search 
+                        formControlName="timezone_Filter"
+                        [placeholderLabel]="'search...'"
+                        [noEntriesFoundLabel]="'no matching found!'"
+                      >
+                      </ngx-mat-select-search>
+                    </mat-option>   
+                                                
+                    <mat-option *ngFor="let b of filtered_timezone | async" [value]="b.text">
+                      {{b.text}}
+                    </mat-option>
+                  </mat-select>
+                <!-- <input type="text" formControlName="TIME_ZONE" (input)="ValidNumberInput('TIME_ZONE', $event.target.value)" maxlength="4" matInput> -->
+                <mat-error *ngIf="firstFormGroup.get('TIME_ZONE').hasError('required')">Timezone is required</mat-error>
+            </mat-form-field>
+
+        </div>
+
+
+        <div fxLayout="column" fxLayout.gt-sm="row" fxLayoutGap.gt-sm="24px" *ngIf="ErrorMessage">
+            <h6 style="color: #ff0000;">{{ErrorMessage}}</h6>
+        </div>
+
+    </form>
+
+</mat-dialog-content>
+<mat-dialog-actions fxLayout="row" fxLayoutAlign="end center">
+    <button mat-raised-button color="primary" (click)="SaveCountry(true)" class="save-btn" [disabled]="!firstFormGroup.valid && !IsEdit">SAVE & ADD NEW</button>
+  <button mat-raised-button color="primary" (click)="SaveCountry()" class="save-btn" [disabled]="!firstFormGroup.valid && !IsEdit">SAVE</button>
+  <button mat-raised-button color="warn" (click)="CloseModal()">CLOSE</button>
+</mat-dialog-actions>
+

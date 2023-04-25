@@ -1,0 +1,618 @@
+<fury-page-layout mode="card" class="support-logistic">
+  <fury-page-layout-header>
+    <form
+      [formGroup]="filterFormGroup"
+      [ngStyle]="{ 'margin-top': '7px' }"
+      (ngSubmit)="onClickSubmit(filterFormGroup.value)"
+    >
+      <div class="filter-area" fxFlex>
+        <div fxLayout="row" fxLayoutAlign="start">
+          <div fxFlex>
+            <mat-form-field>
+              <mat-label>Principal Name</mat-label>
+              <mat-select formControlName="PRINCIPAL_GUID">
+                <mat-option>
+                  <ngx-mat-select-search
+                    formControlName="company_Filter"
+                    [placeholderLabel]="'search...'"
+                    [noEntriesFoundLabel]="'no matching found!'"
+                  >
+                  </ngx-mat-select-search>
+                </mat-option>
+                <mat-option
+                  *ngFor="let b of filtered_principal | async"
+                  [value]="b.COMPANY_GUID"
+                >
+                  {{ b.COMPANY_NAME }}
+                </mat-option>
+              </mat-select>
+            </mat-form-field>
+            <mat-form-field>
+              <mat-label>Vessel</mat-label>
+              <mat-select formControlName="VESSEL_GUID">
+                <mat-option>
+                  <ngx-mat-select-search
+                    formControlName="vessel_Filter"
+                    [placeholderLabel]="'search...'"
+                    [noEntriesFoundLabel]="'no matching found!'"
+                  >
+                  </ngx-mat-select-search>
+                </mat-option>
+                <mat-option
+                  *ngFor="let b of filtered_vessel | async"
+                  [value]="b.VESSEL_GUID"
+                >
+                  {{ b.VESSEL_NAME }}
+                </mat-option>
+              </mat-select>
+            </mat-form-field>
+            <mat-form-field>
+              <mat-label>Search by delivery ref</mat-label>
+              <input
+                formControlName="SEARCH"
+                matInput
+                placeholder="Search by delivery ref"
+                type="text"
+              />
+            </mat-form-field>
+          </div>
+          <div fxFlex>
+            <mat-form-field>
+              <mat-label>Destination</mat-label>
+              <mat-select formControlName="DESTINATION">
+                <mat-option>
+                  <ngx-mat-select-search
+                    formControlName="destination_Filter"
+                    [placeholderLabel]="'search...'"
+                    [noEntriesFoundLabel]="'no matching found!'"
+                  >
+                  </ngx-mat-select-search>
+                </mat-option>
+                <mat-option
+                  *ngFor="let b of filtered_destination | async"
+                  [value]="b.PARAMETER_GUID"
+                >
+                  {{ b.PARAMETER_NAME }}
+                </mat-option>
+              </mat-select>
+            </mat-form-field>
+            <mat-form-field class="two-divide">
+              <mat-label>Follow Up</mat-label>
+              <mat-select formControlName="Followup_GUID" placeholder="">
+                <mat-option>
+                  <ngx-mat-select-search
+                    formControlName="followup_Filter"
+                    [placeholderLabel]="'search...'"
+                    [noEntriesFoundLabel]="'no matching found!'"
+                  >
+                  </ngx-mat-select-search>
+                </mat-option>
+                <mat-option
+                  *ngFor="let b of filtered_followUp | async"
+                  [value]="b.PARAMETER_GUID"
+                >
+                  {{ b.PARAMETER_NAME }}
+                </mat-option>
+              </mat-select>
+            </mat-form-field>
+            <mat-form-field>
+              <mat-label>Search by Outgoing AWB</mat-label>
+              <input
+                formControlName="Out_Awb"
+                matInput
+                placeholder="Search by Outgoing AWB"
+                type="text"
+              />
+            </mat-form-field>
+          </div>
+          <div fxFlex>
+            <mat-form-field>
+              <mat-label>Logistic Type</mat-label>
+              <mat-select formControlName="LOGISTIC_TYPE">
+                <mat-option
+                  *ngFor="let b of filtered_type | async"
+                  [value]="b.PARAMETER_GUID"
+                >
+                  {{ b.PARAMETER_NAME }}
+                </mat-option>
+              </mat-select>
+            </mat-form-field>
+            <mat-form-field>
+              <mat-label>Status</mat-label>
+              <mat-select formControlName="LOGISTIC_STATUS" multiple>
+                <mat-option
+                  *ngFor="let b of filtered_status | async"
+                  [value]="b.PARAMETER_GUID"
+                >
+                  {{ b.PARAMETER_NAME }}
+                </mat-option>
+              </mat-select>
+            </mat-form-field>
+          </div>
+
+          <div class="filter-btn-area" fxFlex>
+            <div>
+              <button
+                class="create"
+                mat-raised-button
+                color="primary"
+                class="filter-btn"
+              >
+                Search
+              </button>
+            </div>
+
+            <div>
+              <button
+                class="create"
+                (click)="clearFilter()"
+                mat-raised-button
+                color="warn"
+                class="filter-btn"
+                type="button"
+              >
+                Clear
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </form>
+  </fury-page-layout-header>
+
+  <fury-page-layout-content [@fadeInUp]>
+    <div class="actions-area">
+      <div>
+        <button
+          class="create"
+          [ngStyle]="{ 'margin-left': '10px' }"
+          (click)="Save(null, false)"
+          type="button"
+          mat-mini-fab
+          color="primary"
+          *ngIf="
+            authGuard.checkPermission(
+              'oPk6Fh2BP24443f12-see41bbbb',
+              'create'
+            )
+          "
+        >
+          <mat-icon>add</mat-icon>
+        </button>
+        Add Logistics
+      </div>
+
+      <div class="flex">
+        <div class="flex">
+          <button
+            mat-raised-button
+            color="primary"
+            *ngIf="
+              selectedItem.length > 0 &&
+              authGuard.checkPermission(
+                'oPk6Fh2BP24443f12-see41bbbb',
+                'edit'
+              )
+            "
+            (click)="UpdateStatus()"
+            class="delivery-btn"
+          >
+            Update Status
+          </button>
+          <button
+            mat-raised-button
+            color="primary"
+            *ngIf="
+              selectedItem.length > 0 &&
+              authGuard.checkPermission(
+                'oPk6Fh2BP24443f12-see41bbbb',
+                'edit'
+              )
+            "
+            (click)="UpdateAWB()"
+            class="delivery-btn"
+          >
+            Update Outgoing AWB
+          </button>
+          <button
+            mat-raised-button
+            color="primary"
+            *ngIf="
+              selectedItem.length > 0 &&
+              authGuard.checkPermission(
+                'oPk6Fh2BP24443f12-see41bbbb',
+                'edit'
+              )
+            "
+            (click)="UpdateDelivery()"
+            class="delivery-btn"
+          >
+            Mark as Completed
+          </button>
+          <mat-form-field>
+            <mat-label>Select Print type</mat-label>
+            <mat-select (selectionChange)="onPrintChange($event)">
+              <mat-option value="delivery_to_vessel"
+                >Care off note - Delivery to Vessel</mat-option
+              >
+              <mat-option value="delivery">Care off note - Delivery</mat-option>
+              <mat-option value="collection"
+                >Care off note - Collection</mat-option
+              >
+            </mat-select>
+          </mat-form-field>
+          <button
+            class="create"
+            [ngStyle]="{ 'margin-left': '10px' }"
+            (click)="PrintDetail()"
+            type="button"
+            mat-mini-fab
+            color="primary"
+            *ngIf="
+              authGuard.checkPermission(
+                'oPk6Fh2BP24443f12-see41bbbb',
+                'export'
+              )
+            "
+          >
+            <mat-icon>print</mat-icon>
+          </button>
+        </div>
+        <span
+          style="cursor: pointer"
+          (click)="exportAsExcel()"
+          *ngIf="
+            authGuard.checkPermission(
+              'oPk6Fh2BP24443f12-see41bbbb',
+              'export'
+            )
+          "
+          ><img
+            src="../../../../assets/img/excel.png"
+            class="logo"
+            alt="excel"
+          />
+        </span>
+      </div>
+    </div>
+    <div #TABLE>
+      <table [dataSource]="dataSource" mat-table matSort #table>
+        <ng-container matColumnDef="Log_Ref">
+          <th
+            *matHeaderCellDef
+            class="actions-cell"
+            mat-header-cell
+            mat-sort-header
+          >
+            Log REF
+          </th>
+          <td *matCellDef="let row" class="actions-cell" mat-cell>
+            <p class="tbl-row-item">
+              {{ row.Log_Ref }}
+            </p>
+          </td>
+        </ng-container>
+        <ng-container matColumnDef="Delivery_Ref">
+          <th
+            *matHeaderCellDef
+            class="actions-cell"
+            mat-header-cell
+            mat-sort-header
+          >
+            Delivery_Ref
+          </th>
+          <td *matCellDef="let row" class="actions-cell" mat-cell>
+            <p class="tbl-row-item">
+              {{ row.DeliveryRef ? "SWS/D" : "" }}{{ row.DeliveryRef }}
+            </p>
+          </td>
+        </ng-container>
+        <ng-container matColumnDef="Type_Name">
+          <th
+            *matHeaderCellDef
+            class="actions-cell"
+            mat-header-cell
+            mat-sort-header
+          >
+            Type
+          </th>
+          <td *matCellDef="let row" class="actions-cell" mat-cell>
+            <p class="tbl-row-item">
+              {{ row.TYPE_NAME }}
+            </p>
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="VESSEL_NAME">
+          <th
+            *matHeaderCellDef
+            class="actions-cell"
+            mat-header-cell
+            mat-sort-header
+          >
+            Vessel
+          </th>
+          <td *matCellDef="let row" class="actions-cell" mat-cell>
+            <p class="tbl-row-item">
+              {{ row.VESSEL_NAME }}
+            </p>
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="Description_Name">
+          <th
+            *matHeaderCellDef
+            class="actions-cell"
+            mat-header-cell
+            mat-sort-header
+          >
+            Description
+          </th>
+          <td *matCellDef="let row" class="actions-cell" mat-cell>
+            <p class="tbl-row-item">
+              {{ row.DESCRIPTION_NAME || row.Description }}
+            </p>
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="FollowUp">
+          <th
+            *matHeaderCellDef
+            class="actions-cell"
+            mat-header-cell
+            mat-sort-header
+          >
+            Follow Up
+          </th>
+          <td *matCellDef="let row" class="actions-cell" mat-cell>
+            <p class="tbl-row-item">
+              {{ row.FOLLOW_NAME || row.Followup_GUID }}
+            </p>
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="Destination_Name">
+          <th
+            *matHeaderCellDef
+            class="actions-cell"
+            mat-header-cell
+            mat-sort-header
+          >
+            Destination
+          </th>
+          <td
+            *matCellDef="let row"
+            class="actions-cell datetime-class"
+            mat-cell
+          >
+            <p class="tbl-row-item">
+              {{ row.DESTINATION_NAME || row.Destination }}
+            </p>
+          </td>
+        </ng-container>
+        <ng-container matColumnDef="Delivery_Date">
+          <th
+            *matHeaderCellDef
+            class="actions-cell"
+            mat-header-cell
+            mat-sort-header
+          >
+            Delivery Date
+          </th>
+          <td
+            *matCellDef="let row"
+            class="actions-cell datetime-class"
+            mat-cell
+          >
+            <p class="tbl-row-item">
+              {{ row.Delivery_Date | date: "dd MMM YYYY" }}
+            </p>
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="Remarks">
+          <th
+            *matHeaderCellDef
+            class="actions-cell"
+            mat-header-cell
+            mat-sort-header
+          >
+            Remarks
+          </th>
+          <td
+            *matCellDef="let row"
+            class="actions-cell datetime-class"
+            mat-cell
+          >
+            <p [matTooltip]="row.Remarks">
+              {{
+                (row.Remarks && row.Remarks.length) > 10
+                  ? (row.Remarks | slice: 0:10) + "..."
+                  : row.Remarks
+              }}
+            </p>
+          </td>
+        </ng-container>
+        <ng-container matColumnDef="Outgoing_AWB">
+          <th
+            *matHeaderCellDef
+            class="actions-cell"
+            mat-header-cell
+            mat-sort-header
+          >
+            Outgoing AWB
+          </th>
+          <td
+            *matCellDef="let row"
+            class="actions-cell datetime-class"
+            mat-cell
+          >
+            <p class="tbl-row-item">{{ row.Outgoing_AWB }}</p>
+          </td>
+        </ng-container>
+        <ng-container matColumnDef="Status_GUID">
+          <th
+            *matHeaderCellDef
+            class="actions-cell"
+            mat-header-cell
+            mat-sort-header
+          >
+            Status
+          </th>
+          <td
+            *matCellDef="let row"
+            class="actions-cell datetime-class"
+            mat-cell
+          >
+            <p class="tbl-row-item">{{ row.STATUS_NAME || row.Status_GUID }}</p>
+          </td>
+        </ng-container>
+        <ng-container matColumnDef="Select">
+          <th *matHeaderCellDef class="actions-cell" mat-header-cell>
+            <mat-checkbox
+              class="example-margin"
+              (change)="SelectAllLog($event.checked)"
+              >Select All</mat-checkbox
+            >
+          </th>
+          <td
+            *matCellDef="let row"
+            class="actions-cell datetime-class"
+            mat-cell
+          >
+            <div
+              *ngIf="
+                row.Status_GUID !==
+                'WdVGpZR7Z94675122-4e9c-40d7-80dd-e01f2893400b'
+              "
+            >
+              <mat-checkbox
+                [checked]="selectedItem.includes(row.Logistics_GUID)"
+                class="example-margin"
+                (change)="SelectRecord($event.checked, row.Logistics_GUID)"
+              ></mat-checkbox>
+            </div>
+          </td>
+        </ng-container>
+        <ng-container matColumnDef="Action">
+          <th
+            *matHeaderCellDef
+            class="actions-cell"
+            mat-header-cell
+            mat-sort-header
+          >
+            Action
+          </th>
+          <td *matCellDef="let row" class="actions-cell" mat-cell>
+            <a
+              *ngIf="row.Acknowledgment"
+              target="_blank"
+              [href]="getFileURL(row.Acknowledgment)"
+            >
+              <button
+                [color]="'accent'"
+                mat-icon-button
+                [matTooltip]="'Delivery Attachment - ' + row.Acknowledgment"
+              >
+                <mat-icon class="icon-display">attach_file</mat-icon>
+              </button></a
+            >
+            <a
+              *ngIf="row.Outgoing_Attachment"
+              target="_blank"
+              [href]="getFileURL(row.Outgoing_Attachment)"
+            >
+              <button
+                [color]="'accent'"
+                mat-icon-button
+                [matTooltip]="
+                  'Outgoing Attachment - ' + row.Outgoing_Attachment
+                "
+              >
+                <mat-icon class="icon-display">attach_file</mat-icon>
+              </button></a
+            >
+
+            <button
+              [color]="
+                (row.Outgoing_Remark && row.Outgoing_Remark.length > 0) ||
+                (row.Remarks && row.Remarks?.length > 0)
+                  ? 'accent'
+                  : 'warn'
+              "
+              mat-icon-button
+              [matTooltip]="'Incoming Remarks: '+row.Remarks &#13; +'
+              Outgoing Remarks: '+row.Outgoing_Remark"
+            >
+              <mat-icon class="icon-display">chat</mat-icon>
+            </button>
+            <button
+              mat-icon-button
+              (click)="Save(row, true)"
+              *ngIf="
+                authGuard.checkPermission(
+                  'oPk6Fh2BP24443f12-see41bbbb',
+                  'edit'
+                )
+              "
+            >
+              <mat-icon class="icon-display">edit</mat-icon>
+            </button>
+
+            <button
+              mat-icon-button
+              (click)="delete(row)"
+              *ngIf="
+                row.ACTIVE_STATUS &&
+                authGuard.checkPermission(
+                  'oPk6Fh2BP24443f12-see41bbbb',
+                  'delete'
+                )
+              "
+            >
+              <!-- <mat-icon [ngStyle]="{'color': row.ACTIVE_STATUS ? 'green' : 'red', 'font-weight':'bold'}">{{row.ACTIVE_STATUS ? 'check' : 'close'}}</mat-icon> -->
+              <mat-icon
+                class="icon-display"
+                [ngStyle]="{ color: 'red', 'font-weight': 'bold' }"
+                >{{ "close" }}</mat-icon
+              >
+            </button>
+
+            <button
+              mat-icon-button
+              [matTooltip]="
+                'Created By : ' +
+                row.CREATED_BY +
+                ' | ' +
+                (row.DATE_CREATED | date: 'dd MMM yyyy HH:mm:ss') +
+                '&#13;
+              ' +
+                (row.MODIFIED_BY
+                  ? 'Modified By : ' +
+                    row.MODIFIED_BY +
+                    ' | ' +
+                    (row.DATE_MODIFIED | date: 'd MMM yyyy HH:mm:ss')
+                  : '')
+              "
+            >
+              <mat-icon class="icon-display">info</mat-icon>
+            </button>
+          </td>
+        </ng-container>
+
+        <tr *matHeaderRowDef="visibleColumns" mat-header-row></tr>
+        <tr
+          *matRowDef="let row; columns: visibleColumns"
+          class="clickable route-animations-elements"
+          mat-row
+        ></tr>
+        <tr class="mat-row" *matNoDataRow>
+          <td class="mat-cell" colspan="9999">No data found</td>
+        </tr>
+      </table>
+    </div>
+
+    <!-- <mat-paginator class="paginator" [pageSizeOptions]="[10, 25, 50, 100]" [pageSize]="pageSize"></mat-paginator> -->
+    <!-- </fury-list> -->
+  </fury-page-layout-content>
+</fury-page-layout>

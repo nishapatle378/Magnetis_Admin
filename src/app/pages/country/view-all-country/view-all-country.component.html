@@ -1,0 +1,247 @@
+<fury-page-layout mode="card">
+  <fury-page-layout-header>
+    <fury-breadcrumbs [@fadeInRight] current="Countries"></fury-breadcrumbs>
+  </fury-page-layout-header>
+
+  <fury-page-layout-content [@fadeInUp]>
+    <div class="actions">
+      <div>
+        <button
+          class="create"
+          [ngStyle]="{ 'margin-top': '10px' }"
+          (click)="SaveData(null, false)"
+          type="button"
+          mat-mini-fab
+          color="primary"
+          *ngIf="
+            authGuard.checkPermission(
+              'BX2GdXyHoa0f9c0b2-2049-43f2-a068-656eeaab1c10',
+              'create'
+            )
+          "
+        >
+          <mat-icon>add</mat-icon>
+        </button>
+        Add Country
+      </div>
+      <div style="background-color: #ffffff; padding: 10px">
+        <span
+          style="cursor: pointer"
+          (click)="exportAsExcel()"
+          *ngIf="
+            authGuard.checkPermission(
+              'BX2GdXyHoa0f9c0b2-2049-43f2-a068-656eeaab1c10',
+              'export'
+            )
+          "
+        >
+          <img
+            src="../../../../assets/img/excel.png"
+            class="logo"
+            alt="excel"
+          />
+        </span>
+      </div>
+    </div>
+
+    <!-- <div style="background-color: #ffffff; padding: 10px;" fxLayout="row" fxFlex  fxLayoutAlign="end">
+
+            <select style="margin-right: 10px; width: 100px;" (change)="FilterDataStatus($event.target.value)">
+              <option value="All">All</option>
+              <option value="Activated" selected>Active</option>
+              <option value="Deleted">Deleted</option>
+            </select>
+
+            <button mat-mini-fab color="primary" (click)="exportAsExcel()"><mat-icon>sticky_note_2</mat-icon></button>
+          </div> -->
+
+    <div #TABLE>
+      <table [dataSource]="dataSource" mat-table matSort #table>
+        <!-- <ng-container matColumnDef="srn">
+              <th *matHeaderCellDef class="actions-cell" mat-header-cell mat-sort-header>Sr No</th>
+              <td *matCellDef="let row; let i =index" class="actions-cell" mat-cell>
+                {{i + 1}}
+              </td>
+            </ng-container> -->
+
+        <ng-container matColumnDef="COUNTRY_NAME">
+          <th
+            *matHeaderCellDef
+            class="actions-cell"
+            mat-header-cell
+            mat-sort-header
+          >
+            Country Name
+          </th>
+          <td *matCellDef="let row" class="actions-cell" mat-cell>
+            <p class="tbl-row-item">{{ row.COUNTRY_NAME }}</p>
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="CONTINENT">
+          <th
+            *matHeaderCellDef
+            class="actions-cell"
+            mat-header-cell
+            mat-sort-header
+          >
+            Continent
+          </th>
+          <td *matCellDef="let row" class="actions-cell" mat-cell>
+            <p class="tbl-row-item">{{ row.CONTINENT }}</p>
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="CAPITAL">
+          <th
+            *matHeaderCellDef
+            class="actions-cell"
+            mat-header-cell
+            mat-sort-header
+          >
+            Capital
+          </th>
+          <td *matCellDef="let row" class="actions-cell" mat-cell>
+            <p class="tbl-row-item">{{ row.CAPITAL }}</p>
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="IDD_CODE">
+          <th
+            *matHeaderCellDef
+            class="actions-cell"
+            mat-header-cell
+            mat-sort-header
+          >
+            IDD Code
+          </th>
+          <td *matCellDef="let row" class="actions-cell" mat-cell>
+            <p class="tbl-row-item">{{ row.IDD_CODE }}</p>
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="ISO_CODE_2CHAR">
+          <th
+            *matHeaderCellDef
+            class="actions-cell"
+            mat-header-cell
+            mat-sort-header
+          >
+            ISO Code 2Char
+          </th>
+          <td *matCellDef="let row" class="actions-cell" mat-cell>
+            <p class="tbl-row-item">{{ row.ISO_CODE_2CHAR }}</p>
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="ISO_CODE_3CHAR">
+          <th
+            *matHeaderCellDef
+            class="actions-cell"
+            mat-header-cell
+            mat-sort-header
+          >
+            ISO Code 3Char
+          </th>
+          <td *matCellDef="let row" class="actions-cell" mat-cell>
+            <p class="tbl-row-item">{{ row.ISO_CODE_3CHAR }}</p>
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="TIME_ZONE">
+          <th
+            *matHeaderCellDef
+            class="actions-cell"
+            mat-header-cell
+            mat-sort-header
+          >
+            Time Zone
+          </th>
+          <td *matCellDef="let row" class="actions-cell" mat-cell>
+            <p class="tbl-row-item">{{ row.TIME_ZONE }}</p>
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="Action">
+          <th
+            *matHeaderCellDef
+            class="actions-cell"
+            mat-header-cell
+            mat-sort-header
+          >
+            Action
+          </th>
+          <td *matCellDef="let row" class="actions-cell" mat-cell>
+            <!-- -->
+            <button
+              mat-icon-button
+              (click)="SaveData(row, true)"
+              *ngIf="
+                authGuard.checkPermission(
+                  'BX2GdXyHoa0f9c0b2-2049-43f2-a068-656eeaab1c10',
+                  'edit'
+                )
+              "
+            >
+              <mat-icon class="icon-display">edit</mat-icon>
+            </button>
+            <!--  -->
+            <button
+              mat-icon-button
+              (click)="ChangeStatus(row)"
+              *ngIf="
+                row.ACTIVE_STATUS &&
+                authGuard.checkPermission(
+                  'BX2GdXyHoa0f9c0b2-2049-43f2-a068-656eeaab1c10',
+                  'delete'
+                )
+              "
+            >
+              <!-- <mat-icon [ngStyle]="{'color': row.ACTIVE_STATUS ? 'green' : 'red', 'font-weight':'bold'}">{{row.ACTIVE_STATUS ? 'check' : 'close'}}</mat-icon> -->
+              <mat-icon
+                class="icon-display"
+                [ngStyle]="{ color: 'red', 'font-weight': 'bold' }"
+                >{{ "close" }}</mat-icon
+              >
+            </button>
+            <button
+              mat-icon-button
+              [matTooltip]="
+                'Created By : ' +
+                row.CREATED_BY +
+                ' | ' +
+                (row.DATE_CREATED | date: 'dd MMM yyyy HH:mm:ss') +
+                '&#13;
+              ' +
+                (row.MODIFIED_BY
+                  ? 'Modified By : ' +
+                    row.MODIFIED_BY +
+                    ' | ' +
+                    (row.DATE_MODIFIED | date: 'd MMM yyyy HH:mm:ss')
+                  : '')
+              "
+            >
+              <mat-icon class="icon-display">info</mat-icon>
+            </button>
+          </td>
+        </ng-container>
+
+        <tr *matHeaderRowDef="visibleColumns" mat-header-row></tr>
+        <tr
+          *matRowDef="let row; columns: visibleColumns"
+          class="clickable route-animations-elements"
+          mat-row
+        ></tr>
+        <tr class="mat-row" *matNoDataRow>
+          <td class="mat-cell" colspan="9999">No data found</td>
+        </tr>
+      </table>
+    </div>
+
+    <mat-paginator
+      class="paginator"
+      [pageSizeOptions]="[10, 25, 50, 100]"
+      [pageSize]="pageSize"
+    ></mat-paginator>
+  </fury-page-layout-content>
+</fury-page-layout>

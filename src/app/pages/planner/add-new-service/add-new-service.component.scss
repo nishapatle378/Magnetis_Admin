@@ -1,0 +1,31 @@
+.add-service {
+  padding: 10px;
+  .mat-form-field-label-wrapper {
+    top: -0.75em;
+    padding-top: 0.84375em;
+  }
+
+  .mat-form-field-wrapper {
+    margin-right: 5px !important;
+    padding-bottom: 0px;
+  }
+
+  .mat-form-field {
+    margin-bottom: 30px;
+    width: 100%;
+  }
+  .mat-form-field-subscript-wrapper {
+    top: 50px;
+  }
+
+  .mat-form-field-flex {
+    align-items: flex-start !important;
+  }
+
+  .mat-form-field-infix {
+    border-top: 0.84375em solid transparent;
+  }
+  .mat-form-field-underline {
+    bottom: 0 !important;
+  }
+}

@@ -1,0 +1,46 @@
+<div mat-dialog-title>Assign Languages</div>
+
+<mat-dialog-content style="height: 100% !important;">
+  
+  <table [dataSource]="dataSource" mat-table matSort style="width: 100%;">
+
+    <ng-container matColumnDef="checkbox">
+      <th *matHeaderCellDef class="actions-cell" mat-header-cell ><input type="text" (input)="onFilterChange($event.target.value)" placeholder="search..."></th>
+      <td *matCellDef="let row" class="actions-cell" mat-cell>
+        <mat-checkbox
+          [color]="'accent'"
+          [(ngModel)]="row.selected"
+        >
+        </mat-checkbox>
+      </td>
+    </ng-container>
+
+    <ng-container matColumnDef="languageCode">
+      <th *matHeaderCellDef class="actions-cell" mat-header-cell>Language Code</th>
+      <td *matCellDef="let row" class="actions-cell" mat-cell>
+        {{row.languageCode}}
+      </td>
+    </ng-container>
+
+    <ng-container matColumnDef="languageName">
+      <th *matHeaderCellDef class="actions-cell" mat-header-cell>Language Name</th>
+      <td *matCellDef="let row" class="actions-cell" mat-cell>
+        {{row.languageName}}
+      </td>
+    </ng-container>
+
+
+    <tr *matHeaderRowDef="visibleColumns" mat-header-row></tr>
+      <tr *matRowDef="let row; columns: visibleColumns;"
+          class="clickable route-animations-elements"
+          mat-row></tr>
+  </table>
+
+<!-- <mat-paginator class="paginator" [pageSize]="pageSize"></mat-paginator> -->
+<!-- <mat-paginator #paginator [pageSize]="10" [pageSizeOptions]="[5, 10, 20]"></mat-paginator> -->
+</mat-dialog-content>
+
+<mat-dialog-actions fxLayout="row" fxLayoutAlign="end center">
+  <button mat-raised-button color="primary" (click)="Save()">SAVE</button>
+  <button mat-raised-button color="primary" (click)="CloseModal()">CLOSE</button>
+</mat-dialog-actions>

@@ -1,0 +1,14 @@
+<mat-form-field>
+    <mat-label>{{label}}</mat-label>
+    <input
+      matInput
+      [matDatepicker]="pickerTo"
+      (dateChange)="onValueChange($event)"
+      [formControl]="defaultValue"
+    />
+    <mat-datepicker-toggle
+      matSuffix
+      [for]="pickerTo"
+    ></mat-datepicker-toggle>
+    <mat-datepicker #pickerTo></mat-datepicker>
+  </mat-form-field>

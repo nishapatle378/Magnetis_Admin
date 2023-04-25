@@ -1,0 +1,280 @@
+<fury-page-layout mode="card" class="planner-view">
+    <fury-page-layout-header>
+      <form
+        [formGroup]="filterFormGroup"
+        [ngStyle]="{ 'margin-top': '7px' }"
+        (ngSubmit)="onClickSubmit(filterFormGroup.value)"
+      >
+        <div class="filter-area" fxFlex>
+          <div fxLayout="row" fxLayoutAlign="start">
+            <div fxFlex>
+              <mat-form-field>
+                <mat-label>Principal Name</mat-label>
+                <mat-select formControlName="PRINCIPAL_GUID">
+                  <mat-option>
+                    <ngx-mat-select-search
+                      formControlName="principal_Filter"
+                      [placeholderLabel]="'search...'"
+                      [noEntriesFoundLabel]="'no matching found!'"
+                    >
+                    </ngx-mat-select-search>
+                  </mat-option>
+  
+                  <mat-option
+                    *ngFor="let b of filtered_principal | async"
+                    [value]="b.COMPANY_GUID"
+                  >
+                    {{ b.COMPANY_NAME }}
+                  </mat-option>
+                </mat-select>
+              </mat-form-field>
+              <mat-form-field>
+                <mat-label>Vessel</mat-label>
+                <mat-select formControlName="VESSEL_GUID">
+                  <mat-option>
+                    <ngx-mat-select-search
+                      formControlName="vessel_Filter"
+                      [placeholderLabel]="'search...'"
+                      [noEntriesFoundLabel]="'no matching found!'"
+                    >
+                    </ngx-mat-select-search>
+                  </mat-option>
+  
+                  <mat-option
+                    *ngFor="let b of filtered_vessel | async"
+                    [value]="b.VESSEL_GUID"
+                  >
+                    {{ b.VESSEL_NAME }}
+                  </mat-option>
+                </mat-select>
+              </mat-form-field>
+            </div>
+            <div fxFlex>
+                <mat-form-field>
+                    <mat-label>Destination</mat-label>
+                    <mat-select formControlName="DESTINATION">
+                      <mat-option
+                        *ngFor="let b of filtered_destination | async"
+                        [value]="b.PARAMETER_GUID"
+                      >
+                        {{ b.PARAMETER_NAME }}
+                      </mat-option>
+                    </mat-select>
+                  </mat-form-field>
+            </div>
+            <div fxFlex>
+              <mat-form-field>
+                <mat-label>Date From</mat-label>
+                <input
+                  matInput
+                  formControlName="DATE_FROM"
+                  [matDatepicker]="pickerFrom"
+                />
+                <mat-datepicker-toggle
+                  matSuffix
+                  [for]="pickerFrom"
+                ></mat-datepicker-toggle>
+                <mat-datepicker #pickerFrom></mat-datepicker>
+              </mat-form-field>
+  
+              <mat-form-field>
+                <mat-label>Date To</mat-label>
+                <input
+                  matInput
+                  formControlName="DATE_TO"
+                  [matDatepicker]="pickerTo"
+                />
+                <mat-datepicker-toggle
+                  matSuffix
+                  [for]="pickerTo"
+                ></mat-datepicker-toggle>
+                <mat-datepicker #pickerTo></mat-datepicker>
+              </mat-form-field>
+            </div>
+  
+            <div class="filter-btn-area" fxFlex>
+              <div>
+                <button
+                  class="create"
+                  mat-raised-button
+                  color="primary"
+                  class="filter-btn"
+                >
+                  Search
+                </button>
+              </div>
+  
+              <div>
+                <button
+                  class="create"
+                  (click)="clearFilter()"
+                  mat-raised-button
+                  color="warn"
+                  class="filter-btn"
+                  type="button"
+                >
+                  Clear
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </form>
+    </fury-page-layout-header>
+  
+    <fury-page-layout-content [@fadeInUp] class="content-area">
+      <div #TABLE>
+          <div class="actions-area">
+              <div>
+                <span (click)="exportAsExcel()" style="cursor: pointer">
+                  <img
+                    src="../../../../assets/img/excel.png"
+                    class="logo"
+                    alt="excel"
+                  />
+                </span>
+              </div>
+            </div>
+        <div *ngIf="loading" class="content-loader">
+          <mat-progress-spinner
+            mode="indeterminate"
+            color="accent"
+          ></mat-progress-spinner>
+        </div>
+        <table [dataSource]="dataSource" mat-table matSort #table>
+            <ng-container matColumnDef="Log_Ref">
+              <th
+                *matHeaderCellDef
+                class="actions-cell"
+                mat-header-cell
+                mat-sort-header
+              >
+                REF
+              </th>
+              <td *matCellDef="let row" class="actions-cell" mat-cell>
+                <p class="tbl-row-item">
+                  {{ row.Log_Ref }}
+                </p>
+              </td>
+            </ng-container>
+            <ng-container matColumnDef="VESSEL_NAME">
+              <th
+                *matHeaderCellDef
+                class="actions-cell"
+                mat-header-cell
+                mat-sort-header
+              >
+                Vessel
+              </th>
+              <td *matCellDef="let row" class="actions-cell" mat-cell>
+                <p class="tbl-row-item">
+                  {{ row.VESSEL_NAME }}
+                </p>
+              </td>
+            </ng-container>
+    
+            <ng-container matColumnDef="Description_Name">
+              <th
+                *matHeaderCellDef
+                class="actions-cell"
+                mat-header-cell
+                mat-sort-header
+              >
+                Description
+              </th>
+              <td *matCellDef="let row" class="actions-cell" mat-cell>
+                <p class="tbl-row-item">
+                  {{ row.DESCRIPTION_NAME || row.Description}}
+                </p>
+              </td>
+            </ng-container>
+            <ng-container matColumnDef="Destination_Name">
+              <th
+                *matHeaderCellDef
+                class="actions-cell"
+                mat-header-cell
+                mat-sort-header
+              >
+                Destination
+              </th>
+              <td
+                *matCellDef="let row"
+                class="actions-cell datetime-class"
+                mat-cell
+              >
+                <p class="tbl-row-item">{{ row.DESTINATION_NAME  || row.Destination }}</p>
+              </td>
+            </ng-container>
+    
+            <ng-container matColumnDef="Remarks">
+              <th
+                *matHeaderCellDef
+                class="actions-cell"
+                mat-header-cell
+                mat-sort-header
+              >
+                Remarks
+              </th>
+              <td
+                *matCellDef="let row"
+                class="actions-cell datetime-class"
+                mat-cell
+              >
+                <p class="tbl-row-item">{{ row.Remarks }}</p>
+              </td>
+            </ng-container>
+            <ng-container matColumnDef="Status_GUID">
+              <th
+                *matHeaderCellDef
+                class="actions-cell"
+                mat-header-cell
+                mat-sort-header
+              >
+                Status
+              </th>
+              <td
+                *matCellDef="let row"
+                class="actions-cell datetime-class"
+                mat-cell
+              >
+                <p class="tbl-row-item">{{ row.STATUS_NAME || row.Status_GUID }}</p>
+              </td>
+            </ng-container>
+            <ng-container matColumnDef="Date_Closed">
+              <th
+                *matHeaderCellDef
+                class="actions-cell"
+                mat-header-cell
+                mat-sort-header
+              >
+                Date Closed
+              </th>
+              <td
+                *matCellDef="let row"
+                class="actions-cell datetime-class"
+                mat-cell
+              >
+                <p class="tbl-row-item">{{ row.Date_Recieved | date: "dd MMM YYYY" }}</p>
+              </td>
+            </ng-container>
+            <tr *matHeaderRowDef="visibleColumns" mat-header-row></tr>
+            <tr
+              *matRowDef="let row; columns: visibleColumns"
+              class="clickable route-animations-elements"
+              mat-row
+            ></tr>
+            <tr class="mat-row" *matNoDataRow>
+              <td class="mat-cell" colspan="9999">No data found</td>
+            </tr>
+          </table>
+      </div>
+  
+      <mat-paginator
+        class="paginator"
+        [pageSizeOptions]="[10, 25, 50, 100]"
+        [pageSize]="pageSize"
+      ></mat-paginator>
+      <!-- </fury-list> -->
+    </fury-page-layout-content>
+  </fury-page-layout>
+  

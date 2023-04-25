@@ -1,0 +1,236 @@
+.activity-report-view {
+  ::ng-deep.user-action-menu {
+    .mat-menu-content {
+      padding-top: 0px !important;
+      padding-bottom: 0px !important;
+    }
+
+    .mat-menu-item {
+      height: 35px !important;
+      line-height: 35px !important;
+    }
+  }
+
+  .filter-select {
+    margin-right: 10px;
+    margin-top: 22px;
+    border: none;
+    background: #f5f5f5;
+    height: 50px;
+    width: 125px;
+  }
+
+  .fury-list-table .mat-cell,
+  .fury-list-table .mat-header-cell {
+    white-space: nowrap;
+    padding-left: 12px;
+    padding-right: 3px;
+  }
+
+  th.mat-header-cell:first-of-type,
+  td.mat-cell:first-of-type,
+  td.mat-footer-cell:first-of-type {
+    padding-left: 10px;
+  }
+
+  .break-word {
+    overflow-wrap: break-word;
+  }
+
+  .tbl-sm {
+    margin-bottom: 20px;
+    background-color: rgb(255, 255, 255);
+    border-radius: 10px;
+    display: flex;
+    // justify-content: space-between;
+  }
+
+  .tbl-full {
+    margin-top: 30px;
+    padding-top: 20px;
+    padding-bottom: 20px;
+
+    background-color: rgb(255, 255, 255);
+    border-radius: 10px;
+    display: flex;
+    justify-content: space-between;
+  }
+
+  //Start custom styling for filter
+  .icon-display {
+    transform: scale(0.7);
+  }
+
+  .mat-icon-button {
+    width: 25px !important;
+  }
+
+  p.tbl-row-item {
+    font-size: 12px;
+    margin-top: 10px;
+    margin-bottom: 10px;
+  }
+
+  .filter-area {
+    background: #ffffff;
+    margin-top: 15px;
+    padding: 10px;
+    border-radius: 10px;
+    margin-bottom: 15px;
+    color: #252525;
+  }
+
+  table.mat-table {
+    width: 100%;
+  }
+
+  .fury-page-layout-header {
+    min-height: 136px;
+    height: auto;
+  }
+
+  .actions-area {
+    background: #fff;
+    border-top-right-radius: 10px;
+    border-top-left-radius: 10px;
+    padding: 10px;
+    // border-bottom: 2px solid #b2b2b2;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+  }
+
+  .actions-area2 {
+    background: #fff;
+    border-top-right-radius: 10px;
+    border-top-left-radius: 10px;
+    padding-bottom: 10px;
+    // border-bottom: 2px solid #b2b2b2;
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-end;
+  }
+
+  .img-icon {
+    border-radius: 50px;
+    height: 40px;
+    width: 40px;
+    overflow: hidden;
+    padding: 3px;
+    border: 0;
+  }
+
+  .mat-form-field-wrapper {
+    margin-right: 5px !important;
+    padding-bottom: 0px;
+  }
+
+  .filter-btn-area {
+    padding: 8px 0px;
+    display: flex;
+    flex-direction: row;
+    margin-bottom: 10px;
+  }
+
+  .filter-btn {
+    margin-right: 5px !important;
+  }
+
+  .mat-form-field-label-wrapper {
+    top: -0.35em;
+    padding-top: 0.84375em;
+  }
+
+  h1.filter-title {
+    color: #000;
+    margin: 0px;
+    padding: 0px;
+  }
+
+  .mat-form-field-appearance-outline .mat-select-arrow-wrapper {
+    transform: translateY(0%);
+  }
+
+  .logo {
+    height: 50px;
+    width: 50px;
+    margin-top: -3px;
+  }
+
+  .actions-area {
+    padding: 0px 20px;
+    border: 0 !important;
+  }
+
+  .grid_table {
+    border: 1px solid #e1e1e1 !important;
+    border-radius: 10px 10px 0px 0px;
+    overflow: hidden;
+  }
+
+  th.mat-header-cell:first-of-type,
+  td.mat-cell:first-of-type,
+  td.mat-footer-cell:first-of-type {
+    padding-left: 10px;
+  }
+
+  th.mat-header-cell:last-of-type,
+  td.mat-cell:last-of-type,
+  td.mat-footer-cell:last-of-type {
+    padding-right: 10px;
+  }
+
+  th.mat-header-cell {
+    background: #1976d2;
+  }
+
+  th.mat-header-cell {
+    background: #1976d2;
+    color: #fff;
+    font-size: 14px;
+  }
+
+
+  .filter-title {
+    color: #4b4870 !important;
+  }
+
+  .mat-form-field-underline {
+    bottom: 0 !important;
+  }
+
+  // .mat-form-field-appearance-fill .mat-select-arrow-wrapper {
+  //   transform: translateY(0%) !important;
+  // }
+  .mat-form-field {
+    margin-bottom: 10px;
+    width: 100%;
+  }
+
+  .mat-form-field-flex {
+    align-items: flex-start !important;
+  }
+
+  .mat-form-field-infix {
+    border-top: 0.84375em solid transparent;
+  }
+
+  .mat-form-field-label-wrapper {
+    top: -0.75em;
+    padding-top: 0.84375em;
+  }
+
+  .mat-form-field-wrapper {
+    margin-right: 5px !important;
+    padding-bottom: 0px;
+  }
+
+  element.style {
+    flex: 1 1 100%;
+    box-sizing: border-box;
+    max-width: 28%;
+    margin-top: 60px;
+  }
+
+
+}

@@ -1,0 +1,40 @@
+<div mat-dialog-title>Add Contents</div>
+
+<mat-dialog-content style="height: 100% !important;">
+  
+  <div *ngFor="let b of Contents; let i = index" [ngStyle]="{'padding': '10px','border': '1px dashed #d3d3d3', 'margin-bottom': '20px'}">
+
+    <div fxLayout="column" fxLayout.gt-sm="row"  fxLayoutGap="10px">
+
+      <div fxLayout="row" fxLayout.gt-sm="row">
+
+        <mat-icon fontSet="material-icons" color="primary" [ngStyle]="{'font-size': '30px', 'cursor': 'pointer', 'margin-right': '8px'}" *ngIf="Contents.length > 1" (click)="RemoveContent(b, i)">close</mat-icon>
+        <mat-icon fontSet="material-icons" color="primary" [ngStyle]="{'font-size': '30px', 'cursor': 'pointer'}" *ngIf="i == Contents.length-1" (click)="AddContent()">library_add</mat-icon>
+  
+      </div>
+
+      <mat-form-field appearance="outline" fxFlex>
+        <mat-label>Media</mat-label>
+        <mat-select [(ngModel)]="b.contentID">   
+            <mat-option *ngFor="let m of MediaList" [value]="m.contentID">
+                {{m.contentName}}
+            </mat-option>
+        </mat-select>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" fxFlex>
+      <mat-label>Play Sequence</mat-label>
+      <input type="text" [(ngModel)]="b.playSequence" matInput>
+    </mat-form-field>
+
+    </div>
+    
+
+  </div>
+
+</mat-dialog-content>
+
+<mat-dialog-actions fxLayout="row" fxLayoutAlign="end center">
+  <button mat-raised-button color="primary" (click)="Save()">SAVE</button>
+  <button mat-raised-button color="primary" (click)="CloseModal()">CLOSE</button>
+</mat-dialog-actions>

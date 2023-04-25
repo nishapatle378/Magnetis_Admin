@@ -1,0 +1,238 @@
+<div mat-dialog-title>{{ IsEdit ? "Edit" : "Add" }} Boat Logs</div>
+<mat-dialog-content style="height: 100% !important" class="add-boat-modal">
+  <form [formGroup]="boatForm" [ngStyle]="{ 'margin-top': '7px' }">
+    <div fxLayout.gt-sm="row" fxLayoutGap.gt-sm="24px">
+      <mat-form-field fxFlex class="two-divide">
+        <mat-label>Megentis ref number</mat-label>
+        <mat-select formControlName="Planner_GUID">
+          <mat-option>
+            <ngx-mat-select-search
+              formControlName="planner_Filter"
+              [placeholderLabel]="'search...'"
+              [noEntriesFoundLabel]="'no matching found!'"
+            >
+            </ngx-mat-select-search>
+          </mat-option>
+          <mat-option
+            *ngFor="let b of filtered_planner | async"
+            [value]="b.GUID"
+          >
+          {{ b.REF_NUM }} - {{b.VESSEL_NAME}} - {{(b.VESSEL_ACTUAL_ARR ? b.VESSEL_ACTUAL_ARR : b.VESSEL_ETA) | date:"dd MMM YYYY"}}
+          </mat-option>
+        </mat-select>
+        <mat-error *ngIf="boatForm.get('Planner_GUID').hasError('required')"
+          >Megentis ref number is required</mat-error
+        >
+      </mat-form-field>
+      <mat-form-field fxFlex>
+        <mat-label>Vessel Name</mat-label>
+        <mat-select formControlName="Vessel_GUID">
+          <mat-option
+            *ngFor="let b of filtered_vessel | async"
+            [value]="b.VESSEL_GUID"
+          >
+            {{ b.VESSEL_NAME }}
+          </mat-option>
+        </mat-select>
+        <mat-error *ngIf="boatForm.get('Vessel_GUID').hasError('required')"
+          >Vessel Name is required</mat-error
+        >
+      </mat-form-field>
+    </div>
+
+    <div fxLayout.gt-sm="row" fxLayoutGap.gt-sm="24px">
+      <mat-form-field fxFlex>
+        <mat-label>Type</mat-label>
+        <mat-select formControlName="Boat_Type_GUID">
+          <mat-option *ngFor="let b of types" [value]="b.PARAMETER_GUID">
+            {{ b.PARAMETER_NAME }}
+          </mat-option>
+        </mat-select>
+        <mat-error *ngIf="boatForm.get('Boat_Type_GUID').hasError('required')"
+          >Type is required</mat-error
+        >
+      </mat-form-field>
+      <mat-form-field fxFlex>
+        <mat-label>Vendor</mat-label>
+        <mat-select formControlName="Boat_Vendor_GUID">
+          <mat-option
+            *ngFor="let b of filtered_vendor | async"
+            [value]="b.Vendor_GUID"
+          >
+            {{ b.Vendor_Name }}
+          </mat-option>
+        </mat-select>
+        <mat-error *ngIf="boatForm.get('Boat_Vendor_GUID').hasError('required')"
+          >Vendor is required</mat-error
+        >
+      </mat-form-field>
+    </div>
+    <div fxLayout.gt-sm="row" fxLayoutGap.gt-sm="24px">
+      <mat-form-field fxFlex>
+        <mat-label>Boat Date</mat-label>
+        <input
+          matInput
+          formControlName="Boat_Date"
+          placeholder="DD MMM YYYY HH:mm"
+          (keyup)="validateDate($event, 'Boat_Date')"
+        />
+        <mat-hint>DD MMM YYYY HH:mm</mat-hint>
+        <mat-error *ngIf="boatForm.get('Boat_Date').hasError('incorrect')"
+          >You have entered incorrect date
+        </mat-error>
+      </mat-form-field>
+    </div>
+
+    <div fxLayout.gt-sm="row" fxLayoutGap.gt-sm="24px">
+      <mat-form-field fxFlex>
+        <mat-label>From</mat-label>
+        <mat-select formControlName="Boat_From_GUID">
+          <mat-option
+            *ngFor="let b of filtered_from | async"
+            [value]="b.PARAMETER_GUID"
+          >
+            {{ b.PARAMETER_NAME }}
+          </mat-option>
+        </mat-select>
+        <mat-error *ngIf="boatForm.get('Boat_From_GUID').hasError('required')"
+          >From is required</mat-error
+        >
+      </mat-form-field>
+      <mat-form-field fxFlex>
+        <mat-label>To</mat-label>
+        <mat-select formControlName="Boat_To_GUID">
+          <mat-option
+            *ngFor="let b of filtered_to | async"
+            [value]="b.PARAMETER_GUID"
+          >
+            {{ b.PARAMETER_NAME }}
+          </mat-option>
+        </mat-select>
+        <mat-error *ngIf="boatForm.get('Boat_To_GUID').hasError('required')"
+          >To is required</mat-error
+        >
+      </mat-form-field>
+    </div>
+    <div style="margin-bottom: 20px">
+      <mat-label>Trip Type</mat-label>
+      <mat-radio-group
+        fxLayout="row"
+        fxLayoutGap="16px"
+        formControlName="Trip_Type"
+      >
+        <mat-radio-button
+          value="one-way"
+          [checked]="boatForm.get('Trip_Type').value == 'one-way'"
+          >One-Way</mat-radio-button
+        >
+        <mat-radio-button
+          value="round-trip"
+          [checked]="boatForm.get('Trip_Type').value == 'round-trip'"
+          [disabled]="isDisabled"
+          >Round-Trip</mat-radio-button
+        >
+      </mat-radio-group>
+    </div>
+    <div
+      fxLayout="column"
+      fxLayout.gt-sm="row"
+      fxLayoutGap.gt-sm="24px"
+      [ngStyle]="{ 'margin-bottom': '10px' }"
+    >
+      <mat-form-field fxFlex>
+        <mat-label>Along Side</mat-label>
+        <input
+          matInput
+          placeholder="HH:MM"
+          (keyup)="formatTime($event)"
+          formControlName="Boat_Alongside"
+        />
+      </mat-form-field>
+
+      <mat-form-field fxFlex>
+        <mat-label>Cast Off</mat-label>
+        <input
+          matInput
+          placeholder="HH:MM"
+          (keyup)="formatTime($event)"
+          formControlName="Boat_Cast_Off"
+        />
+      </mat-form-field>
+    </div>
+
+    <div fxLayout="column" fxLayout.gt-sm="row" fxLayoutGap.gt-sm="24px">
+      <mat-form-field fxFlex>
+        <mat-label>Currency</mat-label>
+        <mat-select formControlName="Currency_GUID">
+          <mat-option
+            *ngFor="let b of filtered_currency | async"
+            [value]="b.CURRENCY_GUID"
+          >
+            {{ b.SHORT_CODE }}
+          </mat-option>
+        </mat-select>
+        <mat-error *ngIf="boatForm.get('Currency_GUID').hasError('required')"
+          >Currency is required</mat-error
+        >
+      </mat-form-field>
+      <mat-form-field fxFlex class="two-divide">
+        <mat-label>Amount</mat-label>
+        <input
+          matInput
+          formControlName="Boat_RATE"
+          (keypress)="validateNo($event)"
+          class="right-text"
+        />
+        <mat-error *ngIf="boatForm.get('Boat_RATE').hasError('required')"
+          >Amount is required</mat-error
+        >
+      </mat-form-field>
+    </div>
+
+    <div fxLayout="column" fxLayout.gt-sm="row" fxLayoutGap.gt-sm="24px">
+      <mat-form-field fxFlex class="two-divide">
+        <mat-label>Remarks</mat-label>
+        <textarea
+          type="text"
+          formControlName="Remarks"
+          rows="3"
+          cols="3"
+          matInput
+        ></textarea>
+        <mat-error *ngIf="boatForm.get('Remarks').hasError('required')"
+          >REMARKS is required</mat-error
+        >
+      </mat-form-field>
+    </div>
+    <div
+      fxLayout="column"
+      fxLayout.gt-sm="row"
+      fxLayoutGap.gt-sm="24px"
+      *ngIf="ErrorMessage"
+    >
+      <h6 style="color: #ff0000">{{ ErrorMessage }}</h6>
+    </div>
+  </form>
+</mat-dialog-content>
+<mat-dialog-actions fxLayout="row" fxLayoutAlign="end center">
+  <button
+    *ngIf="!ReadOnly"
+    mat-raised-button
+    color="primary"
+    [ngClass]="[!boatForm.valid ? '' : 'save-btn']"
+    (click)="saveBoatLog(true)"
+    [disabled]="!boatForm.valid"
+  >
+    SAVE & ADD NEW
+  </button>
+  <button
+    mat-raised-button
+    color="primary"
+    [ngClass]="[!boatForm.valid ? '' : 'save-btn']"
+    (click)="saveBoatLog()"
+    [disabled]="!boatForm.valid"
+  >
+    SAVE
+  </button>
+  <button mat-raised-button color="warn" (click)="CloseModal()">CLOSE</button>
+</mat-dialog-actions>

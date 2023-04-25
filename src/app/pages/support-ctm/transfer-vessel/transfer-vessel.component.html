@@ -1,0 +1,31 @@
+<div mat-dialog-title>{{IsEdit? 'Edit': 'Add'}} CTM</div>
+
+<mat-dialog-content style="height: 100% !important;" class="transfer-vessel">
+    <form [formGroup]="form" [ngStyle]="{'margin-top': '7px'}" class="crew-form">
+      <div class="top-section1">
+        <mat-form-field appearance="outline" fxFlex class="two-divide">
+          <mat-label>Select a Planner</mat-label>
+          <mat-select formControlName="Planner_GUID" placeholder="Please Magentis ref number">
+            <mat-option *ngFor="let b of filtered_planner | async" [value]="b.GUID">
+              {{b.REF_NUM}}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+      </div>
+      <div fxLayout="column" fxLayout.gt-sm="row" fxLayoutGap.gt-sm="24px">
+          <mat-label>Vessel Name</mat-label>
+          <div class="text-value">{{form.value.Vessel_Name}}</div>
+      </div>
+      <div fxLayout="column" fxLayout.gt-sm="row" fxLayoutGap.gt-sm="24px">
+          <mat-label>Port Name</mat-label>
+          <div class="text-value">{{form.value.Port_Name}}</div>
+      </div>
+      <div fxLayout="column" fxLayout.gt-sm="row" fxLayoutGap.gt-sm="24px" *ngIf="ErrorMessage">
+        <h6 style="color: #ff0000;">{{ErrorMessage}}</h6>
+    </div>
+      </form>
+</mat-dialog-content>
+<mat-dialog-actions fxLayout="row" fxLayoutAlign="end center">
+    <button mat-raised-button color="primary" (click)="TransferToVessel()" class="save-btn" [disabled]="!form.valid">Transfer To Vessel</button>
+    <button mat-raised-button color="warn" (click)="CloseModal()">CLOSE</button>
+  </mat-dialog-actions>    

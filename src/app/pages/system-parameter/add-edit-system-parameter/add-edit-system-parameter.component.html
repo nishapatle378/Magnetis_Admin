@@ -1,0 +1,87 @@
+<div mat-dialog-title>{{title}}</div>
+
+<mat-dialog-content style="height: 100% !important;">
+
+
+    <form [formGroup]="firstFormGroup" [ngStyle]="{'margin-top': '7px'}">
+
+        <div fxLayout="column" fxLayout.gt-sm="row" fxLayoutGap.gt-sm="24px">
+  
+            <mat-form-field  [ngStyle]="{'margin-top': '7px'}" fxFlex>
+                <mat-label>Sort Order</mat-label>
+                <!-- <mat-select>
+                    <mat-option value="1">1</mat-option>
+                </mat-select> -->
+
+                <input type="text" formControlName="SORT_ORDER" maxlength="2" (input)="ValidNumberInput('SORT_ORDER', $event.target.value)" matInput>
+                <mat-error *ngIf="firstFormGroup.get('SORT_ORDER').hasError('required')">Sort order is required</mat-error>
+            </mat-form-field>
+
+        </div>
+        
+        <div fxLayout="column" fxLayout.gt-sm="row" [ngStyle]="{'margin-top': '7px'}" fxLayoutGap.gt-sm="24px">
+
+            <mat-form-field  fxFlex>
+                <mat-label>Parameter Short Name</mat-label>
+                <input type="text" formControlName="PARAMETER_SHORT_NAME" maxlength="5" matInput>
+                <mat-error *ngIf="firstFormGroup.get('PARAMETER_SHORT_NAME').hasError('required')">Parameter short name is required</mat-error>
+            </mat-form-field>
+
+        </div>
+
+        <div fxLayout="column" fxLayout.gt-sm="row" [ngStyle]="{'margin-top': '7px'}" fxLayoutGap.gt-sm="24px">
+
+            <mat-form-field  fxFlex>
+                <mat-label>Parameter Name</mat-label>
+                <input type="text" formControlName="PARAMETER_NAME" maxlength="250" matInput>
+                <mat-error *ngIf="firstFormGroup.get('PARAMETER_NAME').hasError('required')">Parameter name is required</mat-error>
+            </mat-form-field>
+
+        </div>
+
+
+        <div fxLayout="column" fxLayout.gt-sm="row" [ngStyle]="{'margin-top': '7px'}" fxLayoutGap.gt-sm="24px" *ngIf="type != 'module'">
+            <mat-form-field  fxFlex class="readonly-wrapper">
+              <mat-label>Parent System Parameter</mat-label>
+              <mat-select formControlName="PARENT_GUID" class="readonly-block">
+                <mat-option>
+                  <ngx-mat-select-search 
+                    formControlName="sp_Filter"
+                    [placeholderLabel]="'search...'"
+                    [noEntriesFoundLabel]="'no matching found!'"
+                  >
+                  </ngx-mat-select-search>
+                </mat-option>   
+                                            
+                <mat-option *ngFor="let b of filtered_sp | async" [value]="b.PARAMETER_GUID">
+                  {{b.PARAMETER_NAME}}
+                </mat-option>
+              </mat-select>
+              <mat-error *ngIf="firstFormGroup.get('PARENT_GUID').hasError('required')">Parent parameter is required</mat-error>
+            </mat-form-field>
+          </div>
+
+        <div fxLayout="column" fxLayout.gt-sm="row" [ngStyle]="{'margin-top': '7px'}" fxLayoutGap.gt-sm="24px">
+  
+            <mat-form-field  fxFlex>
+                <mat-label>Parameter Remarks</mat-label>
+                <textarea type="text" formControlName="PARAMETER_REMARKS" rows="3" maxlength="4000" matInput></textarea>
+                <mat-error *ngIf="firstFormGroup.get('PARAMETER_REMARKS').hasError('required')">Parameter remarks is required</mat-error>
+            </mat-form-field>
+
+        </div>
+        
+
+
+        <div fxLayout="column" fxLayout.gt-sm="row" [ngStyle]="{'margin-top': '7px'}" fxLayoutGap.gt-sm="24px" *ngIf="ErrorMessage">
+            <h6 style="color: #ff0000;">{{ErrorMessage}}</h6>
+        </div>
+
+    </form>
+
+</mat-dialog-content>
+<mat-dialog-actions fxLayout="row" fxLayoutAlign="end center">
+  <button mat-raised-button color="primary" (click)="SaveData()" class="save-btn" [disabled]="!firstFormGroup.valid && !IsEdit">SAVE</button>
+  <button mat-raised-button color="warn" (click)="CloseModal()">CLOSE</button>
+</mat-dialog-actions>
+

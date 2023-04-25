@@ -1,0 +1,82 @@
+::ng-deep.user-action-menu {
+  .mat-menu-content {
+    padding-top: 0px !important;
+    padding-bottom: 0px !important;
+  }
+
+  .mat-menu-item {
+    height: 35px !important;
+    line-height: 35px !important;
+  }
+}
+
+.main-container-table {
+  max-height: 700px;
+  overflow-x: scroll;
+}
+
+.mat-header-row {
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+}
+
+.filter-select {
+  margin-right: 10px;
+  border: none;
+  background: #F5F5F5;
+  height: 41px;
+  width: 100px;
+}
+
+.fury-default fury-list .mat-header-row {
+  background: #eee;
+}
+
+.mat-header-cell {
+  font-size: 14px;
+}
+
+
+//Start custom styling for filter
+.icon-display {
+  transform: scale(0.7);
+}
+
+p.tbl-row-item {
+  font-size: 12px;
+  margin-top: 10px;
+  margin-bottom: 10px;
+}
+
+.logo {
+  height: 50px;
+  width: 50px;
+  margin-top: -3px;
+}
+
+.actions-area {
+  background: #fff;
+  border-top-right-radius: 10px;
+  border-top-left-radius: 10px;
+  padding: 10px;
+  border-bottom: 2px solid #b2b2b2;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
+
+.mat-table {
+  border-spacing: 0;
+  width: 100%;
+}
+
+tr.mat-header-row {
+  height: 56px;
+  background-color: #1976D2;
+}
+
+th.mat-header-cell {
+  text-align: left;
+  color: white;
+}

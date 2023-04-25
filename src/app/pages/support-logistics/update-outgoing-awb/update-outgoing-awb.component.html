@@ -1,0 +1,147 @@
+<div mat-dialog-title>Update outgoing AWB</div>
+
+<mat-dialog-content style="height: 100% !important" class="logistic-dialog">
+  <form
+    [formGroup]="logisticsForm"
+    [ngStyle]="{ 'margin-top': '7px' }"
+    class="logistic-form"
+  >
+    <div class="table-out-section">
+      <div fxLayout="column" fxLayout.gt-sm="row" fxLayoutGap.gt-sm="24px">
+        <mat-form-field fxFlex>
+          <mat-label>Outgoing Courier</mat-label>
+          <mat-select formControlName="Outgoing_Courier" placeholder="">
+            <mat-option>
+              <ngx-mat-select-search
+                formControlName="out_courier_Filter"
+                [placeholderLabel]="'search...'"
+                [noEntriesFoundLabel]="'no matching found!'"
+              >
+              </ngx-mat-select-search>
+            </mat-option>
+            <mat-option
+              *ngFor="let b of filtered_courier | async"
+              [value]="b.PARAMETER_GUID"
+            >
+              {{ b.PARAMETER_NAME }}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+        <mat-form-field fxFlex>
+          <mat-label>Outgoing AWB</mat-label>
+          <input type="text" formControlName="Outgoing_AWB" matInput />
+        </mat-form-field>
+      </div>
+
+      <div fxLayout="column" fxLayout.gt-sm="row" fxLayoutGap.gt-sm="24px">
+        <mat-form-field fxFlex>
+          <mat-label>Date Of Dispatch</mat-label>
+          <input
+            matInput
+            [matDatepicker]="Date_Of_Dispatch"
+            formControlName="Date_Of_Dispatch"
+          />
+          <mat-datepicker-toggle
+            matSuffix
+            [for]="Date_Of_Dispatch"
+          ></mat-datepicker-toggle>
+          <mat-datepicker #Date_Of_Dispatch></mat-datepicker>
+        </mat-form-field>
+      </div>
+      <div fxLayout="column" fxLayout.gt-sm="row" fxLayoutGap.gt-sm="24px">
+        <mat-form-field fxFlex>
+          <mat-label>Currency</mat-label>
+          <mat-select formControlName="Currency">
+            <mat-option
+              *ngFor="let b of filtered_currency | async"
+              [value]="b.CURRENCY_GUID"
+            >
+              {{ b.SHORT_CODE }}
+            </mat-option>
+          </mat-select>
+          <mat-error *ngIf="logisticsForm.get('Currency').hasError('required')"
+            >Currency is required</mat-error
+          >
+        </mat-form-field>
+        <mat-form-field fxFlex>
+          <mat-label>Amount</mat-label>
+          <input type="text" formControlName="Amount" matInput />
+        </mat-form-field>
+      </div>
+      <div fxLayout="column" fxLayout.gt-sm="row" fxLayoutGap.gt-sm="24px">
+        <div fxLayout="column" fxLayout.gt-sm="row" fxLayoutGap.gt-sm="24px">
+          <label class="drop-label"> Upload Outgoing Attachment : </label>
+          <div
+            *ngIf="logisticsForm.value.Outgoing_Attachment"
+            class="file-visible"
+          >
+            <mat-icon [matTooltip]="logisticsForm.value.Outgoing_Attachment"
+              >attach_file</mat-icon
+            ><a href="javascript:void(0)" (click)="fileDelete()"
+              ><mat-icon>delete</mat-icon></a
+            >
+          </div>
+          <div
+            *ngIf="!logisticsForm.value.Outgoing_Attachment"
+            class="container"
+          >
+            <button type="button" mat-raised-button>
+              <label class="drop-label" for="uploadFile1"> Upload File</label>
+            </button>
+
+            <input
+              type="file"
+              id="uploadFile1"
+              style="opacity: 0"
+              (change)="uploadFileEvt($event)"
+              name="uploadFile"
+              accept="image/*"
+            />
+          </div>
+        </div>
+      </div>
+
+      <div fxLayout="column" fxLayout.gt-sm="row" fxLayoutGap.gt-sm="24px">
+        <mat-form-field fxFlex class="two-divide">
+          <mat-label>Outgoing Remarks (will be appended to existing remarks)</mat-label>
+          <textarea
+            rows="3"
+            formControlName="Outgoing_Remark"
+            matInput
+          ></textarea>
+        </mat-form-field>
+      </div>
+      <div style="margin-bottom: 20px">
+        <mat-radio-group
+          fxLayout="row"
+          fxLayoutGap="16px"
+          formControlName="Billable"
+        >
+          <mat-label>Billable</mat-label>
+          <mat-radio-button
+            value="1"
+            [checked]="logisticsForm.get('Billable').value == 1"
+            >Yes</mat-radio-button
+          >
+          <mat-radio-button
+            value="0"
+            [checked]="logisticsForm.get('Billable').value == 0"
+            >No</mat-radio-button
+          >
+        </mat-radio-group>
+      </div>
+    </div>
+  </form>
+</mat-dialog-content>
+<mat-dialog-actions fxLayout="row" fxLayoutAlign="end center">
+  <button
+    mat-raised-button
+    color="primary"
+    (click)="SaveLogistics(logisticsForm.value)"
+    class="save-btn"
+    [disabled]="!logisticsForm.valid"
+  >
+    PROCEED
+  </button>
+  <button mat-raised-button color="warn" (click)="CloseModal()">CLOSE</button>
+</mat-dialog-actions>

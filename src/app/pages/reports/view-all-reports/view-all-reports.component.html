@@ -1,0 +1,344 @@
+<fury-page-layout mode="card" class="view-all-report">
+  <fury-page-layout-header>
+    <!-- <fury-breadcrumbs [@fadeInRight] current="Reports"></fury-breadcrumbs> -->
+    <form
+      [formGroup]="filterFormGroup"
+      [ngStyle]="{ 'margin-top': '7px' }"
+      (ngSubmit)="onClickSubmit(filterFormGroup.value)"
+    >
+      <div class="filter-area" fxFlex>
+        <!-- <h1 class="filter-title title">FILTER</h1> -->
+        <div fxLayout="row" fxLayoutAlign="start">
+          <div class="input-container">
+            <div fxFlex>
+              <mat-form-field>
+                <mat-label>Vessel ETA From</mat-label>
+                <input
+                  matInput
+                  formControlName="ETA_FROM"
+                  [matDatepicker]="pickerFrom"
+                />
+                <mat-datepicker-toggle
+                  matSuffix
+                  [for]="pickerFrom"
+                ></mat-datepicker-toggle>
+                <mat-datepicker #pickerFrom></mat-datepicker>
+              </mat-form-field>
+  
+              <mat-form-field>
+                <mat-label>Vessel ETA To</mat-label>
+                <input
+                  matInput
+                  formControlName="ETA_TO"
+                  [matDatepicker]="pickerTo"
+                />
+                <mat-datepicker-toggle
+                  matSuffix
+                  [for]="pickerTo"
+                ></mat-datepicker-toggle>
+                <mat-datepicker #pickerTo></mat-datepicker>
+              </mat-form-field>
+            </div>
+            <mat-form-field>
+              <mat-label>Principal Name</mat-label>
+              <mat-select formControlName="PRINCIPAL_GUID">
+                <mat-option>
+                  <ngx-mat-select-search
+                    formControlName="principal_Filter"
+                    [placeholderLabel]="'search...'"
+                    [noEntriesFoundLabel]="'no matching found!'"
+                  >
+                  </ngx-mat-select-search>
+                </mat-option>
+
+                <mat-option
+                  *ngFor="let b of filtered_principal | async"
+                  [value]="b.COMPANY_GUID"
+                >
+                  {{ b.COMPANY_NAME }}
+                </mat-option>
+              </mat-select>
+            </mat-form-field>
+          </div>
+
+          <div class="filter-btn-area">
+            <button
+              class="create"
+              mat-raised-button
+              color="primary"
+              class="filter-btn"
+            >
+              Search
+            </button>
+            <button
+              class="create"
+              (click)="clearFilter()"
+              mat-raised-button
+              color="warn"
+              class="filter-btn"
+              type="button"
+            >
+              Clear
+            </button>
+          </div>
+        </div>
+      </div>
+    </form>
+  </fury-page-layout-header>
+
+  <fury-page-layout-content [@fadeInUp]>
+    <!--  fxLayoutAlign="end center" -->
+    <div class="tbl-full" fxLayout="row" fxLayoutAlign="space-around">
+      <div fxFlex="48" #TABLE1>
+        <div class="actions-area">
+          <div class="tbl-sm" fxLayout="row" fxLayoutAlign="space-between">
+            <div>
+              <h2>AT PORT</h2>
+            </div>
+            <div class="tbl-sms">
+              <div>
+                <span class="create" (click)="sendReport(1)">
+                  <button mat-mini-fab color="primary">
+                    <mat-icon>email</mat-icon>
+                  </button>
+                </span>
+              </div>
+              <div>
+                <span
+                  (click)="exportAsExcel(1)"
+                  style="cursor: pointer"
+                  *ngIf="
+                    authGuard.checkPermission(
+                      'oPk6Fh2BP24443f12-see42ee',
+                      'export'
+                    )
+                  "
+                >
+                  <img src="../../../../assets/img/excel.png" class="logo" />
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <table
+          [dataSource]="dataSourceAtPort"
+          mat-table
+          matSort
+          #table1
+          class="grid_table"
+          (matSortChange)="sortDataAtPort($event)"
+        >
+          <ng-container matColumnDef="VESSEL_NAME">
+            <th *matHeaderCellDef class="actions-cell" mat-header-cell>
+              Vessel Name
+            </th>
+            <td *matCellDef="let row" class="actions-cell" mat-cell>
+              {{ row.VESSEL_NAME }}
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="VESSEL_TYPE">
+            <th *matHeaderCellDef class="actions-cell" mat-header-cell>
+              Vessel Type
+            </th>
+            <td *matCellDef="let row" class="actions-cell" mat-cell>
+              {{ row.VESSEL_TYPE_NAME }}
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="VESSEL_ACTUAL_ARR">
+            <th
+              *matHeaderCellDef
+              class="actions-cell"
+              mat-header-cell
+              mat-sort-header
+            >
+              Actual Arrival
+            </th>
+            <td *matCellDef="let row" class="actions-cell" mat-cell>
+              {{ row.VESSEL_ACTUAL_ARR | date: "dd MMM yyyy" }}
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="VESSEL_ETD">
+            <th
+              *matHeaderCellDef
+              class="actions-cell"
+              mat-header-cell
+              mat-sort-header
+            >
+              <div
+                style="
+                  align-items: baseline !important;
+                  display: flex;
+                  justify-content: space-between;
+                "
+              >
+                <div>ETD</div>
+              </div>
+            </th>
+            <td *matCellDef="let row" class="actions-cell" mat-cell>
+              {{ row.VESSEL_ETD | date: "dd MMM yyyy" }}
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="AGENT_GUID">
+            <th *matHeaderCellDef class="actions-cell" mat-header-cell>
+              <div
+                style="
+                  align-items: baseline !important;
+                  display: flex;
+                  justify-content: space-between;
+                "
+              >
+                <div>PIC</div>
+              </div>
+            </th>
+            <td *matCellDef="let row" class="actions-cell" mat-cell>
+              {{ row.USER_FIRST_NAME }} {{ row.USER_LAST_NAME }}
+              {{ row.USER_MIDDLE_NAME }}
+            </td>
+          </ng-container>
+
+          <tr *matHeaderRowDef="visibleColumns" mat-header-row></tr>
+          <tr
+            *matRowDef="let row; columns: visibleColumns"
+            class="clickable route-animations-elements"
+            mat-row
+          ></tr>
+          <tr class="mat-row" *matNoDataRow>
+            <td class="mat-cell" colspan="9999">No data found</td>
+          </tr>
+        </table>
+
+        <mat-paginator
+          #firstPaginator
+          class="paginator"
+          [pageSizeOptions]="[10, 25, 50, 100]"
+          [pageSize]="pageSize"
+        ></mat-paginator>
+      </div>
+
+      <div fxFlex="48" #TABLE2>
+        <div class="actions-area">
+          <div class="tbl-sm" fxLayout="row" fxLayoutAlign="space-between">
+            <div>
+              <h2>TO ARRIVE</h2>
+            </div>
+            <div class="tbl-sms">
+              <div>
+                <span class="create" (click)="sendReport(2)">
+                  <button mat-mini-fab color="primary">
+                    <mat-icon>email</mat-icon>
+                  </button>
+                </span>
+              </div>
+              <div>
+                <span (click)="exportAsExcel(2)" style="cursor: pointer">
+                  <img src="../../../../assets/img/excel.png" class="logo" />
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <table
+          [dataSource]="dataSourceToArrive"
+          mat-table
+          matSort
+          #table2
+          class="grid_table"
+          (matSortChange)="sortDataToArrive($event)"
+        >
+          <ng-container matColumnDef="VESSEL_NAME">
+            <th *matHeaderCellDef class="actions-cell" mat-header-cell>
+              Vessel Name
+            </th>
+            <td *matCellDef="let row" class="actions-cell" mat-cell>
+              {{ row.VESSEL_NAME }}
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="VESSEL_TYPE">
+            <th *matHeaderCellDef class="actions-cell" mat-header-cell>
+              Vessel Type
+            </th>
+            <td *matCellDef="let row" class="actions-cell" mat-cell>
+              {{ row.VESSEL_TYPE_NAME }}
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="VESSEL_ETA">
+            <th
+              *matHeaderCellDef
+              class="actions-cell"
+              mat-header-cell
+              mat-sort-header
+            >
+              ETA
+            </th>
+            <td *matCellDef="let row" class="actions-cell" mat-cell>
+              {{ row.VESSEL_ETA | date: "dd MMM yyyy" }}
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="VESSEL_ETD">
+            <th
+              *matHeaderCellDef
+              class="actions-cell"
+              mat-header-cell
+              mat-sort-header
+            >
+              <div
+                style="
+                  align-items: baseline !important;
+                  display: flex;
+                  justify-content: space-between;
+                "
+              >
+                <div>ETD</div>
+              </div>
+            </th>
+            <td *matCellDef="let row" class="actions-cell" mat-cell>
+              {{ row.VESSEL_ETD | date: "dd MMM yyyy" }}
+            </td>
+          </ng-container>
+          <ng-container matColumnDef="AGENT_GUID">
+            <th *matHeaderCellDef class="actions-cell" mat-header-cell>
+              <div
+                style="
+                  align-items: baseline !important;
+                  display: flex;
+                  justify-content: space-between;
+                "
+              >
+                <div>PIC</div>
+              </div>
+            </th>
+            <td *matCellDef="let row" class="actions-cell" mat-cell>
+              {{ row.USER_FIRST_NAME }} {{ row.USER_LAST_NAME }}
+              {{ row.USER_MIDDLE_NAME }}
+            </td>
+          </ng-container>
+
+          <tr *matHeaderRowDef="visibleColumns2" mat-header-row></tr>
+          <tr
+            *matRowDef="let row; columns: visibleColumns2"
+            class="clickable route-animations-elements"
+            mat-row
+          ></tr>
+          <tr class="mat-row" *matNoDataRow>
+            <td class="mat-cell" colspan="9999">No data found</td>
+          </tr>
+        </table>
+        <mat-paginator
+          #secondPaginator
+          class="paginator"
+          [pageSizeOptions]="[10, 25, 50, 100]"
+          [pageSize]="pageSize"
+        ></mat-paginator>
+      </div>
+    </div>
+  </fury-page-layout-content>
+</fury-page-layout>

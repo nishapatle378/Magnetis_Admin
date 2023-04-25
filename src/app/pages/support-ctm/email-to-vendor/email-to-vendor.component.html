@@ -1,0 +1,56 @@
+<div mat-dialog-title>Vendor To Email</div>
+
+<mat-dialog-content style="height: 100% !important" class="email-vendor">
+  <form [formGroup]="firstFormGroup" [ngStyle]="{ 'margin-top': '7px' }">
+    <div fxLayout="column" fxLayout.gt-sm="row" fxLayoutGap.gt-sm="24px">
+      <mat-form-field fxFlex>
+        <mat-label class="left-label">Email To</mat-label>
+        <input type="text" formControlName="mail_to" matInput />
+        <mat-error *ngIf="firstFormGroup.get('mail_to').hasError('required')"
+          >Email To is required</mat-error
+        >
+      </mat-form-field>
+    </div>
+    <div fxLayout="column" fxLayout.gt-sm="row" fxLayoutGap.gt-sm="24px">
+      
+      <mat-form-field fxFlex>
+        <mat-label class="left-label">Subject</mat-label>
+        <input type="text" formControlName="subject" matInput />
+        <mat-error *ngIf="firstFormGroup.get('subject').hasError('required')"
+          >Email Subject is required</mat-error
+        >
+      </mat-form-field>
+    </div>
+    <div fxLayout="column" fxLayout.gt-sm="row" fxLayoutGap.gt-sm="24px">
+      <quill-editor
+        [styles]="{ height: '200px' }"
+        id="textEditor"
+        (onEditorCreated)="created($event)"
+        (onContentChanged)="contentChanged($event)"
+      >
+      </quill-editor>
+    </div>
+    <div
+      fxLayout="column"
+      fxLayout.gt-sm="row"
+      fxLayoutGap.gt-sm="24px"
+      *ngIf="ErrorMessage"
+    >
+      <h6 style="color: #ff0000">{{ ErrorMessage }}</h6>
+    </div>
+  </form>
+   
+</mat-dialog-content>
+<mat-dialog-actions fxLayout="row" fxLayoutAlign="end center">
+  <button
+    mat-raised-button
+    color="primary"
+    [ngClass]="[!firstFormGroup.valid ? '' : 'save-btn']"
+    [disabled]="!firstFormGroup.valid"
+    (click)="sendEmailToVendor()"
+  >
+    Send Email
+  </button>
+  <button mat-raised-button color="warn" (click)="closeModel()">CLOSE</button>
+</mat-dialog-actions>
+

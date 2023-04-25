@@ -1,0 +1,553 @@
+<fury-page-layout mode="card" class="view-all-crew-handeling">
+  <fury-page-layout-header>
+    <form
+      [formGroup]="filterFormGroup"
+      (ngSubmit)="onClickSubmit(filterFormGroup.value)"
+    >
+      <div class="filter-area">
+        <div fxLayout="row" fxLayoutAlign="start">
+          <div fxFlex>
+            <mat-form-field>
+              <mat-label>Principal Name</mat-label>
+              <mat-select formControlName="PRINCIPAL_GUID">
+                <mat-option>
+                  <ngx-mat-select-search
+                    formControlName="principal_Filter"
+                    [placeholderLabel]="'search...'"
+                    [noEntriesFoundLabel]="'no matching found!'"
+                  >
+                  </ngx-mat-select-search>
+                </mat-option>
+
+                <mat-option
+                  *ngFor="let b of filtered_principal | async"
+                  [value]="b.COMPANY_GUID"
+                >
+                  {{ b.COMPANY_NAME }}
+                </mat-option>
+              </mat-select>
+            </mat-form-field>
+            <mat-form-field>
+              <mat-label>Vessel</mat-label>
+              <mat-select formControlName="VESSEL_GUID">
+                <mat-option>
+                  <ngx-mat-select-search
+                    formControlName="vessel_Filter"
+                    [placeholderLabel]="'search...'"
+                    [noEntriesFoundLabel]="'no matching found!'"
+                  >
+                  </ngx-mat-select-search>
+                </mat-option>
+
+                <mat-option
+                  *ngFor="let b of filtered_vessel | async"
+                  [value]="b.VESSEL_GUID"
+                >
+                  {{ b.VESSEL_NAME }}
+                </mat-option>
+              </mat-select>
+            </mat-form-field>
+            <mat-form-field>
+              <mat-label>Planner</mat-label>
+              <mat-select formControlName="PLANNER_GUID">
+                <mat-option>
+                  <ngx-mat-select-search
+                    formControlName="planner_Filter"
+                    [placeholderLabel]="'search...'"
+                    [noEntriesFoundLabel]="'no matching found!'"
+                  >
+                  </ngx-mat-select-search>
+                </mat-option>
+
+                <mat-option
+                  *ngFor="let b of filtered_planner | async"
+                  [value]="b.GUID"
+                >
+                  {{ b.REF_NUM }} - {{ b.VESSEL_NAME }} -
+                  {{
+                    (b.VESSEL_ACTUAL_ARR ? b.VESSEL_ACTUAL_ARR : b.VESSEL_ETA)
+                      | date: "dd MMM YYYY"
+                  }}
+                </mat-option>
+              </mat-select>
+            </mat-form-field>
+          </div>
+          <div fxFlex>
+            <mat-form-field>
+              <mat-label>Service Category</mat-label>
+              <mat-select formControlName="Service_Category_GUID">
+                <mat-option>
+                  <ngx-mat-select-search
+                    formControlName="category_Filter"
+                    [placeholderLabel]="'search...'"
+                    [noEntriesFoundLabel]="'no matching found!'"
+                  >
+                  </ngx-mat-select-search>
+                </mat-option>
+
+                <mat-option
+                  *ngFor="let b of filtered_service_category | async"
+                  [value]="b.PARAMETER_GUID"
+                >
+                  {{ b.PARAMETER_NAME }}
+                </mat-option>
+              </mat-select>
+            </mat-form-field>
+            <mat-form-field>
+              <mat-label>Service Type</mat-label>
+              <mat-select formControlName="Service_Type_GUID">
+                <mat-option>
+                  <ngx-mat-select-search
+                    formControlName="type_Filter"
+                    [placeholderLabel]="'search...'"
+                    [noEntriesFoundLabel]="'no matching found!'"
+                  >
+                  </ngx-mat-select-search>
+                </mat-option>
+
+                <mat-option
+                  *ngFor="let b of filtered_service_type | async"
+                  [value]="b.PARAMETER_GUID"
+                >
+                  {{ b.PARAMETER_NAME }}
+                </mat-option>
+              </mat-select>
+            </mat-form-field>
+            <mat-form-field>
+              <mat-label>Service Vendor</mat-label>
+              <mat-select formControlName="Vendor_GUID">
+                <mat-option>
+                  <ngx-mat-select-search
+                    formControlName="vendor_Filter"
+                    [placeholderLabel]="'search...'"
+                    [noEntriesFoundLabel]="'no matching found!'"
+                  >
+                  </ngx-mat-select-search>
+                </mat-option>
+
+                <mat-option
+                  *ngFor="let b of filtered_vendor | async"
+                  [value]="b.Vendor_GUID"
+                >
+                  {{ b.Vendor_Name }}
+                </mat-option>
+              </mat-select>
+            </mat-form-field>
+          </div>
+          <div fxFlex>
+            <mat-form-field>
+              <mat-label>Vendor Invoice Received</mat-label>
+              <mat-select formControlName="Invoice_Status">
+                <mat-option value="1"> Yes </mat-option>
+                <mat-option value="0"> No </mat-option>
+                <mat-option value=""> All </mat-option>
+              </mat-select>
+            </mat-form-field>
+            <mat-form-field>
+              <mat-label>Service Status</mat-label>
+              <mat-select formControlName="Status_GUID" multiple>
+                <mat-option
+                  *ngFor="let b of filtered_status | async"
+                  [value]="b.PARAMETER_GUID"
+                >
+                  {{ b.PARAMETER_NAME }}
+                </mat-option>
+              </mat-select>
+            </mat-form-field>
+          </div>
+          <div fxFlex>
+            <mat-form-field>
+              <mat-label>Service Date From</mat-label>
+              <input
+                matInput
+                formControlName="DateFrom"
+                [matDatepicker]="pickerFrom"
+              />
+              <mat-datepicker-toggle
+                matSuffix
+                [for]="pickerFrom"
+              ></mat-datepicker-toggle>
+              <mat-datepicker #pickerFrom></mat-datepicker>
+            </mat-form-field>
+
+            <mat-form-field>
+              <mat-label>Service Date To</mat-label>
+              <input
+                matInput
+                formControlName="DateTo"
+                [matDatepicker]="pickerTo"
+              />
+              <mat-datepicker-toggle
+                matSuffix
+                [for]="pickerTo"
+              ></mat-datepicker-toggle>
+              <mat-datepicker #pickerTo></mat-datepicker>
+            </mat-form-field>
+          </div>
+          <div class="filter-btn-area">
+            <div>
+              <button
+                class="create"
+                mat-raised-button
+                color="primary"
+                class="filter-btn"
+              >
+                Search
+              </button>
+            </div>
+            <div>
+              <button
+                class="create"
+                (click)="clearFilter()"
+                mat-raised-button
+                color="warn"
+                class="filter-btn"
+                type="button"
+              >
+                Clear
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </form>
+  </fury-page-layout-header>
+
+  <fury-page-layout-content [@fadeInUp]>
+    <div #TABLE>
+      <div class="actions-area">
+        <div>
+          <span
+            (click)="exportAsExcel()"
+            style="cursor: pointer"
+            *ngIf="
+              authGuard.checkPermission(
+                'oPk6Fh2BP24443f12-c950-46b3-vendor-report',
+                'export'
+              )
+            "
+          >
+            <img
+              src="../../../../assets/img/excel.png"
+              class="logo"
+              alt="excel"
+            />
+          </span>
+        </div>
+      </div>
+      <div class="summary-table">
+        <div class="width-50">
+          <table class="width-100">
+            <tr>
+              <th class="text-center blue-header">Vendor Name</th>
+              <th class="text-center blue-header">Count</th>
+            </tr>
+            <tr *ngFor="let vendor of VendorWiseCount">
+              <td
+                [class]="
+                  vendor.Vendor_GUID === selectedVendor
+                    ? 'text-center selected'
+                    : 'text-center'
+                "
+              >
+                {{ vendor.Vendor_Name }}
+              </td>
+              <td
+                [class]="
+                  vendor.Vendor_GUID === selectedVendor
+                    ? 'text-center selected'
+                    : 'text-center'
+                "
+              >
+                <span
+                  class="count-text"
+                  (click)="filterByVendor(vendor?.Vendor_GUID)"
+                  >{{ vendor.data.length }}</span
+                >
+              </td>
+            </tr>
+          </table>
+        </div>
+        <div class="width-50">
+          <table class="width-100">
+            <tr>
+              <th class="text-center blue-header">Vessel Name</th>
+              <th class="text-center blue-header">Count</th>
+            </tr>
+            <tr *ngFor="let vessel of VesselWiseCount">
+              <td
+                [class]="
+                  vessel.VESSEL_GUID === selectedVessel
+                    ? 'text-center selected'
+                    : 'text-center'
+                "
+              >
+                {{ vessel.VESSEL_NAME }}
+              </td>
+              <td
+                [class]="
+                  vessel.VESSEL_GUID === selectedVessel
+                    ? 'text-center selected'
+                    : 'text-center'
+                "
+              >
+                <span
+                  class="count-text"
+                  (click)="filterByVessel(vessel?.VESSEL_GUID)"
+                  >{{ vessel.data.length }}</span
+                >
+              </td>
+            </tr>
+          </table>
+        </div>
+      </div>
+      <div>
+        <table
+          [dataSource]="dataSource"
+          mat-table
+          matSort
+          #table
+          class="width-100"
+          (matSortChange)="sortData($event)"
+        >
+          <ng-container matColumnDef="Planner">
+            <th
+              *matHeaderCellDef
+              class="actions-cell"
+              mat-header-cell
+              mat-sort-header
+            >
+              Planner Ref
+            </th>
+            <td *matCellDef="let row" class="actions-cell" mat-cell>
+              {{ row.Planner_Ref }}
+            </td>
+          </ng-container>
+          <ng-container matColumnDef="Principal">
+            <th
+              *matHeaderCellDef
+              class="actions-cell"
+              mat-header-cell
+              mat-sort-header
+            >
+              Principal
+            </th>
+            <td *matCellDef="let row" class="actions-cell" mat-cell>
+              {{ row.COMPANY_NAME }}
+            </td>
+          </ng-container>
+          <ng-container matColumnDef="Vessel">
+            <th
+              *matHeaderCellDef
+              class="actions-cell"
+              mat-header-cell
+              mat-sort-header
+            >
+              Vessel
+            </th>
+            <td *matCellDef="let row" class="actions-cell" mat-cell>
+              {{ row.VESSEL_NAME }}
+            </td>
+          </ng-container>
+          <ng-container matColumnDef="Services_Category">
+            <th
+              *matHeaderCellDef
+              class="actions-cell"
+              mat-header-cell
+              mat-sort-header
+            >
+              Services Category
+            </th>
+            <td *matCellDef="let row" class="actions-cell" mat-cell>
+              {{ row.Service_Category_Name }}
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="Service_Type">
+            <th
+              *matHeaderCellDef
+              class="actions-cell"
+              mat-header-cell
+              mat-sort-header
+            >
+              Service Type
+            </th>
+            <td *matCellDef="let row" class="actions-cell" mat-cell>
+              {{ row.Service_Type_Name }} {{ getBoatType(row.Boat_Type_GUID) }}
+            </td>
+          </ng-container>
+          <ng-container matColumnDef="Service_Date">
+            <th
+              *matHeaderCellDef
+              class="actions-cell"
+              mat-header-cell
+              mat-sort-header
+            >
+              Service Date
+            </th>
+            <td *matCellDef="let row" class="actions-cell" mat-cell>
+              {{
+                (row?.Boat_Date ? row?.Boat_Date : row?.Service_date)
+                  | date: "d MMM yyyy HH:mm"
+              }}
+            </td>
+          </ng-container>
+          <ng-container matColumnDef="Vendor_Name">
+            <th
+              *matHeaderCellDef
+              class="actions-cell"
+              mat-header-cell
+              mat-sort-header
+            >
+              Vendor Name
+            </th>
+            <td *matCellDef="let row" class="actions-cell" mat-cell>
+              {{ row.Vendor_Name }}
+            </td>
+          </ng-container>
+          <ng-container matColumnDef="Svc_Quantity">
+            <th
+              *matHeaderCellDef
+              class="actions-cell center-text"
+              mat-header-cell
+              mat-sort-header
+            >
+              Quantity
+            </th>
+            <td *matCellDef="let row" class="actions-cell center-text" mat-cell>
+              {{ row.Svc_Quantity }}
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="Currency_Name">
+            <th
+              *matHeaderCellDef
+              class="actions-cell"
+              mat-header-cell
+              mat-sort-header
+            >
+              Currency
+            </th>
+            <td
+              *matCellDef="let row"
+              class="actions-cell datetime-class"
+              mat-cell
+            >
+              <p>{{ row.Currency_Name }}</p>
+            </td>
+          </ng-container>
+          <ng-container matColumnDef="Svc_Amount">
+            <th
+              *matHeaderCellDef
+              class="actions-cell right-text"
+              mat-header-cell
+            >
+              Amount
+            </th>
+            <td
+              *matCellDef="let row"
+              class="actions-cell datetime-class"
+              mat-cell
+            >
+              <p class="right-text">
+                {{ row.Svc_Amount || 0 | number: "2.2" }}
+              </p>
+            </td>
+          </ng-container>
+          <ng-container matColumnDef="Remarks">
+            <th
+              *matHeaderCellDef
+              class="actions-cell"
+              mat-header-cell
+              mat-sort-header
+            >
+              Vendor Invoice No.
+            </th>
+            <td
+              *matCellDef="let row"
+              class="actions-cell datetime-class"
+              mat-cell
+            >
+              <p [matTooltip]="row.Remarks">
+                {{ row.FDA_Vendor_Invoice }}
+              </p>
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="Status_GUID">
+            <th
+              *matHeaderCellDef
+              class="actions-cell"
+              mat-header-cell
+              mat-sort-header
+            >
+              Status
+            </th>
+            <td
+              *matCellDef="let row"
+              class="actions-cell datetime-class"
+              mat-cell
+            >
+              {{ row.Status_Name }}
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="Action">
+            <th
+              *matHeaderCellDef
+              class="actions-cell"
+              mat-header-cell
+              mat-sort-header
+            >
+              Info
+            </th>
+            <td *matCellDef="let row" class="actions-cell" mat-cell>
+              <button
+                [color]="row.Remarks?.length > 0 ? 'accent' : 'warn'"
+                mat-icon-button
+                [matTooltip]="row.Remarks"
+              >
+                <mat-icon class="icon-display">chat</mat-icon>
+              </button>
+              <button
+                mat-icon-button
+                [matTooltip]="
+                  'Created By : ' +
+                  row.CREATED_BY +
+                  ' | ' +
+                  (row.DATE_CREATED | date: 'dd MMM yyyy HH:mm:ss') +
+                  '&#13;
+                      ' +
+                  (row.MODIFIED_BY
+                    ? 'Modified By : ' +
+                      row.MODIFIED_BY +
+                      ' | ' +
+                      (row.DATE_MODIFIED | date: 'd MMM yyyy HH:mm:ss')
+                    : '')
+                "
+              >
+                <mat-icon class="icon-display">info</mat-icon>
+              </button>
+            </td>
+          </ng-container>
+
+          <tr *matHeaderRowDef="visibleColumns" mat-header-row></tr>
+          <tr
+            *matRowDef="let row; columns: visibleColumns"
+            class="clickable route-animations-elements"
+            mat-row
+          ></tr>
+          <tr class="mat-row" *matNoDataRow>
+            <td class="mat-cell" colspan="9999">No data found</td>
+          </tr>
+        </table>
+      </div>
+    </div>
+    <mat-paginator
+      class="paginator"
+      [pageSizeOptions]="[10, 25, 50, 100]"
+      [pageSize]="pageSize"
+    ></mat-paginator>
+    <!-- </fury-list> -->
+  </fury-page-layout-content>
+</fury-page-layout>

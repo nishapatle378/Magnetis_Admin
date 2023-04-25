@@ -1,0 +1,80 @@
+<div mat-dialog-title>Currency</div>
+
+<mat-dialog-content style="height: 100% !important;">
+
+
+    <form [formGroup]="firstFormGroup" [ngStyle]="{'margin-top': '7px'}">
+      <div fxLayout="column" fxLayout.gt-sm="row" fxLayoutGap.gt-sm="24px">
+
+        <mat-form-field  fxFlex>
+            <mat-label>Currency Name</mat-label>
+            <input type="text" formControlName="CURRENCY_NAME"  matInput>
+            <mat-error *ngIf="firstFormGroup.get('CURRENCY_NAME').hasError('required')">Currency Name is required</mat-error>
+        </mat-form-field>
+
+    </div>
+        <div fxLayout="column" fxLayout.gt-sm="row" fxLayoutGap.gt-sm="24px">
+
+            <mat-form-field  fxFlex>
+                <mat-label>Short Code</mat-label>
+                <input type="text" formControlName="SHORT_CODE" maxlength="5" matInput>
+                <mat-error *ngIf="firstFormGroup.get('SHORT_CODE').hasError('required')">Short code is required</mat-error>
+            </mat-form-field>
+
+        </div>
+
+        <div fxLayout="column" fxLayout.gt-sm="row" fxLayoutGap.gt-sm="24px">
+            <mat-form-field  fxFlex>
+              <mat-label>Country</mat-label>
+              <mat-select formControlName="COUNTRY_ID">
+                <mat-option>
+                  <ngx-mat-select-search 
+                    formControlName="country_Filter"
+                    [placeholderLabel]="'search...'"
+                    [noEntriesFoundLabel]="'no matching found!'"
+                  >
+                  </ngx-mat-select-search>
+                </mat-option>   
+                                            
+                <mat-option *ngFor="let b of filtered_country | async" [value]="b.COUNTRY_GUID">
+                  {{b.COUNTRY_NAME}}
+                </mat-option>
+              </mat-select>
+              <mat-error *ngIf="firstFormGroup.get('COUNTRY_ID').hasError('required')">Country is required</mat-error>
+            </mat-form-field>
+          </div>
+
+        <div fxLayout="column" fxLayout.gt-sm="row" fxLayoutGap.gt-sm="24px">
+  
+            <!-- <mat-form-field  fxFlex>
+                <mat-label>Description</mat-label>
+                <textarea type="text" formControlName="DESCRIPTION" rows="3" maxlength="250" matInput></textarea>
+                <mat-error *ngIf="firstFormGroup.get('DESCRIPTION').hasError('required')">Description is required</mat-error>
+            </mat-form-field> -->
+
+        </div>
+        
+        <div fxLayout="column" fxLayout.gt-sm="row" fxLayoutGap.gt-sm="24px">
+  
+            <mat-form-field  fxFlex>
+                <mat-label>Called As</mat-label>
+                <input type="text" formControlName="Called_As" maxlength="250" matInput>
+                <mat-error *ngIf="firstFormGroup.get('Called_As').hasError('required')">Called as is required</mat-error>
+            </mat-form-field>
+
+        </div>
+
+
+        <div fxLayout="column" fxLayout.gt-sm="row" fxLayoutGap.gt-sm="24px" *ngIf="ErrorMessage">
+            <h6 style="color: #ff0000;">{{ErrorMessage}}</h6>
+        </div>
+
+    </form>
+
+</mat-dialog-content>
+<mat-dialog-actions fxLayout="row" fxLayoutAlign="end center">
+  <button mat-raised-button color="primary" (click)="SaveCountry(true)" class="save-btn" [disabled]="!firstFormGroup.valid && !IsEdit">SAVE & ADD NEW</button>
+  <button mat-raised-button color="primary" (click)="SaveCountry()" class="save-btn" [disabled]="!firstFormGroup.valid && !IsEdit">SAVE</button>
+  <button mat-raised-button color="warn" (click)="CloseModal()">CLOSE</button>
+</mat-dialog-actions>
+

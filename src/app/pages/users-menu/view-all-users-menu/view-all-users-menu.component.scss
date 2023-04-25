@@ -1,0 +1,175 @@
+  view-all-users-menu{
+    .user_name{
+      padding: 10px 0px 10px 10px;
+      text-transform: capitalize;
+      cursor: pointer;
+    }
+    .user_name:hover{
+      background-color: #f5f5f5;
+    }
+    .user_name_selected{
+      padding: 10px 0px 10px 10px;
+      text-transform: capitalize;
+      cursor: pointer;
+      background-color: #0784C0;
+      color: #ffffff;
+    }
+    .module_name{
+      padding: 3px 30px 3px 30px;
+      text-transform: capitalize;
+      cursor: pointer;
+    }
+    .module_name:hover{
+      background-color: #f5f5f5;
+    }
+    .module_name_selected{
+      padding: 3px 30px 3px 30px;
+      text-transform: capitalize;
+      cursor: pointer;
+      background-color: #0784C0;
+      color: #ffffff;
+      font-weight: 500;
+    }
+    .user-action-menu{
+      .mat-menu-content{
+        padding-top: 0px !important;
+        padding-bottom: 0px !important;
+      }
+      .mat-menu-item{
+        height: 35px !important;
+        line-height: 35px !important;
+      }
+    }
+    .add-sp-btn{
+      height: 24px;
+      width: 24px;
+      align-items: center;
+      display: flex;
+    }
+    
+    .add-sp-btn-icon{
+      font-size: 24px;
+      align-self: center;
+      margin-top: -1px;
+    }
+    
+    .sp-title-text{
+      background-color: #17366E;
+      color: #fff;
+      font-size: 16px;
+      font-weight: 500;
+      padding: 10px
+    }
+    
+    .sp-card-view{
+      width: 20%;
+      padding: 0px;
+      margin-right: 7px;
+      box-shadow: 0px 2px 15px 2px rgb(0 0 0 / 32%), 0px 1px 1px 0px rgb(0 0 0 / 30%), 0px 1px 3px 0px rgb(0 0 0 / 4%) !important;
+      height: fit-content;
+      border-radius: 5px;
+      overflow: hidden;
+    }
+    
+    .sp-card-view-header{
+      width: 100%;
+      background-color: #d3d3d3;
+      flex-direction: row;
+      box-sizing: border-box;
+      display: flex;
+      place-content: stretch space-between;
+      align-items: stretch;
+      padding: 6px 6px 6px 7px;
+      border-top-right-radius: 5px;
+      border-top-left-radius: 5px;
+      color: #333;
+      font-weight: 500;
+    }
+    
+    .search {
+      margin-top: 5px;
+      margin-bottom: -20px;
+    }
+    
+     .mat-card-header-text{
+      margin: 0px !important;
+    }
+    
+     .mat-menu-content{
+      padding: 0px !important;
+    }
+    
+     .mat-menu-item{
+      height: 32px !important;
+      line-height: 0px !important;
+    }
+    
+     .mat-paginator-range-label{
+      margin: 0px !important;
+    }
+    
+     .mat-paginator .mat-form-field-flex {
+      padding-top: 0px !important;
+      padding-bottom: 5px !important;
+    }
+    
+     .mat-paginator .mat-form-field-infix{
+      padding: 0px !important;
+      border-top: 8px solid transparent !important;
+    }
+    
+     .mat-paginator .mat-select-arrow{
+      margin: 8px 1px 0px 0px !important;
+    }
+    
+     .mat-paginator-page-size-label{
+      // display: none !important;
+    }
+    
+     .search .mat-form-field-flex{
+      background-color: #fff !important;
+      // padding: 0px !important;
+    }
+
+    .mat-form-field{
+      width: 100%;
+      margin: 0px 5px -2px 5px;
+    }
+    
+    //  .search .mat-form-field-infix{
+    //   padding: 0px !important;
+    // }
+
+    th.mat-header-cell {
+      text-align: center;
+      color: white;
+      font-size: 14px;
+      font-weight: 500;
+    }
+
+    tr.mat-header-row {
+      height: 56px;
+      background: #17366E;
+    }
+  
+    .action-btn{
+      float: right;
+    }
+
+    .action-label{
+      color: white;
+      padding: 6px 6px 0px 6px;
+      border: 1px solid #fff;
+    }
+  
+    .sp-data-row{
+      cursor: pointer;
+      background-color: #fff;
+    }
+  
+    .sp-data-row-s{
+      cursor: pointer;
+      background-color: #d6d6d6;
+    }
+  
+  }

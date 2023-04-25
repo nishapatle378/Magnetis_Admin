@@ -1,0 +1,74 @@
+.add-sp-btn{
+    height: 24px;
+    width: 24px;
+    align-items: center;
+    display: flex;
+}
+
+.add-sp-btn-icon{
+    font-size: 24px;
+    align-self: center;
+    margin-top: -1px;
+}
+
+.sp-title-text{
+    background-color: #17366E;
+    color: #fff;
+    font-size: 16px;
+    font-weight: 500;
+    padding: 3px 0px 3px 6px
+}
+
+.sp-card-view{
+    width: 20%;
+    padding: 0px;
+    margin-right: 7px;
+    box-shadow: 0px 2px 15px 2px rgb(0 0 0 / 32%), 0px 1px 1px 0px rgb(0 0 0 / 30%), 0px 1px 3px 0px rgb(0 0 0 / 4%);
+    height: fit-content;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.sp-card-view-header{
+    width: 100%;
+    background-color: #d3d3d3;
+    flex-direction: row;
+    box-sizing: border-box;
+    display: flex;
+    place-content: stretch space-between;
+    align-items: stretch;
+    padding: 6px 6px 6px 7px;
+    border-top-right-radius: 5px;
+    border-top-left-radius: 5px;
+    color: #333;
+    font-weight: 500;
+}
+
+::ng-deep .mat-card-header-text{
+    margin: 0px !important;
+}
+
+::ng-deep .mat-menu-content{
+    padding: 0px !important;
+}
+
+::ng-deep .mat-menu-item{
+    height: 32px !important;
+    line-height: 0px !important;
+}
+
+.readonly-wrapper {
+    cursor: not-allowed;
+}
+
+.readonly-wrapper .readonly-block {
+    pointer-events: none;
+}
+.mat-form-field-appearance-outline .mat-form-field-label {
+    top: 33px;
+    margin-top: -4px;
+}
+.mat-form-field-appearance-outline .mat-form-field-label {
+    top: 26px;
+    margin-top: 4px;
+}

@@ -1,0 +1,630 @@
+<fury-page-layout mode="card" class="planner-view">
+  <fury-page-layout-header>
+    <!-- <fury-breadcrumbs [@fadeInRight] current="Planner"></fury-breadcrumbs> -->
+    <form
+      [formGroup]="filterFormGroup"
+      [ngStyle]="{ 'margin-top': '7px' }"
+      (ngSubmit)="onClickSubmit(filterFormGroup.value)"
+    >
+      <div class="filter-area" fxFlex>
+        <div fxLayout="row" fxLayoutAlign="start">
+          <div style="display: block !important">
+            <div>
+              <mat-form-field>
+                <mat-label>Principal Name</mat-label>
+                <mat-select formControlName="PRINCIPAL_GUID">
+                  <mat-option>
+                    <ngx-mat-select-search
+                      formControlName="principal_Filter"
+                      [placeholderLabel]="'search...'"
+                      [noEntriesFoundLabel]="'no matching found!'"
+                    >
+                    </ngx-mat-select-search>
+                  </mat-option>
+
+                  <mat-option
+                    *ngFor="let b of filtered_principal | async"
+                    [value]="b.COMPANY_GUID"
+                  >
+                    {{ b.COMPANY_NAME }}
+                  </mat-option>
+                </mat-select>
+              </mat-form-field>
+            </div>
+            <div>
+              <mat-form-field fxFlex>
+                <mat-label>Vessel Type *</mat-label>
+                <mat-select formControlName="VESSEL_TYPE">
+                  <mat-option
+                    *ngFor="let b of filtered_vesselType | async"
+                    [value]="b.PARAMETER_GUID"
+                  >
+                    {{ b.PARAMETER_NAME }}
+                  </mat-option>
+                </mat-select>
+              </mat-form-field>
+            </div>
+            <div>
+              <mat-form-field>
+                <mat-label>Vessel</mat-label>
+                <mat-select formControlName="VESSEL_GUID">
+                  <mat-option>
+                    <ngx-mat-select-search
+                      formControlName="vessel_Filter"
+                      [placeholderLabel]="'search...'"
+                      [noEntriesFoundLabel]="'no matching found!'"
+                    >
+                    </ngx-mat-select-search>
+                  </mat-option>
+
+                  <mat-option
+                    *ngFor="let b of filtered_vessel | async"
+                    [value]="b.VESSEL_GUID"
+                  >
+                    {{ b.VESSEL_NAME }}
+                  </mat-option>
+                </mat-select>
+              </mat-form-field>
+            </div>
+          </div>
+
+          <div fxFlex>
+            <mat-form-field>
+              <mat-label>Search by ref</mat-label>
+              <input
+                formControlName="SEARCH"
+                matInput
+                placeholder="Search by ref"
+                type="text"
+              />
+            </mat-form-field>
+            <mat-form-field>
+              <mat-label>Port</mat-label>
+              <mat-select formControlName="PORT_GUID">
+                <mat-option>
+                  <ngx-mat-select-search
+                    formControlName="port_Filter"
+                    [placeholderLabel]="'search...'"
+                    [noEntriesFoundLabel]="'no matching found!'"
+                  >
+                  </ngx-mat-select-search>
+                </mat-option>
+
+                <mat-option
+                  *ngFor="let b of filtered_port | async"
+                  [value]="b.PORT_GUID"
+                >
+                  {{ b.Port_Name }}
+                </mat-option>
+              </mat-select>
+            </mat-form-field>
+            <mat-form-field appearance="fill">
+              <mat-label>Departed Status</mat-label>
+              <mat-select formControlName="DEPARTED_STATUS">
+                <mat-option value="all"> All </mat-option>
+                <mat-option value="1"> Ship Departed </mat-option>
+                <mat-option value="0"> Ship Not Departed </mat-option>
+              </mat-select>
+            </mat-form-field>
+          </div>
+
+          <div fxFlex>
+            <mat-form-field>
+              <mat-label>Vessel ETA From</mat-label>
+              <input
+                matInput
+                formControlName="VESSEL_ETA"
+                [matDatepicker]="pickerFrom"
+              />
+              <mat-datepicker-toggle
+                matSuffix
+                [for]="pickerFrom"
+              ></mat-datepicker-toggle>
+              <mat-datepicker #pickerFrom></mat-datepicker>
+            </mat-form-field>
+
+            <mat-form-field>
+              <mat-label>Vessel ETA To</mat-label>
+              <input
+                matInput
+                formControlName="VESSEL_ETD"
+                [matDatepicker]="pickerTo"
+              />
+              <mat-datepicker-toggle
+                matSuffix
+                [for]="pickerTo"
+              ></mat-datepicker-toggle>
+              <mat-datepicker #pickerTo></mat-datepicker>
+            </mat-form-field>
+          </div>
+          <div fxFlex>
+            <mat-form-field>
+              <mat-label>Status</mat-label>
+              <mat-select formControlName="PLAN_STATUS_GUID">
+                <mat-option value="all"> All </mat-option>
+                <mat-option
+                  *ngFor="let b of filtered_status | async"
+                  [value]="b.PARAMETER_GUID"
+                >
+                  {{ b.PARAMETER_NAME }}
+                </mat-option>
+              </mat-select>
+            </mat-form-field>
+            <mat-form-field>
+              <mat-label>PIC</mat-label>
+              <mat-select formControlName="AGENT_GUID">
+                <mat-option>
+                  <ngx-mat-select-search
+                    formControlName="pic_Filter"
+                    [placeholderLabel]="'search...'"
+                    [noEntriesFoundLabel]="'no matching found!'"
+                  >
+                  </ngx-mat-select-search>
+                </mat-option>
+
+                <mat-option
+                  *ngFor="let b of filtered_pic | async"
+                  [value]="b.USER_GUID"
+                >
+                  {{ b.USER_FIRST_NAME }} {{ b.USER_MIDDLE_NAME }}
+                  {{ b.USER_LAST_NAME }}
+                </mat-option>
+              </mat-select>
+            </mat-form-field>
+          </div>
+          <div class="filter-btn-area" fxFlex>
+            <div>
+              <button
+                class="create"
+                mat-raised-button
+                color="primary"
+                class="filter-btn"
+              >
+                Search
+              </button>
+            </div>
+
+            <div>
+              <button
+                class="create"
+                (click)="clearFilter()"
+                mat-raised-button
+                color="warn"
+                class="filter-btn"
+                type="button"
+              >
+                Clear
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </form>
+  </fury-page-layout-header>
+
+  <fury-page-layout-content [@fadeInUp] class="content-area">
+    <div #TABLE>
+      <div class="actions-area">
+        <div
+          *ngIf="
+            authGuard.checkPermission(
+              'oPk6Fh2BP24443f12-c950-46b3-b22c-fff14f4d9ed1',
+              'create'
+            )
+          "
+        >
+          <span class="create" (click)="Save(null, false)">
+            <button mat-mini-fab color="primary">
+              <mat-icon>add</mat-icon>
+            </button>
+            Add Plan
+          </span>
+        </div>
+
+        <div
+          *ngIf="
+            authGuard.checkPermission(
+              'oPk6Fh2BP24443f12-c950-46b3-b22c-fff14f4d9ed1',
+              'export'
+            )
+          "
+        >
+          <span (click)="exportAsExcel()" style="cursor: pointer">
+            <img
+              src="../../../../assets/img/excel.png"
+              class="logo"
+              alt="excel"
+            />
+          </span>
+        </div>
+      </div>
+      <div *ngIf="loading" class="content-loader">
+        <mat-progress-spinner
+          mode="indeterminate"
+          color="accent"
+        ></mat-progress-spinner>
+      </div>
+      <div style="overflow: scroll">
+        <table [dataSource]="dataSource" mat-table matSort #table>
+          <ng-container matColumnDef="REF_NUM">
+            <th
+              *matHeaderCellDef
+              class="actions-cell"
+              [ngStyle]="{ 'white-space': 'initial' }"
+              mat-header-cell
+              mat-sort-header
+            >
+              Ref Num
+            </th>
+            <td *matCellDef="let row" class="actions-cell" mat-cell>
+              <p class="tbl-row-item">{{ row.REF_NUM }}</p>
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="PRINCIPAL_NAME">
+            <th
+              *matHeaderCellDef
+              class="actions-cell"
+              [ngStyle]="{ 'white-space': 'initial' }"
+              mat-header-cell
+              mat-sort-header
+            >
+              Principal
+            </th>
+            <td *matCellDef="let row" class="actions-cell" mat-cell>
+              <p class="tbl-row-item">{{ row.COMPANY_NAME }}</p>
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="Port_Name">
+            <th
+              *matHeaderCellDef
+              class="actions-cell"
+              [ngStyle]="{ 'white-space': 'initial' }"
+              mat-header-cell
+              mat-sort-header
+            >
+              Port Name
+            </th>
+            <td
+              *matCellDef="let row"
+              class="actions-cell"
+              [ngStyle]="{ 'white-space': 'initial' }"
+              mat-cell
+            >
+              <p class="tbl-row-item">{{ row.Port_Name }}</p>
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="VESSEL_NAME">
+            <th
+              *matHeaderCellDef
+              class="actions-cell"
+              [ngStyle]="{ 'white-space': 'initial' }"
+              mat-header-cell
+              mat-sort-header
+            >
+              Vessel Name
+            </th>
+            <td
+              *matCellDef="let row"
+              class="actions-cell"
+              [ngStyle]="{ 'white-space': 'initial' }"
+              mat-cell
+            >
+              <p class="tbl-row-item">{{ row.VESSEL_NAME }}</p>
+            </td>
+          </ng-container>
+          <ng-container matColumnDef="VESSEL_TYPE">
+            <th
+              *matHeaderCellDef
+              class="actions-cell"
+              [ngStyle]="{ 'white-space': 'initial' }"
+              mat-header-cell
+              mat-sort-header
+            >
+              Vessel Type
+            </th>
+            <td
+              *matCellDef="let row"
+              class="actions-cell"
+              [ngStyle]="{ 'white-space': 'initial' }"
+              mat-cell
+            >
+              <p class="tbl-row-item">{{ row.VESSEL_TYPE_NAME }}</p>
+            </td>
+          </ng-container>
+          <ng-container matColumnDef="APPOINTMENT_TYPE">
+            <th
+              *matHeaderCellDef
+              class="actions-cell"
+              [ngStyle]="{ 'white-space': 'initial' }"
+              mat-header-cell
+              mat-sort-header
+            >
+              Appointment Type
+            </th>
+            <td
+              *matCellDef="let row"
+              class="actions-cell"
+              [ngStyle]="{ 'white-space': 'initial' }"
+              mat-cell
+            >
+              <p class="tbl-row-item">{{ row.APPOINTMENT_TYPE_NAME }}</p>
+            </td>
+          </ng-container>
+          <ng-container matColumnDef="PRINCIPAL_REF">
+            <th
+              *matHeaderCellDef
+              class="actions-cell"
+              [ngStyle]="{ 'white-space': 'initial' }"
+              mat-header-cell
+              mat-sort-header
+            >
+              Principal Ref
+            </th>
+            <td
+              *matCellDef="let row"
+              class="actions-cell"
+              [ngStyle]="{ 'white-space': 'initial' }"
+              mat-cell
+            >
+              <p class="tbl-row-item">{{ row.APPOINTMENT_REF }}</p>
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="VESSEL_ETA">
+            <th
+              *matHeaderCellDef
+              class="actions-cell"
+              mat-header-cell
+              mat-sort-header
+            >
+              Vessel ETA
+            </th>
+            <td
+              *matCellDef="let row"
+              class="actions-cell datetime-class"
+              mat-cell
+            >
+              <p class="tbl-row-item">
+                {{ row.VESSEL_ETA | date: "dd MMM YYYY HH:mm" }}
+              </p>
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="VESSEL_ETD">
+            <th
+              *matHeaderCellDef
+              class="actions-cell"
+              mat-header-cell
+              mat-sort-header
+              [ngStyle]="{ 'white-space': 'initial' }"
+            >
+              Vessel ETD
+            </th>
+            <td
+              *matCellDef="let row"
+              [ngStyle]="{ 'white-space': 'initial' }"
+              class="actions-cell datetime-class"
+              mat-cell
+            >
+              <p class="tbl-row-item">
+                {{ row.VESSEL_ETD | date: "dd MMM YYYY HH:mm" }}
+              </p>
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="VESSEL_ACTUAL_ARR">
+            <th
+              *matHeaderCellDef
+              class="actions-cell"
+              mat-header-cell
+              mat-sort-header
+              [ngStyle]="{ 'white-space': 'initial' }"
+            >
+              Vessel Actual ARR
+            </th>
+            <td
+              *matCellDef="let row"
+              class="actions-cell datetime-class"
+              mat-cell
+            >
+              <p class="tbl-row-item">
+                {{ row.VESSEL_ACTUAL_ARR | date: "dd MMM YYYY HH:mm" }}
+              </p>
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="VESSEL_ACTUAL_DEP">
+            <th
+              *matHeaderCellDef
+              class="actions-cell"
+              mat-header-cell
+              mat-sort-header
+              [ngStyle]="{ 'white-space': 'initial' }"
+            >
+              Vessel Actual DEP
+            </th>
+            <td
+              *matCellDef="let row"
+              class="actions-cell datetime-class"
+              mat-cell
+            >
+              <p class="tbl-row-item">
+                {{ row.VESSEL_ACTUAL_DEP | date: "dd MMM YYYY HH:mm" }}
+              </p>
+            </td>
+          </ng-container>
+          <ng-container matColumnDef="AGENT_GUID">
+            <th
+              *matHeaderCellDef
+              class="actions-cell"
+              mat-header-cell
+              mat-sort-header
+              [ngStyle]="{ 'white-space': 'initial' }"
+            >
+              PIC
+            </th>
+            <td
+              *matCellDef="let row"
+              class="actions-cell datetime-class"
+              mat-cell
+            >
+              <p class="tbl-row-item">
+                {{ row.USER_FIRST_NAME }} {{ row.USER_MIDDLE_NAME }}
+                {{ row.USER_LAST_NAME }}
+              </p>
+            </td>
+          </ng-container>
+          <ng-container matColumnDef="STATUS">
+            <th
+              *matHeaderCellDef
+              class="actions-cell"
+              mat-header-cell
+              mat-sort-header
+              [ngStyle]="{ 'white-space': 'initial' }"
+            >
+              Status
+            </th>
+            <td
+              *matCellDef="let row"
+              class="actions-cell datetime-class"
+              mat-cell
+            >
+              <p class="tbl-row-item">
+                {{ row.STATUS_NAME }}
+              </p>
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="Action">
+            <th
+              *matHeaderCellDef
+              class="actions-cell"
+              mat-header-cell
+              mat-sort-header
+            >
+              Action
+            </th>
+            <td *matCellDef="let row" class="actions-cell" mat-cell>
+              <button
+                [color]="row['CTM_Amount'] ? 'accent' : 'warn'"
+                mat-icon-button
+                [matTooltip]="
+                  'Planned CTM Amount : ' +
+                  (row['CTM_Amount'] || 0 | currency: 'USD') +
+                  '&#13;
+                                                                                                                                         Actual CTM Amount : ' +
+                  (row['CTM_Actual_Amount'] || 0 | currency: 'USD') +
+                  '&#13;
+                                                                                                                                         CTM Status : ' +
+                  getCTMStatus(row['CTM_Status'])
+                "
+              >
+                $
+              </button>
+
+              <button
+                [matTooltip]="printCrewDetail(row['crew'])"
+                [color]="row['Crew_Change'] ? 'accent' : 'warn'"
+                mat-icon-button
+              >
+                <mat-icon class="icon-display">person</mat-icon>
+              </button>
+              <button
+                [color]="row.Remarks?.length > 0 ? 'accent' : 'warn'"
+                mat-icon-button
+                [matTooltip]="row.Remarks"
+              >
+                <mat-icon class="icon-display">chat</mat-icon>
+              </button>
+              <button
+                *ngIf="
+                  authGuard.checkPermission(
+                    'oPk6Fh2BP24443f12-c950-46b3-b22c-fff14f4d9ed1',
+                    'edit'
+                  ) &&
+                  row.PLAN_STATUS_GUID ===
+                    'ZVqQ6nM4ddd3c03b6-78ec-4c4c-8e98-f22ff5c09b0a'
+                "
+                mat-icon-button
+                (click)="Save(row, true)"
+              >
+                <mat-icon class="icon-display">edit</mat-icon>
+              </button>
+
+              <button
+                mat-icon-button
+                (click)="ChangeStatus(row)"
+                *ngIf="
+                  authGuard.checkPermission(
+                    'oPk6Fh2BP24443f12-c950-46b3-b22c-fff14f4d9ed1',
+                    'delete'
+                  ) &&
+                  row.PLAN_STATUS_GUID ===
+                    'ZVqQ6nM4ddd3c03b6-78ec-4c4c-8e98-f22ff5c09b0a'
+                "
+              >
+                <mat-icon color="warn" class="icon-display">{{
+                  "close"
+                }}</mat-icon>
+              </button>
+
+              <button
+                mat-icon-button
+                [matTooltip]="
+                  'Created By : ' +
+                  row.CREATED_BY +
+                  ' | ' +
+                  (row.DATE_CREATED | date: 'dd MMM yyyy HH:mm:ss') +
+                  '&#13;
+                  ' +
+                  (row.MODIFIED_BY
+                    ? 'Modified By : ' +
+                      row.MODIFIED_BY +
+                      ' | ' +
+                      (row.DATE_MODIFIED | date: 'd MMM yyyy HH:mm:ss')
+                    : '')
+                "
+              >
+                <mat-icon class="icon-display">info</mat-icon>
+              </button>
+              <a
+                *ngIf="
+                  authGuard.checkPermission(
+                    'oPk6Fh2BP24443f12-c950-46b3-b22c-fff14f4d9ed1',
+                    'view'
+                  )
+                "
+                routerLink="/planner/service/{{ row.REF_NUM }}"
+                target="_blank"
+              >
+                <button mat-icon-button [matTooltip]="'Planner Details'">
+                  <mat-icon class="icon-display">build_circle</mat-icon>
+                </button>
+              </a>
+            </td>
+          </ng-container>
+
+          <tr *matHeaderRowDef="visibleColumns" mat-header-row></tr>
+          <tr
+            *matRowDef="let row; columns: visibleColumns"
+            class="clickable route-animations-elements"
+            mat-row
+          ></tr>
+          <tr class="mat-row" *matNoDataRow>
+            <td class="mat-cell" colspan="9999">No data found</td>
+          </tr>
+        </table>
+      </div>
+    </div>
+
+    <mat-paginator
+      class="paginator"
+      [pageSizeOptions]="[10, 25, 50, 100]"
+      [pageSize]="pageSize"
+    ></mat-paginator>
+    <!-- </fury-list> -->
+  </fury-page-layout-content>
+</fury-page-layout>

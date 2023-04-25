@@ -1,0 +1,82 @@
+::ng-deep.user-action-menu {
+  .mat-menu-content {
+    padding-top: 0px !important;
+    padding-bottom: 0px !important;
+  }
+
+  .mat-menu-item {
+    height: 35px !important;
+    line-height: 35px !important;
+  }
+}
+
+//Start custom styling for filter
+.icon-display {
+  transform: scale(0.7);
+}
+.filter-btn-area {
+  padding: 8px 0px;
+  text-align: center;
+}
+
+.filter-btn {
+  margin-right: 5px !important;
+  width: 100px;
+  margin-bottom: 10px !important;
+}
+
+.filter-area {
+  background: #ffffff;
+  margin-top: 15px;
+  padding: 20px;
+  border-radius: 10px;
+  margin-bottom: 15px;
+  color: #252525;
+}
+.mat-form-field-wrapper {
+  margin-right: 5px !important;
+}
+p.tbl-row-item {
+  font-size: 12px;
+  margin-top: 10px;
+  margin-bottom: 10px;
+}
+
+.logo {
+  height: 50px;
+  width: 50px;
+  margin-top: 5px;
+}
+
+tr.mat-header-row {
+  height: 56px;
+  background-color: #1976d2;
+}
+
+th.mat-header-cell {
+  text-align: left;
+  color: white;
+}
+
+.actions-area {
+  background: #fff;
+  border-top-right-radius: 10px;
+  border-top-left-radius: 10px;
+  padding: 10px;
+  border-bottom: 2px solid #b2b2b2;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
+
+.mat-table {
+  width: 100%;
+}
+.text-green {
+  color: green;
+  font-weight: bold;
+}
+.text-red {
+  color: red;
+  font-weight: bold;
+}

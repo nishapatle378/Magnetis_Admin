@@ -1,0 +1,98 @@
+<div mat-dialog-title>Add Vessel</div>
+
+<mat-dialog-content style="height: 100% !important">
+  <form [formGroup]="firstFormGroup" [ngStyle]="{ 'margin-top': '7px' }">
+    <div
+      fxLayout="column"
+      fxLayout.gt-sm="row"
+      fxLayoutGap.gt-sm="24px"
+      class="top"
+    >
+      <mat-form-field fxFlex>
+        <mat-label>Vessel Name</mat-label>
+        <input type="text" formControlName="VESSEL_NAME" matInput />
+        <mat-error
+          *ngIf="firstFormGroup.get('VESSEL_NAME').hasError('required')"
+          >Vessel name is required</mat-error
+        >
+      </mat-form-field>
+    </div>
+
+    <div
+      fxLayout="column"
+      fxLayout.gt-sm="row"
+      fxLayoutGap.gt-sm="24px"
+      class="top"
+    >
+      <mat-form-field fxFlex>
+        <mat-label>Company</mat-label>
+        <mat-select formControlName="COMPANY_GUID">
+          <mat-option>
+            <ngx-mat-select-search
+              formControlName="company_Filter"
+              [placeholderLabel]="'search...'"
+              [noEntriesFoundLabel]="'no matching found!'"
+            >
+            </ngx-mat-select-search>
+          </mat-option>
+
+          <mat-option
+            *ngFor="let b of filtered_company | async"
+            [value]="b.COMPANY_GUID"
+          >
+            {{ b.COMPANY_NAME }}
+          </mat-option>
+        </mat-select>
+        <mat-error
+          *ngIf="firstFormGroup.get('COMPANY_GUID').hasError('required')"
+          >Company is required</mat-error
+        >
+      </mat-form-field>
+    </div>
+
+    <div
+      fxLayout="column"
+      fxLayout.gt-sm="row"
+      fxLayoutGap.gt-sm="24px"
+      class="top"
+    >
+      <mat-form-field fxFlex>
+        <mat-label>Vessel Type</mat-label>
+        <mat-select formControlName="VESSEL_TYPE">
+          <mat-option>
+            <ngx-mat-select-search
+              formControlName="vesselType_Filter"
+              [placeholderLabel]="'search...'"
+              [noEntriesFoundLabel]="'no matching found!'"
+            >
+            </ngx-mat-select-search>
+          </mat-option>
+
+          <mat-option
+            *ngFor="let b of filtered_vesselType | async"
+            [value]="b.PARAMETER_GUID"
+          >
+            {{ b.PARAMETER_NAME }}
+          </mat-option>
+        </mat-select>
+        <!-- <input type="text" formControlName="VESSEL_TYPE" matInput> -->
+        <mat-error
+          *ngIf="firstFormGroup.get('VESSEL_TYPE').hasError('required')"
+          >Vessel type is required</mat-error
+        >
+      </mat-form-field>
+    </div>
+  </form>
+</mat-dialog-content>
+<mat-dialog-actions fxLayout="row" fxLayoutAlign="end center">
+  <button
+    mat-raised-button
+    color="primary"
+    (click)="Save()"
+    class="save-btn"
+    [disabled]="!firstFormGroup.valid"
+  >
+    SAVE
+  </button>
+  <button mat-raised-button color="warn" (click)="CloseModal()">CLOSE</button>
+</mat-dialog-actions>

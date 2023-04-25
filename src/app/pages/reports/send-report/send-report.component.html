@@ -1,0 +1,58 @@
+<div mat-dialog-title>Send Report</div>
+
+<mat-dialog-content style="height: 100% !important;">
+
+
+    <form [formGroup]="firstFormGroup" [ngStyle]="{'margin-top': '7px'}">
+
+        <div fxLayout="column" fxLayout.gt-sm="row" fxLayoutGap.gt-sm="24px">
+
+            <mat-form-field appearance="outline" fxFlex>
+                <mat-label>To</mat-label>
+                <input type="text" formControlName="to" matInput>
+                <mat-error *ngIf="firstFormGroup.get('to').hasError('required')">Recipient is required</mat-error>
+            </mat-form-field>
+
+        </div>
+
+        <div fxLayout="column" fxLayout.gt-sm="row" fxLayoutGap.gt-sm="24px">
+
+          <mat-form-field appearance="outline" fxFlex>
+              <mat-label>CC</mat-label>
+              <input type="text" formControlName="cc" matInput>
+          </mat-form-field>
+
+        </div>
+
+        <div fxLayout="column" fxLayout.gt-sm="row" fxLayoutGap.gt-sm="24px">
+
+          <mat-form-field appearance="outline" fxFlex>
+              <mat-label>Subject</mat-label>
+              <input type="text" formControlName="subject" matInput>
+              <mat-error *ngIf="firstFormGroup.get('subject').hasError('required')">Subject is required</mat-error>
+          </mat-form-field>
+
+        </div>
+
+        <div fxLayout="column" fxLayout.gt-sm="row" fxLayoutGap.gt-sm="24px">
+
+          <mat-form-field appearance="outline" fxFlex>
+              <mat-label>Body</mat-label>
+              <textarea type="text" formControlName="body" rows="4" matInput></textarea>
+              <mat-error *ngIf="firstFormGroup.get('body').hasError('required')">Body is required</mat-error>
+          </mat-form-field>
+
+        </div>
+
+        <div fxLayout="column" fxLayout.gt-sm="row" fxLayoutGap.gt-sm="24px" *ngIf="ErrorMessage">
+            <h6 style="color: #ff0000;">{{ErrorMessage}}</h6>
+        </div>
+
+    </form>
+
+</mat-dialog-content>
+<mat-dialog-actions fxLayout="row" fxLayoutAlign="end center">
+  <button mat-raised-button color="primary" [ngClass]="[!firstFormGroup.valid && !IsEdit ? '' : 'save-btn']" (click)="Save()" [disabled]="!firstFormGroup.valid && !IsEdit">SAVE</button>
+  <button mat-raised-button color="warn" (click)="CloseModal()">CLOSE</button>
+</mat-dialog-actions>
+

@@ -1,0 +1,69 @@
+<div mat-dialog-title>Billing Address</div>
+<form [formGroup]="companyAddressForm">
+  <div mat-dialog-content>
+    <table class="mat-table details-table" border="1" style="width: 100%">
+      <tr class="mat-row" *ngFor="let address of ADDRESS_LIST_SEQ">
+        <td style="width: 50px; text-align: center">
+          <mat-radio-button
+            [name]="'Address'"
+            (click)="radiobuttonClick(0, address)"
+            [checked]="
+            companyAddressForm.get('Address_' + address).value == 1
+              "
+          ></mat-radio-button>
+        </td>
+        <td><mat-label>{{ADDRESS_LIST[address]}}</mat-label></td>
+      </tr>
+      <tr>
+        <td colspan="2">
+          <mat-form-field style="width: 100%">
+            <mat-label>Custom Address</mat-label>
+            <textarea
+              rows="6"
+              matInput
+              formControlName="New_Address"
+              placeholder="Enter new address"
+            ></textarea>
+          </mat-form-field>
+        </td>
+      </tr>
+      <tr>
+        <td colspan="2">
+          <button
+            mat-raised-button
+            color="primary"
+            (click)="addNewAddress()"
+            [disabled]="!companyAddressForm.valid"
+          >
+            Add New Address
+          </button>
+        </td>
+      </tr>
+    </table>
+  </div>
+</form>
+
+<mat-dialog-actions fxLayout="row" fxLayoutAlign="end center">
+  <button
+    mat-raised-button
+    color="primary"
+    (click)="selectAddress()"
+    [disabled]="SELECTED < 0"
+  >
+    Select
+  </button>
+  <button mat-raised-button color="primary" (click)="closeModal()">
+    Close
+  </button>
+</mat-dialog-actions>
+<style>
+  table,
+  th,
+  td {
+    border: 1px solid #dadada;
+    border-collapse: collapse;
+  }
+  td {
+    padding: 10px 10px;
+  }
+</style>

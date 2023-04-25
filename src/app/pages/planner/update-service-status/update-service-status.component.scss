@@ -1,0 +1,38 @@
+.update-services {
+  table.mat-table {
+    border-spacing: 0;
+    width: 100%;
+  }
+
+  .details-table {
+    margin-bottom: 20px;
+    border-spacing: 0px;
+  }
+
+  .details-table td.mat-cell {
+    padding: 2px;
+  }
+
+  .mat-table th {
+    background: #adadad;
+    color: #fff;
+    font-weight: 700;
+  }
+  .details-table th.mat-cell {
+    border: 1px solid #eee;
+    padding: 5px 5px;
+    display: table-cell !important;
+    font-size: 12px;
+  }
+  tr.mat-row,
+  tr.mat-footer-row {
+    height: auto;
+  }
+  td {
+    border: 1px solid #e2e2e2;
+    padding: 5px 5px;
+  }
+  .text-center {
+    text-align: center;
+  }
+}

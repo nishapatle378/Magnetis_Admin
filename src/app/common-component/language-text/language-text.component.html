@@ -1,0 +1,31 @@
+<div mat-dialog-title>Language Text</div>
+
+<mat-dialog-content style="height: 100% !important;">
+  
+  <div fxLayout="column" fxLayout.gt-sm="row" fxLayoutGap.gt-sm="24px" *ngFor="let b of langText; let i = index">
+
+    <div fxFlex="10" fxLayoutAlign="start" [ngStyle]="{'padding-top': '16px'}">
+      
+      <mat-icon fontSet="material-icons" color="primary" [ngStyle]="{'font-size': '30px', 'cursor': 'pointer', 'margin-right': '8px'}" *ngIf="langText.length > 1" (click)="RemoveLang(b, i)">close</mat-icon>
+      <mat-icon fontSet="material-icons" color="primary" [ngStyle]="{'font-size': '30px', 'cursor': 'pointer'}" *ngIf="i == langText.length-1" (click)="AddLang()">library_add</mat-icon>
+
+    </div>
+
+    <mat-form-field appearance="outline" fxFlex="45">
+      <mat-label>Language Key</mat-label>
+      <input type="text" [(ngModel)]="b.langKey" [ngModelOptions]="{standalone: true}" matInput>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" fxFlex="45">
+      <mat-label>Language Text</mat-label>
+      <input type="text" [(ngModel)]="b.langText" [ngModelOptions]="{standalone: true}" matInput>
+    </mat-form-field>
+
+  </div>
+
+</mat-dialog-content>
+
+<mat-dialog-actions fxLayout="row" fxLayoutAlign="end center">
+  <button mat-raised-button color="primary" (click)="Save()">SAVE</button>
+  <button mat-raised-button color="primary" (click)="CloseModal()">CLOSE</button>
+</mat-dialog-actions>

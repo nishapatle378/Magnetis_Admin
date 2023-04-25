@@ -1,0 +1,331 @@
+<div class="crew-handeling-screen">
+  <div mat-dialog-title>Crew Handling</div>
+  <mat-dialog-content style="height: 100% !important">
+    <form
+      [formGroup]="crewForm"
+      [ngStyle]="{ 'margin-top': '7px' }"
+      class="crew-form"
+    >
+      <table class="mat-table details-table">
+        <tr class="mat-row">
+          <td class="mat-cell right-text">
+            <label class="crew-label">Megentis ref number *</label>
+          </td>
+          <td class="mat-cell">
+            <mat-form-field class="two-divide">
+              <mat-select
+                formControlName="Planner_GUID"
+                placeholder="Please Magentis ref number"
+              >
+                <mat-option
+                  *ngFor="let b of filtered_planner | async"
+                  [value]="b.GUID"
+                >
+                  {{ b.REF_NUM }}
+                </mat-option>
+              </mat-select>
+              <!-- <mat-error *ngIf="crewForm.get('Planner_GUID').hasError('required')">Megentis ref number is required</mat-error> -->
+            </mat-form-field>
+          </td>
+        </tr>
+        <tr class="mat-row">
+          <td class="mat-cell right-text">
+            <label class="crew-label">Vessel Name </label>
+          </td>
+          <td class="mat-cell">
+            <!-- <input type="hidden" formControlName="Vessel_GUID" /> -->
+            <mat-form-field>
+              <label class="crew-label">Vessel Name</label>
+              <input matInput formControlName="Vessel_Name" />
+              
+            </mat-form-field>
+          </td>
+          <td>
+            <mat-form-field>
+              <label class="crew-label">Port Name</label>
+              <input matInput formControlName="Port_Name" />
+            </mat-form-field>
+          </td>
+          <td>
+            <mat-form-field>
+              <label class="crew-label">Principal Name</label>
+              <input matInput formControlName="Principal_Name" />
+            </mat-form-field>
+          </td>
+        </tr>
+        <tr class="mat-row">
+          <td class="mat-cell right-text">
+            <label class="crew-label">Currency *</label>
+          </td>
+          <td class="mat-cell">
+            <mat-form-field class="two-divide">
+              <mat-select
+                formControlName="Currency_GUID"
+                placeholder="Please select currency"
+              >
+                <mat-option
+                  *ngFor="let b of filtered_currency | async"
+                  [value]="b.CURRENCY_GUID"
+                >
+                  {{ b.SHORT_CODE }}
+                </mat-option>
+              </mat-select>
+              <!-- <mat-error *ngIf="crewForm.get('Currency_GUID').hasError('required')">Planner Service is required</mat-error> -->
+            </mat-form-field>
+          </td>
+        </tr>
+        <tr class="mat-row header">
+          <td class="mat-cell"></td>
+          <td class="mat-cell"><label class="crew-label">On</label></td>
+          <td class="mat-cell"><label class="crew-label">Off</label></td>
+          <td class="mat-cell"><label class="crew-label"></label></td>
+        </tr>
+        <tr class="mat-row">
+          <td class="mat-cell right-text">
+            <label class="crew-label">Original crew change plan</label>
+          </td>
+          <td class="mat-cell">
+            <mat-form-field>
+              <input
+                matInput
+                formControlName="Crew_On_Plan"
+                (keypress)="validateNo($event)"
+                placeholder="Enter on plan"
+              />
+              <mat-error
+                *ngIf="crewForm.get('Crew_On_Plan').hasError('required')"
+                >On is required</mat-error
+              >
+            </mat-form-field>
+          </td>
+          <td class="mat-cell">
+            <mat-form-field>
+              <input
+                matInput
+                formControlName="Crew_Off_Plan"
+                (keypress)="validateNo($event)"
+                placeholder="Enter off plan"
+              />
+              <mat-error
+                *ngIf="crewForm.get('Crew_Off_Plan').hasError('required')"
+                >Off is required</mat-error
+              >
+            </mat-form-field>
+          </td>
+        </tr>
+        <tr class="mat-row">
+          <td class="mat-cell right-text">
+            <label class="crew-label">Final crew change plan</label>
+          </td>
+          <td class="mat-cell">
+            <mat-form-field class="two-divide">
+              <input
+                matInput
+                formControlName="Crew_On_Actual"
+                (keypress)="validateNo($event)"
+                placeholder="Enter actual on plan"
+              />
+              <mat-error
+                *ngIf="crewForm.get('Crew_On_Actual').hasError('required')"
+                >On is required</mat-error
+              >
+            </mat-form-field>
+          </td>
+          <td class="mat-cell">
+            <mat-form-field class="two-divide">
+              <input
+                matInput
+                formControlName="Crew_Off_Actual"
+                (keypress)="validateNo($event)"
+                placeholder="Enter actual off plan"
+              />
+              <mat-error
+                *ngIf="crewForm.get('Crew_Off_Actual').hasError('required')"
+                >Off is required</mat-error
+              >
+            </mat-form-field>
+          </td>
+        </tr>
+        <tr class="mat-row header">
+          <td class="mat-cell right-text">
+            <label class="crew-label">Charge</label>
+          </td>
+          <td class="mat-cell right-text">
+            <label class="crew-label">Charge in SGD</label>
+          </td>
+          <td class="mat-cell right-text">
+            <label class="crew-label">To Charge</label>
+          </td>
+          <td class="mat-cell right-text">
+            <label class="crew-label">Total Amount</label>
+          </td>
+        </tr>
+        <tr class="mat-row">
+          <td class="mat-cell right-text">
+            <label class="crew-label"
+              >Crew Processed not joined / signed off</label
+            >
+          </td>
+          <td class="mat-cell">
+            <mat-form-field class="two-divide">
+              <input
+                matInput
+                formControlName="Crew_Off_Rate"
+                (keypress)="validateNo($event)"
+                placeholder="Enter off rate"
+              />
+              <mat-error
+                *ngIf="crewForm.get('Crew_Off_Rate').hasError('required')"
+                >Off Rate is required</mat-error
+              >
+            </mat-form-field>
+          </td>
+          <td class="mat-cell">
+            <mat-form-field class="two-divide">
+              <input
+                matInput
+                formControlName="Crew_Not_Joined_To_Charge"
+                (keypress)="validateNo($event)"
+                placeholder="00.00"
+                class="right-text"
+                readonly
+              />
+              <!-- <mat-error *ngIf="crewForm.get('Crew_Off_Actual').hasError('required')">Off is required</mat-error> -->
+            </mat-form-field>
+          </td>
+          <td class="mat-cell">
+            <mat-form-field class="two-divide">
+              <input
+                matInput
+                formControlName="Crew_Off_Total"
+                (keypress)="validateNo($event)"
+                placeholder="00.00"
+                class="right-text"
+                readonly
+              />
+              <mat-error
+                *ngIf="crewForm.get('Crew_Off_Total').hasError('required')"
+                >Total is required</mat-error
+              >
+            </mat-form-field>
+          </td>
+        </tr>
+        <tr class="mat-row">
+          <td class="mat-cell right-text">
+            <label class="crew-label">Crew joined / signed off</label>
+          </td>
+          <td class="mat-cell">
+            <mat-form-field class="two-divide">
+              <input
+                matInput
+                formControlName="Crew_On_RATE"
+                (keypress)="validateNo($event)"
+                placeholder="Enter on rate"
+              />
+              <mat-error
+                *ngIf="crewForm.get('Crew_On_RATE').hasError('required')"
+                >On Rate is required</mat-error
+              >
+            </mat-form-field>
+          </td>
+          <td class="mat-cell">
+            <mat-form-field class="two-divide">
+              <input
+                matInput
+                formControlName="Crew_Joined_To_Charge"
+                (keypress)="validateNo($event)"
+                placeholder="00.00"
+                class="right-text"
+                readonly
+              />
+              <!-- <mat-error *ngIf="crewForm.get('Crew_Off_Actual').hasError('required')">Off is required</mat-error> -->
+            </mat-form-field>
+          </td>
+          <td class="mat-cell">
+            <mat-form-field class="two-divide">
+              <input
+                matInput
+                formControlName="Crew_On_Total"
+                (keypress)="validateNo($event)"
+                placeholder="00.00"
+                class="right-text"
+                readonly
+              />
+              <mat-error
+                *ngIf="crewForm.get('Crew_On_Total').hasError('required')"
+                >Off is required</mat-error
+              >
+            </mat-form-field>
+          </td>
+        </tr>
+        <tr class="mat-row">
+          <td class="mat-cell right-text">
+            <label class="crew-label">Total</label>
+          </td>
+          <td class="mat-cell"></td>
+          <td class="mat-cell"></td>
+          <td class="mat-cell">
+            <mat-form-field class="two-divide">
+              <input
+                matInput
+                formControlName="Crew_On_Off_Total"
+                (keypress)="validateNo($event)"
+                placeholder="00.00"
+                class="right-text"
+                readonly
+              />
+              <mat-error
+                *ngIf="crewForm.get('Crew_On_Off_Total').hasError('required')"
+                >Total is required</mat-error
+              >
+            </mat-form-field>
+          </td>
+        </tr>
+        <tr class="mat-row">
+          <td class="mat-cell right-text"><label class="crew-label">Remarks</label></td>
+          <td class="mat-cell" colspan="3">
+            <mat-form-field class="two-divide">
+              <textarea
+                type="text"
+                formControlName="Remarks"
+                rows="3"
+                matInput
+              ></textarea>
+              <mat-error *ngIf="crewForm.get('Remarks').hasError('required')"
+                >Remarks is required</mat-error
+              >
+            </mat-form-field>
+          </td>
+        </tr>
+      </table>
+      <div
+        fxLayout="column"
+        fxLayout.gt-sm="row"
+        fxLayoutGap.gt-sm="24px"
+        *ngIf="ErrorMessage"
+      >
+        <h6 style="color: #ff0000">{{ ErrorMessage }}</h6>
+      </div>
+    </form>
+  </mat-dialog-content>
+  <mat-dialog-actions fxLayout="row" fxLayoutAlign="end center">
+    <button
+      mat-raised-button
+      color="primary"
+      [ngClass]="[!crewForm.valid ? '' : 'save-btn']"
+      [disabled]="!crewForm.valid"
+      (click)="saveRecord()"
+    >
+      SAVE & CLOSE
+    </button>
+    <button mat-raised-button color="warn" (click)="CloseModal()">CLOSE</button>
+    <button
+      mat-raised-button
+      color="warn"
+      [disabled]="!crewForm.valid"
+      (click)="cancelledAndSave()"
+    >
+      CANCELLED
+    </button>
+  </mat-dialog-actions>
+</div>

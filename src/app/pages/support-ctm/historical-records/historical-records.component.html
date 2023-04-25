@@ -1,0 +1,202 @@
+<fury-page-layout mode="card" class="planner-view">
+  <fury-page-layout-header>
+    <form
+      [formGroup]="filterFormGroup"
+      [ngStyle]="{ 'margin-top': '7px' }"
+      (ngSubmit)="onClickSubmit(filterFormGroup.value)"
+    >
+      <div class="filter-area" fxFlex>
+        <div fxLayout="row" fxLayoutAlign="start">
+          <div fxFlex>
+            <mat-form-field>
+              <mat-label>Principal Name</mat-label>
+              <mat-select formControlName="PRINCIPAL_GUID">
+                <mat-option>
+                  <ngx-mat-select-search
+                    formControlName="principal_Filter"
+                    [placeholderLabel]="'search...'"
+                    [noEntriesFoundLabel]="'no matching found!'"
+                  >
+                  </ngx-mat-select-search>
+                </mat-option>
+
+                <mat-option
+                  *ngFor="let b of filtered_principal | async"
+                  [value]="b.COMPANY_GUID"
+                >
+                  {{ b.COMPANY_NAME }}
+                </mat-option>
+              </mat-select>
+            </mat-form-field>
+            <mat-form-field>
+              <mat-label>Vessel</mat-label>
+              <mat-select formControlName="VESSEL_GUID">
+                <mat-option>
+                  <ngx-mat-select-search
+                    formControlName="vessel_Filter"
+                    [placeholderLabel]="'search...'"
+                    [noEntriesFoundLabel]="'no matching found!'"
+                  >
+                  </ngx-mat-select-search>
+                </mat-option>
+
+                <mat-option
+                  *ngFor="let b of filtered_vessel | async"
+                  [value]="b.VESSEL_GUID"
+                >
+                  {{ b.VESSEL_NAME }}
+                </mat-option>
+              </mat-select>
+            </mat-form-field>
+          </div>
+
+          <div fxFlex>
+            <mat-form-field>
+              <mat-label>Date From</mat-label>
+              <input
+                matInput
+                formControlName="DATE_FROM"
+                [matDatepicker]="pickerFrom"
+              />
+              <mat-datepicker-toggle
+                matSuffix
+                [for]="pickerFrom"
+              ></mat-datepicker-toggle>
+              <mat-datepicker #pickerFrom></mat-datepicker>
+            </mat-form-field>
+
+            <mat-form-field>
+              <mat-label>Date To</mat-label>
+              <input
+                matInput
+                formControlName="DATE_TO"
+                [matDatepicker]="pickerTo"
+              />
+              <mat-datepicker-toggle
+                matSuffix
+                [for]="pickerTo"
+              ></mat-datepicker-toggle>
+              <mat-datepicker #pickerTo></mat-datepicker>
+            </mat-form-field>
+          </div>
+
+          <div class="filter-btn-area" fxFlex>
+            <div>
+              <button
+                class="create"
+                mat-raised-button
+                color="primary"
+                class="filter-btn"
+              >
+                Search
+              </button>
+            </div>
+
+            <div>
+              <button
+                class="create"
+                (click)="clearFilter()"
+                mat-raised-button
+                color="warn"
+                class="filter-btn"
+                type="button"
+              >
+                Clear
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </form>
+  </fury-page-layout-header>
+
+  <fury-page-layout-content [@fadeInUp] class="content-area">
+    <div #TABLE>
+      <div class="actions-area">
+        <div>
+          <span (click)="exportAsExcel()" style="cursor: pointer">
+            <img
+              src="../../../../assets/img/excel.png"
+              class="logo"
+              alt="excel"
+            />
+          </span>
+        </div>
+      </div>
+      <div *ngIf="loading" class="content-loader">
+        <mat-progress-spinner
+          mode="indeterminate"
+          color="accent"
+        ></mat-progress-spinner>
+      </div>
+      <table [dataSource]="dataSource" mat-table matSort #table>
+        <ng-container matColumnDef="DATE_DELIVERED">
+          <th
+            *matHeaderCellDef
+            class="actions-cell"
+            [ngStyle]="{ 'white-space': 'initial' }"
+            mat-header-cell
+            mat-sort-header
+          >
+            Date delivered
+          </th>
+          <td *matCellDef="let row" class="actions-cell" mat-cell>
+            <p class="tbl-row-item">
+              {{ row.Remittance_Received | date: "dd MMM YYYY" }}
+            </p>
+          </td>
+        </ng-container>
+        <ng-container matColumnDef="AMOUNT">
+          <th
+            *matHeaderCellDef
+            class="actions-cell"
+            [ngStyle]="{ 'white-space': 'initial' }"
+            mat-header-cell
+            mat-sort-header
+          >
+            Amount
+          </th>
+          <td *matCellDef="let row" class="actions-cell" mat-cell>
+            <p class="tbl-row-item">
+              {{ row.USD_Amount_Due | currency: "USD" }}
+            </p>
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="REF_NUM">
+          <th
+            *matHeaderCellDef
+            class="actions-cell"
+            [ngStyle]="{ 'white-space': 'initial' }"
+            mat-header-cell
+            mat-sort-header
+          >
+            Ref Num
+          </th>
+          <td *matCellDef="let row" class="actions-cell clickable" mat-cell (click)="openDetails(row)">
+            <p class="tbl-row-item">{{ row.REF_NUM }}</p>
+          </td>
+        </ng-container>
+
+        <tr *matHeaderRowDef="visibleColumns" mat-header-row></tr>
+        <tr
+          *matRowDef="let row; columns: visibleColumns"
+          class="clickable route-animations-elements"
+          mat-row
+        ></tr>
+        <tr class="mat-row" *matNoDataRow>
+          <td class="mat-cell" colspan="9999">No data found</td>
+        </tr>
+      </table>
+    </div>
+    <div>
+      <label>Total Amount Due : {{ totalAmountDue | currency: "USD" }}</label>
+      <mat-paginator
+        class="paginator"
+        [pageSizeOptions]="[10, 25, 50, 100]"
+        [pageSize]="pageSize"
+      >
+      </mat-paginator>
+    </div>
+  </fury-page-layout-content>
+</fury-page-layout>

@@ -1,0 +1,218 @@
+<fury-page-layout mode="card" class="vessel-schedule">
+  <fury-page-layout-header>
+    <form
+      [formGroup]="filterFormGroup"
+      [ngStyle]="{ 'margin-top': '7px' }"
+      (ngSubmit)="onClickSubmit(filterFormGroup.value)"
+    >
+      <div class="filter-area" fxFlex>
+        <div fxLayout="row" fxLayoutAlign="start">
+          <mat-form-field>
+            <mat-label>Principal Name</mat-label>
+            <mat-select formControlName="PRINCIPAL_GUID">
+              <mat-option>
+                <ngx-mat-select-search
+                  formControlName="principal_Filter"
+                  [placeholderLabel]="'search...'"
+                  [noEntriesFoundLabel]="'no matching found!'"
+                >
+                </ngx-mat-select-search>
+              </mat-option>
+
+              <mat-option
+                *ngFor="let b of filtered_principal | async"
+                [value]="b.COMPANY_GUID"
+              >
+                {{ b.COMPANY_NAME }}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+          <mat-form-field>
+            <mat-label>Principal Name</mat-label>
+            <mat-select formControlName="AGENT_GUID">
+              <mat-option>
+                <ngx-mat-select-search
+                  formControlName="agent_Filter"
+                  [placeholderLabel]="'search...'"
+                  [noEntriesFoundLabel]="'no matching found!'"
+                >
+                </ngx-mat-select-search>
+              </mat-option>
+
+              <mat-option
+                *ngFor="let b of filtered_users | async"
+                [value]="b.USER_GUID"
+              >
+                {{ b.USER_FIRST_NAME }}
+                {{ b.USER_MIDDLE_NAME }}
+                {{ b.USER_LAST_NAME }}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+
+          <mat-form-field>
+            <mat-label>Vessel ETA FROM</mat-label>
+            <input
+              matInput
+              formControlName="VESSEL_ETA_FROM"
+              [matDatepicker]="pickerTo"
+            />
+            <mat-datepicker-toggle
+              matSuffix
+              [for]="pickerTo"
+            ></mat-datepicker-toggle>
+            <mat-datepicker #pickerTo></mat-datepicker>
+          </mat-form-field>
+          <mat-form-field>
+            <mat-label>Vessel ETA To</mat-label>
+            <input
+              matInput
+              formControlName="VESSEL_ETD_TO"
+              [matDatepicker]="pickerFrom"
+            />
+            <mat-datepicker-toggle
+              matSuffix
+              [for]="pickerFrom"
+            ></mat-datepicker-toggle>
+            <mat-datepicker #pickerFrom></mat-datepicker>
+          </mat-form-field>
+          <div class="filter-btn-area">
+            <button
+              type="button"
+              class="create"
+              mat-raised-button
+              color="primary"
+              class="filter-btn"
+              (click)="onClickSubmit(filterFormGroup.value)"
+            >
+              Search
+            </button>
+            <button
+              type="button"
+              class="create"
+              (click)="clearFilter()"
+              mat-raised-button
+              color="warn"
+              class="filter-btn"
+            >
+              Clear
+            </button>
+          </div>
+        </div>
+      </div>
+    </form>
+  </fury-page-layout-header>
+
+  <fury-page-layout-content [@fadeInUp]>
+    <div *ngIf="loading" class="content-loader">
+      <mat-progress-spinner
+        mode="indeterminate"
+        color="accent"
+      ></mat-progress-spinner>
+    </div>
+
+    <div class="actions-area">
+      <div class="tbl-sm">
+        <span class="create" (click)="sendEmail()">
+          <button mat-mini-fab color="primary">
+            <mat-icon>email</mat-icon>
+          </button>
+        </span>
+      </div>
+    </div>
+
+    <table
+      [dataSource]="dataSourceDetail"
+      mat-table
+      matSort
+      #table2
+      class="grid_table"
+    >
+      <ng-container matColumnDef="COMPANY_NAME">
+        <th
+          *matHeaderCellDef
+          class="actions-cell"
+          [ngStyle]="{ 'white-space': 'initial' }"
+          mat-header-cell
+        >
+          Company Name
+        </th>
+        <td *matCellDef="let row" class="actions-cell" mat-cell>
+          <p class="tbl-row-item">
+            {{ row.COMPANY_NAME }}
+          </p>
+        </td>
+      </ng-container>
+      <ng-container matColumnDef="VESSEL_NAME">
+        <th
+          *matHeaderCellDef
+          class="actions-cell"
+          [ngStyle]="{ 'white-space': 'initial' }"
+          mat-header-cell
+        >
+          Vessel Name
+        </th>
+        <td *matCellDef="let row" class="actions-cell" mat-cell>
+          <p class="tbl-row-item">
+            {{ row.VESSEL_NAME }}
+          </p>
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="VESSEL_TYPE">
+        <th
+          *matHeaderCellDef
+          class="actions-cell"
+          [ngStyle]="{ 'white-space': 'initial' }"
+          mat-header-cell
+        >
+          Vessel Type
+        </th>
+        <td *matCellDef="let row" class="actions-cell" mat-cell>
+          <p class="tbl-row-item">
+            {{ row.VESSEL_TYPE_NAME }}
+          </p>
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="VESSEL_ACTUAL_ARR">
+        <th *matHeaderCellDef class="actions-cell" mat-header-cell>
+          <div
+            style="
+              align-items: baseline !important;
+              display: flex;
+              justify-content: space-between;
+            "
+          >
+            <div class="break-word" [ngStyle]="{ 'white-space': 'initial' }">
+              Vessel Actual Arrival
+            </div>
+          </div>
+        </th>
+        <td *matCellDef="let row" class="actions-cell" mat-cell>
+          <p class="tbl-row-item">
+            {{ row.VESSEL_ACTUAL_ARR | date: "dd MMM yyyy HH:mm" }}
+          </p>
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="PLANNER_PIC">
+        <th *matHeaderCellDef class="actions-cell" mat-header-cell>PIC</th>
+        <td *matCellDef="let row" class="actions-ce ll" mat-cell>
+          <p class="tbl-row-item">
+            {{ row.PIC_NAME }}
+          </p>
+        </td>
+      </ng-container>
+
+      <tr *matHeaderRowDef="visibleColumns" mat-header-row></tr>
+      <tr
+        *matRowDef="let row; columns: visibleColumns"
+        class="clickable route-animations-elements"
+        mat-row
+      ></tr>
+      ƒ
+    </table>
+    <div *ngIf="dataSourceDetail.data.length === 0">No records found</div>
+  </fury-page-layout-content>
+</fury-page-layout>

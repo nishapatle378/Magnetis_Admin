@@ -1,0 +1,238 @@
+<fury-page-layout mode="card" class="add-service">
+  <form [formGroup]="firstFormGroup" [ngStyle]="{ 'margin-top': '7px' }">
+    <div fxLayout="column" fxLayout.gt-sm="row" fxLayoutGap.gt-sm="24px">
+      <mat-form-field fxFlex>
+        <mat-label class="left-label">Planner</mat-label>
+        <mat-select formControlName="Planner_GUID">
+          <mat-option
+            *ngFor="let b of filtered_planner | async"
+            [value]="b.GUID"
+          >
+            {{ b.REF_NUM }} - {{b.VESSEL_NAME}} - {{(b.VESSEL_ACTUAL_ARR ? b.VESSEL_ACTUAL_ARR : b.VESSEL_ETA) | date:"dd MMM YYYY"}}
+          </mat-option>
+        </mat-select>
+        <mat-error
+          *ngIf="firstFormGroup.get('Planner_GUID').hasError('required')"
+          >Planner is required</mat-error
+        >
+      </mat-form-field>
+      <mat-form-field fxFlex>
+        <mat-label class="left-label">Services Category</mat-label>
+        <mat-select formControlName="Services_Category">
+          <mat-option
+            *ngFor="let b of filtered_service_category | async"
+            [value]="b.PARAMETER_GUID"
+          >
+            {{ b.PARAMETER_NAME }}
+          </mat-option>
+        </mat-select>
+        <mat-error
+          *ngIf="firstFormGroup.get('Services_Category').hasError('required')"
+          >Services Category is required</mat-error
+        >
+      </mat-form-field>
+      <mat-form-field fxFlex>
+        <mat-label class="left-label">Service Type</mat-label>
+        <mat-select formControlName="Service_Type">
+          <mat-option>
+            <ngx-mat-select-search
+              formControlName="service_type"
+              [placeholderLabel]="'search...'"
+              [noEntriesFoundLabel]="'no matching found!'"
+            >
+            </ngx-mat-select-search>
+          </mat-option>
+          <mat-option
+            *ngFor="let b of filtered_service_type | async"
+            [value]="b.PARAMETER_GUID"
+          >
+            {{ b.PARAMETER_NAME }}
+          </mat-option>
+        </mat-select>
+        <mat-error
+          *ngIf="firstFormGroup.get('Service_Type').hasError('required')"
+          >Service Type is required</mat-error
+        >
+      </mat-form-field>
+    </div>
+
+    <div fxLayout="column" fxLayout.gt-sm="row" fxLayoutGap.gt-sm="24px">
+      <mat-form-field fxFlex appearance="fill" *ngIf="isBoat">
+        <mat-label>Boat Type</mat-label>
+        <mat-select formControlName="Boat_Types">
+          <mat-option
+            *ngFor="let b of filteredBoatType | async"
+            [value]="b.PARAMETER_GUID"
+          >
+            {{ b.PARAMETER_NAME }}
+          </mat-option>
+        </mat-select>
+        <mat-error *ngIf="firstFormGroup.get('Boat_Types').hasError('required')"
+          >Boat Service is required</mat-error
+        >
+      </mat-form-field>
+      <mat-form-field fxFlex>
+        <mat-label>Service Date</mat-label>
+        <input
+          matInput
+          formControlName="Service_date"
+          placeholder="DD MMM YYYY HH:mm"
+          (keyup)="validateDate($event, 'Service_date')"
+        />
+        <mat-hint>DD MMM YYYY HH:mm</mat-hint>
+        <mat-error
+          *ngIf="firstFormGroup.get('Service_date').hasError('incorrect')"
+          >You have entered incorrect date </mat-error
+        >
+      </mat-form-field>
+      <mat-form-field fxFlex>
+        <mat-label class="left-label">Vendor</mat-label>
+        <mat-select formControlName="Vendor_GUID">
+          <mat-option>
+            <ngx-mat-select-search
+              formControlName="vendor_Filter"
+              [placeholderLabel]="'search...'"
+              [noEntriesFoundLabel]="'no matching found!'"
+            >
+            </ngx-mat-select-search>
+          </mat-option>
+
+          <mat-option
+            *ngFor="let b of filtered_vendor | async"
+            [value]="b.Vendor_GUID"
+          >
+            {{ b.Vendor_Name }}
+          </mat-option>
+        </mat-select>
+        <mat-error
+          *ngIf="firstFormGroup.get('Vendor_GUID').hasError('required')"
+          >Vendor is required</mat-error
+        >
+      </mat-form-field>
+    </div>
+    <div fxLayout="column" fxLayout.gt-sm="row" fxLayoutGap.gt-sm="24px">
+      <mat-form-field fxFlex>
+        <mat-label class="left-label">Quantity</mat-label>
+        <input type="text" formControlName="Svc_Quantity" matInput />
+        <mat-error
+          *ngIf="firstFormGroup.get('Svc_Quantity').hasError('required')"
+          >Quantity is required</mat-error
+        >
+      </mat-form-field>
+      <mat-form-field fxFlex *ngIf="invoiceService">
+        <mat-label class="left-label">Invoice Number</mat-label>
+        <input type="text" formControlName="Invoice_Number" matInput />
+        <mat-error
+          *ngIf="firstFormGroup.get('Invoice_Number').hasError('required')"
+          >Invoice number is required</mat-error
+        >
+      </mat-form-field>
+    </div>
+    <div *ngIf="invoiceService">
+      <mat-form-field fxFlex>
+        <mat-label class="left-label"> Service Amount</mat-label>
+        <input
+          type="text"
+          class="right-text"
+          formControlName="Amount"
+          matInput
+          matInput
+          readonly
+        />
+      </mat-form-field>
+    </div>
+    <div fxLayout="column" fxLayout.gt-sm="row" fxLayoutGap.gt-sm="24px">
+      <mat-form-field fxFlex>
+        <mat-label class="left-label">Currency</mat-label>
+        <mat-select formControlName="Svc_Currency_GUID">
+          <mat-option
+            *ngFor="let b of filtered_currency | async"
+            [value]="b.CURRENCY_GUID"
+          >
+            {{ b.SHORT_CODE }}
+          </mat-option>
+        </mat-select>
+        <mat-error
+          *ngIf="firstFormGroup.get('Svc_Currency_GUID').hasError('required')"
+          >Currency is required</mat-error
+        >
+      </mat-form-field>
+      <mat-form-field fxFlex>
+        <mat-label class="left-label">
+          {{ invoiceService ? "Invoice Amount" : "Amount" }}</mat-label
+        >
+        <input
+          type="text"
+          class="right-text"
+          formControlName="Svc_Amount"
+          matInput
+          placeholder="0"
+          (keypress)="validateNo($event)"
+          matInput
+          autocomplete="off"
+        />
+        <mat-error *ngIf="firstFormGroup.get('Svc_Amount').hasError('required')"
+          >Amount is required</mat-error
+        >
+      </mat-form-field>
+    </div>
+
+    <div fxLayout="column" fxLayout.gt-sm="row" fxLayoutGap.gt-sm="24px">
+      <mat-form-field fxFlex>
+        <mat-label>Remarks</mat-label>
+        <textarea
+          matInput
+          formControlName="Remarks"
+          placeholder="Remarks"
+        ></textarea>
+      </mat-form-field>
+    </div>
+    <div fxLayout="column" fxLayout.gt-sm="row" fxLayoutGap.gt-sm="24px">
+      <mat-form-field fxFlex>
+        <mat-label class="left-label">Status</mat-label>
+        <mat-select formControlName="Status_GUID">
+          <mat-option
+            *ngFor="let b of filtered_status | async"
+            [value]="b.PARAMETER_GUID"
+          >
+            {{ b.PARAMETER_NAME }}
+          </mat-option>
+        </mat-select>
+        <mat-error
+          *ngIf="firstFormGroup.get('Status_GUID').hasError('required')"
+          >Status is required</mat-error
+        >
+      </mat-form-field>
+    </div>
+
+    <!--  -->
+
+    <div
+      fxLayout="column"
+      fxLayout.gt-sm="row"
+      fxLayoutGap.gt-sm="24px"
+      *ngIf="ErrorMessage"
+    >
+      <h6 style="color: #ff0000">{{ ErrorMessage }}</h6>
+    </div>
+  </form>
+  <div>
+    <button
+      mat-raised-button
+      color="primary"
+      [ngClass]="[!firstFormGroup.valid ? '' : 'save-btn']"
+      [disabled]="!firstFormGroup.valid"
+      (click)="saveServiceData()"
+    >
+      SAVE
+    </button>
+    <button
+      mat-raised-button
+      color="warn"
+      (click)="resetForm()"
+      style="margin-left: 10px"
+    >
+      RESET
+    </button>
+  </div>
+</fury-page-layout>

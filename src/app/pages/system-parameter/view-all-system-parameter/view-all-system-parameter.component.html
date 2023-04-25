@@ -1,0 +1,876 @@
+<fury-page-layout mode="card" class="system-parameter">
+  <fury-page-layout-header>
+    <fury-breadcrumbs
+      [@fadeInRight]
+      current="System Parameters"
+    ></fury-breadcrumbs>
+  </fury-page-layout-header>
+
+  <fury-page-layout-content [@fadeInUp]>
+    <mat-card>
+      <mat-card-content fxLayout="row">
+        <mat-card class="sp-card-view">
+          <mat-card-header fxLayout="column">
+            <div
+              fxLayout="row"
+              fxLayoutAlign="space-between"
+              class="sp-card-view-header"
+            >
+              <mat-card-title>Module</mat-card-title>
+              <div fxLayout="row" fxLayoutGap="10px">
+                <button
+                  mat-mini-fab
+                  [matTooltip]="'Sort items'"
+                  color="primary"
+                  class="add-sp-btn save-btn"
+                  (click)="handleSortModal(moduleDataSource.data)"
+                >
+                  <mat-icon class="add-sp-btn-icon">sort</mat-icon>
+                </button>
+                <button
+                  mat-mini-fab
+                  color="primary"
+                  [matTooltip]="'Add item'"
+                  class="add-sp-btn save-btn"
+                  (click)="SaveData({}, false, 'Add Module', 'module')"
+                  *ngIf="
+                    authGuard.checkPermission(
+                      '6610OnftPc4daaf9e-5aa7-4061-940c-6b0cbb1dc012',
+                      'create'
+                    )
+                  "
+                >
+                  <mat-icon class="add-sp-btn-icon">add</mat-icon>
+                </button>
+                <button
+                  mat-mini-fab
+                  color="warn"
+                  class="add-sp-btn"
+                  (click)="removeFilter('module')"
+                  [matTooltip]="'Remove Filter'"
+                >
+                  <mat-icon class="add-sp-btn-icon">remove</mat-icon>
+                </button>
+              </div>
+            </div>
+            <div fxLayout="row" fxLayoutAlign="space-between">
+              <mat-form-field>
+                <mat-label>search...</mat-label>
+                <input
+                  type="text"
+                  [(ngModel)]="moduleSearch"
+                  (input)="onFilterChange($event.target.value, 'module')"
+                  matInput
+                />
+              </mat-form-field>
+              <select
+                class="status-filter"
+                [(ngModel)]="moduleDataType"
+                (change)="FilterDataStatus($event.target.value, 'module')"
+              >
+                <option value="All">All</option>
+                <option value="Activated">Active</option>
+                <option value="Deleted">Deleted</option>
+              </select>
+            </div>
+          </mat-card-header>
+          <mat-card-content>
+            <table
+              [dataSource]="moduleDataSource"
+              mat-table
+              style="width: 100%; margin-top: 5px"
+            >
+              <ng-container matColumnDef="name">
+                <th *matHeaderCellDef class="actions-cell" mat-header-cell>
+                  Name
+                </th>
+                <td *matCellDef="let row" class="actions-cell" mat-cell>
+                  {{ row.PARAMETER_NAME }}
+                </td>
+              </ng-container>
+
+              <ng-container matColumnDef="Action">
+                <th *matHeaderCellDef class="actions-cell" mat-header-cell>
+                  Action
+                </th>
+                <td *matCellDef="let row" class="actions-cell" mat-cell>
+                  <button
+                    mat-icon-button
+                    [matTooltip]="
+                      'Created By : ' +
+                      row.CREATED_BY +
+                      ' | ' +
+                      (row.DATE_CREATED | date: 'dd MMM yyyy HH:mm:ss') +
+                      '&#13;
+              ' +
+                      (row.MODIFIED_BY
+                        ? 'Modified By : ' +
+                          row.MODIFIED_BY +
+                          ' | ' +
+                          (row.DATE_MODIFIED | date: 'd MMM yyyy HH:mm:ss')
+                        : '')
+                    "
+                  >
+                    <mat-icon class="icon-display">info</mat-icon>
+                  </button>
+
+                  <button
+                    type="button"
+                    *ngIf="row.ACTIVE_STATUS"
+                    mat-icon-button
+                    class="action-btn"
+                    [matMenuTriggerFor]="actionsMenu"
+                    (click)="$event.stopPropagation()"
+                  >
+                    <mat-icon>more_horiz</mat-icon>
+                  </button>
+                  <mat-menu
+                    #actionsMenu="matMenu"
+                    yPosition="below"
+                    xPosition="after"
+                    class="user-action-menu"
+                  >
+                    <button
+                      (click)="SaveData(row, true, 'Edit Module', 'module')"
+                      mat-menu-item
+                      *ngIf="
+                        authGuard.checkPermission(
+                          '6610OnftPc4daaf9e-5aa7-4061-940c-6b0cbb1dc012',
+                          'edit'
+                        )
+                      "
+                    >
+                      <mat-icon class="add-sp-btn-icon">edit</mat-icon
+                      ><span>Edit</span>
+                    </button>
+                    <button
+                      (click)="ChangeStatus(row, 'module')"
+                      mat-menu-item
+                      *ngIf="
+                        authGuard.checkPermission(
+                          '6610OnftPc4daaf9e-5aa7-4061-940c-6b0cbb1dc012',
+                          'delete'
+                        )
+                      "
+                    >
+                      <mat-icon class="add-sp-btn-icon">delete_forever</mat-icon
+                      ><span>Delete</span>
+                    </button>
+                  </mat-menu>
+                </td>
+              </ng-container>
+
+              <tr mat-header-row *matHeaderRowDef="visibleColumns"></tr>
+              <tr
+                mat-row
+                *matRowDef="let row; columns: visibleColumns"
+                (click)="selectSP(row, 'module')"
+                [ngClass]="row.selected ? 'sp-data-row-s' : 'sp-data-row'"
+              ></tr>
+            </table>
+            <div *ngIf="moduleDataSource.data.length == 0">
+              <p style="text-align: center">records not found</p>
+            </div>
+            <mat-paginator
+              #modulePaginator
+              class="paginator"
+              [pageSizeOptions]="[10, 25, 50, 100]"
+              [pageSize]="pageSize"
+            ></mat-paginator>
+          </mat-card-content>
+        </mat-card>
+
+        <mat-card class="sp-card-view">
+          <mat-card-header fxLayout="column">
+            <div
+              fxLayout="row"
+              fxLayoutAlign="space-between"
+              class="sp-card-view-header"
+            >
+              <mat-card-title>Parent</mat-card-title>
+              <div fxLayout="row" fxLayoutGap="10px">
+                <button
+                  mat-mini-fab
+                  color="primary"
+                  [matTooltip]="'Sort items'"
+                  class="add-sp-btn save-btn"
+                  (click)="handleSortModal(parentDataSource.data)"
+                >
+                  <mat-icon class="add-sp-btn-icon">sort</mat-icon>
+                </button>
+                <button
+                  mat-mini-fab
+                  color="primary"
+                  [matTooltip]="'Add item'"
+                  class="add-sp-btn save-btn"
+                  (click)="SaveData({}, false, 'Add Parent', 'parent')"
+                  *ngIf="
+                    authGuard.checkPermission(
+                      '6610OnftPc4daaf9e-5aa7-4061-940c-6b0cbb1dc012',
+                      'create'
+                    )
+                  "
+                >
+                  <mat-icon class="add-sp-btn-icon">add</mat-icon>
+                </button>
+                <button
+                  mat-mini-fab
+                  color="warn"
+                  class="add-sp-btn"
+                  (click)="removeFilter('parent')"
+                  [matTooltip]="'Remove Filter'"
+                >
+                  <mat-icon class="add-sp-btn-icon">remove</mat-icon>
+                </button>
+              </div>
+            </div>
+            <div class="search" fxLayout="row" fxLayoutAlign="space-between">
+              <mat-form-field>
+                <mat-label>search...</mat-label>
+                <input
+                  type="text"
+                  [(ngModel)]="parentSearch"
+                  (input)="onFilterChange($event.target.value, 'parent')"
+                  matInput
+                />
+              </mat-form-field>
+
+              <select
+                class="status-filter"
+                [(ngModel)]="parentDataType"
+                (change)="FilterDataStatus($event.target.value, 'parent')"
+              >
+                <option value="All">All</option>
+                <option value="Activated" selected>Active</option>
+                <option value="Deleted">Deleted</option>
+              </select>
+            </div>
+          </mat-card-header>
+          <mat-card-content>
+            <table
+              [dataSource]="parentDataSource"
+              mat-table
+              style="width: 100%; margin-top: 5px"
+            >
+              <ng-container matColumnDef="name">
+                <th *matHeaderCellDef class="actions-cell" mat-header-cell>
+                  Name
+                </th>
+                <td *matCellDef="let row" class="actions-cell" mat-cell>
+                  {{ row.PARAMETER_NAME }}
+                </td>
+              </ng-container>
+
+              <ng-container matColumnDef="Action">
+                <th *matHeaderCellDef class="actions-cell" mat-header-cell>
+                  Action
+                </th>
+                <td *matCellDef="let row" class="actions-cell" mat-cell>
+                  <button
+                    mat-icon-button
+                    [matTooltip]="
+                      'Created By : ' +
+                      row.CREATED_BY +
+                      ' | ' +
+                      (row.DATE_CREATED | date: 'dd MMM yyyy HH:mm:ss') +
+                      '&#13;
+              ' +
+                      (row.MODIFIED_BY
+                        ? 'Modified By : ' +
+                          row.MODIFIED_BY +
+                          ' | ' +
+                          (row.DATE_MODIFIED | date: 'd MMM yyyy HH:mm:ss')
+                        : '')
+                    "
+                  >
+                    <mat-icon class="icon-display">info</mat-icon>
+                  </button>
+
+                  <button
+                    type="button"
+                    *ngIf="row.ACTIVE_STATUS"
+                    mat-icon-button
+                    class="action-btn"
+                    [matMenuTriggerFor]="actionsMenu2"
+                    (click)="$event.stopPropagation()"
+                  >
+                    <mat-icon>more_horiz</mat-icon>
+                  </button>
+                  <mat-menu
+                    #actionsMenu2="matMenu"
+                    yPosition="below"
+                    xPosition="after"
+                    class="user-action-menu"
+                  >
+                    <button
+                      *ngIf="
+                        authGuard.checkPermission(
+                          '6610OnftPc4daaf9e-5aa7-4061-940c-6b0cbb1dc012',
+                          'edit'
+                        )
+                      "
+                      (click)="SaveData(row, true, 'Edit Parent', 'parent')"
+                      mat-menu-item
+                    >
+                      <mat-icon class="add-sp-btn-icon">edit</mat-icon
+                      ><span>Edit</span>
+                    </button>
+                    <button
+                      (click)="ChangeStatus(row, 'parent')"
+                      mat-menu-item
+                      *ngIf="
+                        authGuard.checkPermission(
+                          '6610OnftPc4daaf9e-5aa7-4061-940c-6b0cbb1dc012',
+                          'delete'
+                        )
+                      "
+                    >
+                      <mat-icon class="add-sp-btn-icon">delete_forever</mat-icon
+                      ><span>Delete</span>
+                    </button>
+                  </mat-menu>
+                </td>
+              </ng-container>
+
+              <tr mat-header-row *matHeaderRowDef="visibleColumns"></tr>
+              <tr
+                mat-row
+                *matRowDef="let row; columns: visibleColumns"
+                (click)="selectSP(row, 'parent')"
+                [ngClass]="row.selected ? 'sp-data-row-s' : 'sp-data-row'"
+              ></tr>
+            </table>
+            <div *ngIf="parentDataSource.data.length == 0">
+              <p style="text-align: center">records not found</p>
+            </div>
+            <mat-paginator
+              #parentPaginator
+              class="paginator"
+              [pageSizeOptions]="[10, 25, 50, 100]"
+              [pageSize]="pageSize"
+            ></mat-paginator>
+          </mat-card-content>
+        </mat-card>
+
+        <mat-card class="sp-card-view">
+          <mat-card-header fxLayout="column">
+            <div
+              fxLayout="row"
+              fxLayoutAlign="space-between"
+              class="sp-card-view-header"
+            >
+              <mat-card-title>Child</mat-card-title>
+              <div fxLayout="row" fxLayoutGap="10px">
+                <button
+                  mat-mini-fab
+                  color="primary"
+                  [matTooltip]="'Sort items'"
+                  class="add-sp-btn save-btn"
+                  (click)="handleSortModal(childDataSource.data)"
+                >
+                  <mat-icon class="add-sp-btn-icon">sort</mat-icon>
+                </button>
+                <button
+                  mat-mini-fab
+                  color="primary"
+                  [matTooltip]="'Add item'"
+                  class="add-sp-btn save-btn"
+                  (click)="SaveData({}, false, 'Add Child', 'child')"
+                  *ngIf="
+                    authGuard.checkPermission(
+                      '6610OnftPc4daaf9e-5aa7-4061-940c-6b0cbb1dc012',
+                      'create'
+                    )
+                  "
+                >
+                  <mat-icon class="add-sp-btn-icon">add</mat-icon>
+                </button>
+                <button
+                  mat-mini-fab
+                  color="warn"
+                  class="add-sp-btn"
+                  (click)="removeFilter('child')"
+                  [matTooltip]="'Remove Filter'"
+                >
+                  <mat-icon class="add-sp-btn-icon">remove</mat-icon>
+                </button>
+              </div>
+            </div>
+            <div class="search" fxLayout="row" fxLayoutAlign="space-between">
+              <mat-form-field>
+                <mat-label>search...</mat-label>
+                <input
+                  type="text"
+                  [(ngModel)]="childSearch"
+                  (input)="onFilterChange($event.target.value, 'child')"
+                  matInput
+                />
+              </mat-form-field>
+
+              <select
+                class="status-filter"
+                [(ngModel)]="childDataType"
+                (change)="FilterDataStatus($event.target.value, 'child')"
+              >
+                <option value="All">All</option>
+                <option value="Activated" selected>Active</option>
+                <option value="Deleted">Deleted</option>
+              </select>
+            </div>
+          </mat-card-header>
+          <mat-card-content>
+            <table
+              [dataSource]="childDataSource"
+              mat-table
+              style="width: 100%; margin-top: 5px"
+            >
+              <ng-container matColumnDef="name">
+                <th *matHeaderCellDef class="actions-cell" mat-header-cell>
+                  Name
+                </th>
+                <td *matCellDef="let row" class="actions-cell" mat-cell>
+                  {{ row.PARAMETER_NAME }}
+                </td>
+              </ng-container>
+
+              <ng-container matColumnDef="Action">
+                <th *matHeaderCellDef class="actions-cell" mat-header-cell>
+                  Action
+                </th>
+                <td *matCellDef="let row" class="actions-cell" mat-cell>
+                  <button
+                    mat-icon-button
+                    [matTooltip]="
+                      'Created By : ' +
+                      row.CREATED_BY +
+                      ' | ' +
+                      (row.DATE_CREATED | date: 'dd MMM yyyy HH:mm:ss') +
+                      '&#13;
+              ' +
+                      (row.MODIFIED_BY
+                        ? 'Modified By : ' +
+                          row.MODIFIED_BY +
+                          ' | ' +
+                          (row.DATE_MODIFIED | date: 'd MMM yyyy HH:mm:ss')
+                        : '')
+                    "
+                  >
+                    <mat-icon class="icon-display">info</mat-icon>
+                  </button>
+                  <button
+                    type="button"
+                    mat-icon-button
+                    *ngIf="row.ACTIVE_STATUS"
+                    class="action-btn"
+                    [matMenuTriggerFor]="actionsMenu"
+                    (click)="$event.stopPropagation()"
+                  >
+                    <mat-icon>more_horiz</mat-icon>
+                  </button>
+                  <mat-menu
+                    #actionsMenu="matMenu"
+                    yPosition="below"
+                    xPosition="after"
+                    class="user-action-menu"
+                  >
+                    <button
+                      (click)="SaveData(row, true, 'Edit Child', 'child')"
+                      mat-menu-item
+                      *ngIf="
+                        authGuard.checkPermission(
+                          '6610OnftPc4daaf9e-5aa7-4061-940c-6b0cbb1dc012',
+                          'edit'
+                        )
+                      "
+                    >
+                      <mat-icon class="add-sp-btn-icon">edit</mat-icon
+                      ><span>Edit</span>
+                    </button>
+                    <button
+                      (click)="ChangeStatus(row, 'child')"
+                      mat-menu-item
+                      *ngIf="
+                        authGuard.checkPermission(
+                          '6610OnftPc4daaf9e-5aa7-4061-940c-6b0cbb1dc012',
+                          'delete'
+                        )
+                      "
+                    >
+                      <mat-icon class="add-sp-btn-icon">delete_forever</mat-icon
+                      ><span>Delete</span>
+                    </button>
+                  </mat-menu>
+                </td>
+              </ng-container>
+
+              <tr mat-header-row *matHeaderRowDef="visibleColumns"></tr>
+              <tr
+                mat-row
+                *matRowDef="let row; columns: visibleColumns"
+                (click)="selectSP(row, 'child')"
+                [ngClass]="row.selected ? 'sp-data-row-s' : 'sp-data-row'"
+              ></tr>
+            </table>
+            <div *ngIf="childDataSource.data.length == 0">
+              <p style="text-align: center">records not found</p>
+            </div>
+            <mat-paginator
+              #childPaginator
+              class="paginator"
+              [pageSizeOptions]="[10, 25, 50, 100]"
+              [pageSize]="pageSize"
+            ></mat-paginator>
+          </mat-card-content>
+        </mat-card>
+
+        <mat-card class="sp-card-view">
+          <mat-card-header fxLayout="column">
+            <div
+              fxLayout="row"
+              fxLayoutAlign="space-between"
+              class="sp-card-view-header"
+            >
+              <mat-card-title> Grand Child</mat-card-title>
+              <div fxLayout="row" fxLayoutGap="10px">
+                <button
+                  mat-mini-fab
+                  color="primary"
+                  [matTooltip]="'Sort items'"
+                  class="add-sp-btn save-btn"
+                  (click)="handleSortModal(grandDataSource.data)"
+                >
+                  <mat-icon class="add-sp-btn-icon">sort</mat-icon>
+                </button>
+                <button
+                  mat-mini-fab
+                  color="primary"
+                  [matTooltip]="'Add item'"
+                  class="add-sp-btn save-btn"
+                  (click)="SaveData({}, false, 'Add Grand Child', 'grand')"
+                  *ngIf="
+                    authGuard.checkPermission(
+                      '6610OnftPc4daaf9e-5aa7-4061-940c-6b0cbb1dc012',
+                      'create'
+                    )
+                  "
+                >
+                  <mat-icon class="add-sp-btn-icon">add</mat-icon>
+                </button>
+                <button
+                  mat-mini-fab
+                  color="warn"
+                  class="add-sp-btn"
+                  (click)="removeFilter('grand')"
+                  [matTooltip]="'Remove Filter'"
+                >
+                  <mat-icon class="add-sp-btn-icon">remove</mat-icon>
+                </button>
+              </div>
+            </div>
+            <div class="search" fxLayout="row" fxLayoutAlign="space-between">
+              <mat-form-field>
+                <mat-label>search...</mat-label>
+                <input
+                  type="text"
+                  [(ngModel)]="grandSearch"
+                  (input)="onFilterChange($event.target.value, 'grand')"
+                  matInput
+                />
+              </mat-form-field>
+
+              <select
+                class="status-filter"
+                [(ngModel)]="grandDataType"
+                (change)="FilterDataStatus($event.target.value, 'module')"
+              >
+                <option value="All">All</option>
+                <option value="Activated" selected>Active</option>
+                <option value="Deleted">Deleted</option>
+              </select>
+            </div>
+          </mat-card-header>
+          <mat-card-content>
+            <table
+              [dataSource]="grandDataSource"
+              mat-table
+              style="width: 100%; margin-top: 5px"
+            >
+              <ng-container matColumnDef="name">
+                <th *matHeaderCellDef class="actions-cell" mat-header-cell>
+                  Name
+                </th>
+                <td *matCellDef="let row" class="actions-cell" mat-cell>
+                  {{ row.PARAMETER_NAME }}
+                </td>
+              </ng-container>
+
+              <ng-container matColumnDef="Action">
+                <th *matHeaderCellDef class="actions-cell" mat-header-cell>
+                  Action
+                </th>
+                <td *matCellDef="let row" class="actions-cell" mat-cell>
+                  <button
+                    mat-icon-button
+                    [matTooltip]="
+                      'Created By : ' +
+                      row.CREATED_BY +
+                      ' | ' +
+                      (row.DATE_CREATED | date: 'dd MMM yyyy HH:mm:ss') +
+                      '&#13;
+              ' +
+                      (row.MODIFIED_BY
+                        ? 'Modified By : ' +
+                          row.MODIFIED_BY +
+                          ' | ' +
+                          (row.DATE_MODIFIED | date: 'd MMM yyyy HH:mm:ss')
+                        : '')
+                    "
+                  >
+                    <mat-icon class="icon-display">info</mat-icon>
+                  </button>
+
+                  <button
+                    type="button"
+                    mat-icon-button
+                    *ngIf="row.ACTIVE_STATUS"
+                    class="action-btn"
+                    [matMenuTriggerFor]="actionsMenu"
+                    (click)="$event.stopPropagation()"
+                  >
+                    <mat-icon>more_horiz</mat-icon>
+                  </button>
+                  <mat-menu
+                    #actionsMenu="matMenu"
+                    yPosition="below"
+                    xPosition="after"
+                    class="user-action-menu"
+                  >
+                    <button
+                      (click)="SaveData(row, true, 'Edit Grand Child', 'grand')"
+                      mat-menu-item
+                      *ngIf="
+                        authGuard.checkPermission(
+                          '6610OnftPc4daaf9e-5aa7-4061-940c-6b0cbb1dc012',
+                          'edit'
+                        )
+                      "
+                    >
+                      <mat-icon class="add-sp-btn-icon">edit</mat-icon
+                      ><span>Edit</span>
+                    </button>
+                    <button
+                      (click)="ChangeStatus(row, 'grand')"
+                      mat-menu-item
+                      *ngIf="
+                        authGuard.checkPermission(
+                          '6610OnftPc4daaf9e-5aa7-4061-940c-6b0cbb1dc012',
+                          'delete'
+                        )
+                      "
+                    >
+                      <mat-icon class="add-sp-btn-icon">delete_forever</mat-icon
+                      ><span>Delete</span>
+                    </button>
+                  </mat-menu>
+                </td>
+              </ng-container>
+
+              <tr mat-header-row *matHeaderRowDef="visibleColumns"></tr>
+              <tr
+                mat-row
+                *matRowDef="let row; columns: visibleColumns"
+                (click)="selectSP(row, 'grand')"
+                [ngClass]="row.selected ? 'sp-data-row-s' : 'sp-data-row'"
+              ></tr>
+            </table>
+            <div *ngIf="grandDataSource.data.length == 0">
+              <p style="text-align: center">records not found</p>
+            </div>
+            <mat-paginator
+              #grandPaginator
+              class="paginator"
+              [pageSizeOptions]="[10, 25, 50, 100]"
+              [pageSize]="pageSize"
+            ></mat-paginator>
+          </mat-card-content>
+        </mat-card>
+
+        <mat-card class="sp-card-view">
+          <mat-card-header fxLayout="column">
+            <div
+              fxLayout="row"
+              fxLayoutAlign="space-between"
+              class="sp-card-view-header"
+            >
+              <mat-card-title> Great Grand Child</mat-card-title>
+              <div fxLayout="row" fxLayoutGap="10px">
+                <button
+                  mat-mini-fab
+                  color="primary"
+                  [matTooltip]="'Sort items'"
+                  class="add-sp-btn save-btn"
+                  (click)="handleSortModal(greatDataSource.data)"
+                >
+                  <mat-icon class="add-sp-btn-icon">sort</mat-icon>
+                </button>
+                <button
+                  mat-mini-fab
+                  color="primary"
+                  [matTooltip]="'Add item'"
+                  class="add-sp-btn save-btn"
+                  (click)="
+                    SaveData({}, false, 'Add Great Grand Child', 'great')
+                  "
+                  *ngIf="
+                    authGuard.checkPermission(
+                      '6610OnftPc4daaf9e-5aa7-4061-940c-6b0cbb1dc012',
+                      'create'
+                    )
+                  "
+                >
+                  <mat-icon class="add-sp-btn-icon">add</mat-icon>
+                </button>
+                <button
+                  mat-mini-fab
+                  color="warn"
+                  class="add-sp-btn"
+                  (click)="removeFilter('great')"
+                  [matTooltip]="'Remove Filter'"
+                >
+                  <mat-icon class="add-sp-btn-icon">remove</mat-icon>
+                </button>
+              </div>
+            </div>
+            <div class="search" fxLayout="row" fxLayoutAlign="space-between">
+              <mat-form-field>
+                <mat-label>search...</mat-label>
+                <input
+                  type="text"
+                  [(ngModel)]="greatSearch"
+                  (input)="onFilterChange($event.target.value, 'great')"
+                  matInput
+                />
+              </mat-form-field>
+
+              <select
+                class="status-filter"
+                [(ngModel)]="greatDataType"
+                (change)="FilterDataStatus($event.target.value, 'module')"
+              >
+                <option value="All">All</option>
+                <option value="Activated" selected>Active</option>
+                <option value="Deleted">Deleted</option>
+              </select>
+            </div>
+          </mat-card-header>
+          <mat-card-content>
+            <table
+              [dataSource]="greatDataSource"
+              mat-table
+              style="width: 100%; margin-top: 5px"
+            >
+              <ng-container matColumnDef="name">
+                <th *matHeaderCellDef class="actions-cell" mat-header-cell>
+                  Name
+                </th>
+                <td *matCellDef="let row" class="actions-cell" mat-cell>
+                  {{ row.PARAMETER_NAME }}
+                </td>
+              </ng-container>
+
+              <ng-container matColumnDef="Action">
+                <th *matHeaderCellDef class="actions-cell" mat-header-cell>
+                  Action
+                </th>
+                <td *matCellDef="let row" class="actions-cell" mat-cell>
+                  <button
+                    mat-icon-button
+                    [matTooltip]="
+                      'Created By : ' +
+                      row.CREATED_BY +
+                      ' | ' +
+                      (row.DATE_CREATED | date: 'dd MMM yyyy HH:mm:ss') +
+                      '&#13;
+                                ' +
+                      (row.MODIFIED_BY
+                        ? 'Modified By : ' +
+                          row.MODIFIED_BY +
+                          ' | ' +
+                          (row.DATE_MODIFIED | date: 'd MMM yyyy HH:mm:ss')
+                        : '')
+                    "
+                  >
+                    <mat-icon class="icon-display">info</mat-icon>
+                  </button>
+
+                  <button
+                    type="button"
+                    mat-icon-button
+                    *ngIf="row.ACTIVE_STATUS"
+                    class="action-btn"
+                    [matMenuTriggerFor]="actionsMenu"
+                    (click)="$event.stopPropagation()"
+                  >
+                    <mat-icon>more_horiz</mat-icon>
+                  </button>
+                  <mat-menu
+                    #actionsMenu="matMenu"
+                    yPosition="below"
+                    xPosition="after"
+                    class="user-action-menu"
+                  >
+                    <button
+                      (click)="
+                        SaveData(row, true, 'Edit Great Grand Child', 'great')
+                      "
+                      mat-menu-item
+                      *ngIf="
+                        authGuard.checkPermission(
+                          '6610OnftPc4daaf9e-5aa7-4061-940c-6b0cbb1dc012',
+                          'edit'
+                        )
+                      "
+                    >
+                      <mat-icon class="add-sp-btn-icon">edit</mat-icon
+                      ><span>Edit</span>
+                    </button>
+                    <button
+                      (click)="ChangeStatus(row, 'great')"
+                      mat-menu-item
+                      *ngIf="
+                        authGuard.checkPermission(
+                          '6610OnftPc4daaf9e-5aa7-4061-940c-6b0cbb1dc012',
+                          'delete'
+                        )
+                      "
+                    >
+                      <mat-icon class="add-sp-btn-icon">delete_forever</mat-icon
+                      ><span>Delete</span>
+                    </button>
+                  </mat-menu>
+                </td>
+              </ng-container>
+
+              <tr mat-header-row *matHeaderRowDef="visibleColumns"></tr>
+              <tr
+                mat-row
+                *matRowDef="let row; columns: visibleColumns"
+                (click)="selectSP(row, 'great')"
+                [ngClass]="row.selected ? 'sp-data-row-s' : 'sp-data-row'"
+              ></tr>
+            </table>
+            <div *ngIf="greatDataSource.data.length == 0">
+              <p style="text-align: center">records not found</p>
+            </div>
+            <mat-paginator
+              #greatPaginator
+              class="paginator"
+              [pageSizeOptions]="[10, 25, 50, 100]"
+              [pageSize]="pageSize"
+            ></mat-paginator>
+          </mat-card-content>
+        </mat-card>
+      </mat-card-content>
+    </mat-card>
+  </fury-page-layout-content>
+</fury-page-layout>

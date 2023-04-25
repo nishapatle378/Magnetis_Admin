@@ -1,0 +1,232 @@
+<fury-page-layout mode="card">
+  <fury-page-layout-header>
+    <fury-breadcrumbs [@fadeInRight] current="Currencies"></fury-breadcrumbs>
+  </fury-page-layout-header>
+
+  <fury-page-layout-content [@fadeInUp]>
+    <div class="actions-area">
+      <div>
+        <span
+          class="create"
+          *ngIf="
+            authGuard.checkPermission(
+              'ueiDydH186d51831f-2dc3-41fe-a91d-23f41134d8ef',
+              'create'
+            )
+          "
+        >
+          <button
+            class="create"
+            [ngStyle]="{ 'margin-top': '10px' }"
+            (click)="SaveData(null, false)"
+            type="button"
+            mat-mini-fab
+            color="primary"
+          >
+            <mat-icon>add</mat-icon>
+          </button>
+          Add Currency
+        </span>
+      </div>
+
+      <div>
+        <span
+          (click)="exportAsExcel()"
+          style="cursor: pointer"
+          *ngIf="
+            authGuard.checkPermission(
+              'ueiDydH186d51831f-2dc3-41fe-a91d-23f41134d8ef',
+              'export'
+            )
+          "
+        >
+          <img
+            src="../../../../assets/img/excel.png"
+            class="logo"
+            alt="excel"
+          />
+        </span>
+      </div>
+    </div>
+    <!-- <fury-list name="Currencies" [columns]="columns" (filterChange)="onFilterChange($event)"> -->
+    <!-- <div class="actions">
+            <div style="background-color: #ffffff; padding: 10px;" fxLayout="row" fxFlex  fxLayoutAlign="end">
+
+              <select style="margin-right: 10px; width: 100px;" (change)="FilterDataStatus($event.target.value)">
+                <option value="All">All</option>
+                <option value="Activated" selected>Active</option>
+                <option value="Deleted">Deleted</option>
+              </select>
+              <span  (click)="exportAsExcel()" style="cursor: pointer;">
+                <img
+                  src="../../../../assets/img/excel.png"
+                 class="logo"
+                  alt="excel"
+                />
+              </span>
+               <button mat-mini-fab color="primary" (click)="exportAsExcel()"><mat-icon>sticky_note_2</mat-icon></button> -->
+    <!-- </div>
+            <button class="create" [ngStyle]="{'margin-top': '10px'}" (click)="SaveData(null, false)" type="button" mat-mini-fab color="primary">
+              <mat-icon>add</mat-icon>
+            </button>
+          </div> -->
+
+    <!-- <div style="background-color: #ffffff; padding: 10px;" fxLayout="row" fxFlex  fxLayoutAlign="end">
+
+            <select style="margin-right: 10px; width: 100px;" (change)="FilterDataStatus($event.target.value)">
+              <option value="All">All</option>
+              <option value="Activated" selected>Active</option>
+              <option value="Deleted">Deleted</option>
+            </select>
+
+            <button mat-mini-fab color="primary" (click)="exportAsExcel()"><mat-icon>sticky_note_2</mat-icon></button>
+          </div> -->
+
+    <div #TABLE>
+      <table [dataSource]="dataSource" mat-table matSort #table>
+        <!-- <ng-container matColumnDef="srn">
+              <th *matHeaderCellDef class="actions-cell" mat-header-cell mat-sort-header>Sr No</th>
+              <td *matCellDef="let row; let i =index" class="actions-cell" mat-cell>
+              <p class="tbl-row-item">{{i + 1}}</p>
+              </td>
+            </ng-container> -->
+
+        <ng-container matColumnDef="SHORT_CODE">
+          <th
+            *matHeaderCellDef
+            class="actions-cell"
+            mat-header-cell
+            mat-sort-header
+          >
+            Short Code
+          </th>
+          <td *matCellDef="let row" class="actions-cell" mat-cell>
+            <p class="tbl-row-item">{{ row.SHORT_CODE }}</p>
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="COUNTRY_NAME">
+          <th
+            *matHeaderCellDef
+            class="actions-cell"
+            mat-header-cell
+            mat-sort-header
+          >
+            Country
+          </th>
+          <td *matCellDef="let row" class="actions-cell" mat-cell>
+            <p class="tbl-row-item">{{ row.COUNTRY_NAME }}</p>
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="DESCRIPTION">
+          <th
+            *matHeaderCellDef
+            class="actions-cell"
+            mat-header-cell
+            mat-sort-header
+          >
+            Description
+          </th>
+          <td *matCellDef="let row" class="actions-cell" mat-cell>
+            <p class="tbl-row-item">{{ row.DESCRIPTION }}</p>
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="Called_As">
+          <th
+            *matHeaderCellDef
+            class="actions-cell"
+            mat-header-cell
+            mat-sort-header
+          >
+            Called As
+          </th>
+          <td *matCellDef="let row" class="actions-cell" mat-cell>
+            <p class="tbl-row-item">{{ row.Called_As }}</p>
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="Action">
+          <th
+            *matHeaderCellDef
+            class="actions-cell"
+            mat-header-cell
+            mat-sort-header
+          >
+            Action
+          </th>
+          <td *matCellDef="let row" class="actions-cell" mat-cell>
+            <!-- -->
+            <button
+              mat-icon-button
+              (click)="SaveData(row, true)"
+              *ngIf="
+                authGuard.checkPermission(
+                  'ueiDydH186d51831f-2dc3-41fe-a91d-23f41134d8ef',
+                  'edit'
+                )
+              "
+            >
+              <mat-icon class="icon-display">edit</mat-icon>
+            </button>
+            <!--  -->
+            <button
+              mat-icon-button
+              (click)="ChangeStatus(row)"
+              *ngIf="
+                row.ACTIVE_STATUS &&
+                authGuard.checkPermission(
+                  'ueiDydH186d51831f-2dc3-41fe-a91d-23f41134d8ef',
+                  'edit'
+                )
+              "
+            >
+              <!-- <mat-icon [ngStyle]="{'color': row.ACTIVE_STATUS ? 'green' : 'red', 'font-weight':'bold'}">{{row.ACTIVE_STATUS ? 'check' : 'close'}}</mat-icon> -->
+              <mat-icon
+                class="icon-display"
+                [ngStyle]="{ color: 'red', 'font-weight': 'bold' }"
+                >{{ "close" }}</mat-icon
+              >
+            </button>
+
+            <button
+              mat-icon-button
+              [matTooltip]="
+                'Created By : ' +
+                row.CREATED_BY +
+                ' | ' +
+                (row.DATE_CREATED | date: 'dd MMM yyyy HH:mm:ss') +
+                '&#13;
+                    ' +
+                (row.MODIFIED_BY
+                  ? 'Modified By : ' +
+                    row.MODIFIED_BY +
+                    ' | ' +
+                    (row.DATE_MODIFIED | date: 'd MMM yyyy HH:mm:ss')
+                  : '')
+              "
+            >
+              <mat-icon class="icon-display">info</mat-icon>
+            </button>
+          </td>
+        </ng-container>
+
+        <tr *matHeaderRowDef="visibleColumns" mat-header-row></tr>
+        <tr
+          *matRowDef="let row; columns: visibleColumns"
+          class="clickable route-animations-elements"
+          mat-row
+        ></tr>
+      </table>
+    </div>
+
+    <mat-paginator
+      class="paginator"
+      [pageSizeOptions]="[10, 25, 50, 100]"
+      [pageSize]="pageSize"
+    ></mat-paginator>
+
+    <!-- </fury-list> -->
+  </fury-page-layout-content>
+</fury-page-layout>

@@ -1,0 +1,249 @@
+<div mat-dialog-title>{{ IsEdit ? "Edit" : "Add" }} follow-up</div>
+<mat-dialog-content style="height: 100% !important" class="add-service">
+  <form [formGroup]="firstFormGroup" [ngStyle]="{ 'margin-top': '7px' }">
+    <div class="main-section">
+      <div class="child-section-left">
+        <div
+          fxLayout="column"
+          fxLayout.gt-sm="row"
+          fxLayoutGap.gt-sm="24px"
+          *ngIf="!IsEdit"
+        >
+          <mat-form-field fxFlex>
+            <mat-label class="left-label">Planner</mat-label>
+            <mat-select formControlName="Planner_GUID">
+              <mat-option
+                *ngFor="let b of filtered_planner | async"
+                [value]="b.GUID"
+              >
+                {{ b.REF_NUM }} - {{ b.VESSEL_NAME }} -
+                {{
+                  (b.VESSEL_ACTUAL_ARR ? b.VESSEL_ACTUAL_ARR : b.VESSEL_ETA)
+                    | date: "dd MMM YYYY"
+                }}
+              </mat-option>
+            </mat-select>
+            <mat-error
+              *ngIf="firstFormGroup.get('Planner_GUID').hasError('required')"
+              >Planner is required</mat-error
+            >
+          </mat-form-field>
+        </div>
+        <div
+          fxLayout="column"
+          fxLayout.gt-sm="row"
+          fxLayoutGap.gt-sm="24px"
+          *ngIf="!IsEdit"
+        >
+          <mat-form-field fxFlex>
+            <mat-label class="left-label">Principal</mat-label>
+            <mat-select formControlName="Principal_GUID">
+              <mat-option>
+                <ngx-mat-select-search
+                  formControlName="principal_Filter"
+                  [placeholderLabel]="'search...'"
+                  [noEntriesFoundLabel]="'no matching found!'"
+                >
+                </ngx-mat-select-search>
+              </mat-option>
+              <mat-option
+                *ngFor="let b of filteredPrincipal | async"
+                [value]="b.COMPANY_GUID"
+              >
+                {{ b.COMPANY_NAME }}
+              </mat-option>
+            </mat-select>
+            <mat-error
+              *ngIf="firstFormGroup.get('Principal_GUID').hasError('required')"
+              >Principal is required</mat-error
+            >
+          </mat-form-field>
+        </div>
+        <div
+          fxLayout="column"
+          fxLayout.gt-sm="row"
+          fxLayoutGap.gt-sm="24px"
+          *ngIf="!IsEdit"
+        >
+          <mat-form-field fxFlex>
+            <mat-label class="left-label">Vessel</mat-label>
+            <mat-select formControlName="Vessel_GUID">
+              <mat-option>
+                <ngx-mat-select-search
+                  formControlName="vessel_Filter"
+                  [placeholderLabel]="'search...'"
+                  [noEntriesFoundLabel]="'no matching found!'"
+                >
+                </ngx-mat-select-search>
+              </mat-option>
+              <mat-option value="ADDVESSEL">+ Add New Vessel</mat-option>
+              <mat-option
+                *ngFor="let b of filteredVessel | async"
+                [value]="b.VESSEL_GUID"
+              >
+                {{ b.VESSEL_NAME }}
+              </mat-option>
+            </mat-select>
+            <mat-error
+              *ngIf="firstFormGroup.get('Vessel_GUID').hasError('required')"
+              >Vessel is required</mat-error
+            >
+          </mat-form-field>
+        </div>
+        <div
+          fxLayout="column"
+          fxLayout.gt-sm="row"
+          fxLayoutGap.gt-sm="24px"
+          *ngIf="IsEdit"
+        >
+          <table matTable class="planner-table">
+            <tr>
+              <th colspan="2">Planner Detail</th>
+            </tr>
+            <tr>
+              <td>Planner Ref</td>
+              <td>{{ Services_Data.Planner_Ref }}</td>
+            </tr>
+            <tr>
+              <td>Principal Name</td>
+              <td>{{ Services_Data.COMPANY_NAME }}</td>
+            </tr>
+            <tr>
+              <td>Vessel Name</td>
+              <td>{{ Services_Data.VESSEL_NAME }}</td>
+            </tr>
+            <tr>
+              <td>Service Category</td>
+              <td>{{ Services_Data.Service_Category_Name }}</td>
+            </tr>
+            <tr>
+              <td>Service Type</td>
+              <td>
+                {{ Services_Data.Service_Type_Name }}
+                {{ getBoatType(Services_Data.Boat_Type_GUID) }}
+              </td>
+            </tr>
+            <tr>
+              <td>Service Date</td>
+              <td>
+                {{
+                  (Services_Data?.Boat_Date
+                    ? Services_Data?.Boat_Date
+                    : Services_Data?.Service_date
+                  ) | date: "d MMM yyyy HH:mm"
+                }}
+              </td>
+            </tr>
+            <tr>
+              <td>Vendor Name</td>
+              <td>{{ Services_Data.Vendor_Name }}</td>
+            </tr>
+            <tr>
+              <td>Quantity</td>
+              <td>{{ Services_Data.Svc_Quantity }}</td>
+            </tr>
+            <tr>
+              <td>Currency</td>
+              <td>{{ Services_Data.Currency_Name }}</td>
+            </tr>
+            <tr>
+              <td>Amount</td>
+              <td>
+                {{ Services_Data.Svc_Amount || 0 | number: "2.2" }}
+              </td>
+            </tr>
+            <tr
+              *ngIf="
+                Services_Data.Service_Type && Services_Data.Services_GUID !== ''
+              "
+            >
+              <td colspan="2" style="text-align: center">
+                <a
+                  mat-raised-button
+                  color="primary"
+                  *ngIf="
+                    Services_Data.Service_Type ===
+                    'vcryU7qKZ540c23dc-04ea-4e04-b18e-49600e155e99'
+                  "
+                  routerLink="/support-ctm/edit-service/{{
+                    Services_Data.Services_GUID
+                  }}"
+                  target="_blank"
+                >
+                  VIEW CTM DETAIL
+                </a>
+                <button
+                  *ngIf="
+                    Services_Data.Service_Type !==
+                    'vcryU7qKZ540c23dc-04ea-4e04-b18e-49600e155e99'
+                  "
+                  mat-raised-button
+                  color="primary"
+                  (click)="showSeviceDetail(Services_Data)"
+                >
+                  VIEW
+                  {{
+                    Services_Data.Service_Type ===
+                    "9mY6JkMJj72a8a16b-27e2-444d-8776-d930860cfd10"
+                      ? "CREW Handling"
+                      : ""
+                  }}
+                  DETAIL
+                </button>
+              </td>
+            </tr>
+          </table>
+        </div>
+      </div>
+      <div class="child-section-right">
+        <div fxLayout="column" fxLayout.gt-sm="row" fxLayoutGap.gt-sm="24px">
+          <mat-form-field fxFlex>
+            <mat-label>Remarks</mat-label>
+            <textarea
+              rows="10"
+              matInput
+              formControlName="Remarks"
+              placeholder="Remarks"
+            ></textarea>
+          </mat-form-field>
+        </div>
+        <div fxLayout="column" fxLayout.gt-sm="row" fxLayoutGap.gt-sm="24px">
+          <mat-form-field fxFlex>
+            <mat-label class="left-label">Status</mat-label>
+            <mat-select formControlName="Status_GUID">
+              <mat-option
+                *ngFor="let b of filtered_status | async"
+                [value]="b.PARAMETER_GUID"
+              >
+                {{ b.PARAMETER_NAME }}
+              </mat-option>
+            </mat-select>
+            <mat-error
+              *ngIf="firstFormGroup.get('Status_GUID').hasError('required')"
+              >Status is required</mat-error
+            >
+          </mat-form-field>
+        </div>
+      </div>
+    </div>
+  </form>
+</mat-dialog-content>
+<mat-dialog-actions fxLayout="row" fxLayoutAlign="end center">
+  <button
+    mat-raised-button
+    color="primary"
+    [ngClass]="[!firstFormGroup.valid ? '' : 'save-btn']"
+    [disabled]="!firstFormGroup.valid"
+    (click)="saveServiceData()"
+  >
+    SAVE
+  </button>
+  <button
+    mat-raised-button
+    color="warn"
+    (click)="CloseModal()"
+    style="margin-left: 10px"
+  >
+    Close
+  </button>
+</mat-dialog-actions>

@@ -1,0 +1,425 @@
+<div mat-dialog-title>{{ IsEdit ? "Edit" : "Add" }} Support Logistics</div>
+
+<mat-dialog-content style="height: 100% !important" class="logistic-dialog">
+  <form
+    [formGroup]="logisticsForm"
+    [ngStyle]="{ 'margin-top': '7px' }"
+    class="logistic-form"
+  >
+    <div class="table-out-section">
+      <div
+        fxLayout="column"
+        fxLayout.gt-sm="row"
+        fxLayoutGap.gt-sm="24px"
+        [ngStyle]="{ 'margin-bottom': '10px' }"
+      >
+        <mat-form-field fxFlex>
+          <mat-label>Vessel</mat-label>
+          <mat-select formControlName="Vessel_GUID">
+            <mat-option>
+              <ngx-mat-select-search
+                formControlName="vessel_Filter"
+                [placeholderLabel]="'search...'"
+                [noEntriesFoundLabel]="'no matching found!'"
+              >
+              </ngx-mat-select-search>
+            </mat-option>
+            <mat-option value="ADDVESSEL">+ Add New Vessel</mat-option>
+            <mat-option
+              *ngFor="let b of filtered_vessel | async"
+              [value]="b.VESSEL_GUID"
+            >
+              {{ b.VESSEL_NAME }}
+            </mat-option>
+          </mat-select>
+          <mat-error
+            *ngIf="logisticsForm.get('Vessel_GUID').hasError('required')"
+          >
+            Vessel is required</mat-error
+          >
+        </mat-form-field>
+        <mat-form-field fxFlex>
+          <mat-label>Vessel Type</mat-label>
+          <input matInput formControlName="VESSEL_TYPE_NAME" readonly />
+        </mat-form-field>
+
+        <mat-form-field fxFlex>
+          <mat-label>Principal Name</mat-label>
+          <input matInput formControlName="PRINCIPAL_NAME" readonly />
+        </mat-form-field>
+        <mat-form-field fxFlex>
+          <mat-label>Principal Ref</mat-label>
+          <input type="text" formControlName="Principal_Ref" matInput />
+        </mat-form-field>
+      </div>
+      <div
+        fxLayout="column"
+        fxLayout.gt-sm="row"
+        fxLayoutGap.gt-sm="24px"
+        [ngStyle]="{ 'margin-bottom': '10px' }"
+      >
+        <mat-form-field fxFlex>
+          <mat-label>Log REF</mat-label>
+          <input type="text" formControlName="Log_Ref" matInput readonly />
+        </mat-form-field>
+        <mat-form-field fxFlex>
+          <mat-label>Type</mat-label>
+          <mat-select formControlName="Type_GUID" placeholder="">
+            <mat-option
+              *ngFor="let b of filtered_type | async"
+              [value]="b.PARAMETER_GUID"
+            >
+              {{ b.PARAMETER_NAME }}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+      </div>
+
+      <div fxLayout="column" fxLayout.gt-sm="row" fxLayoutGap.gt-sm="24px">
+        <mat-form-field fxFlex>
+          <mat-label>Description</mat-label>
+          <mat-select formControlName="Description" placeholder="">
+            <mat-option>
+              <ngx-mat-select-search
+                formControlName="description_Filter"
+                [placeholderLabel]="'search...'"
+                [noEntriesFoundLabel]="'no matching found!'"
+              >
+              </ngx-mat-select-search>
+            </mat-option>
+            <mat-option value="addDescrition">+Add New</mat-option>
+            <mat-option
+              *ngFor="let b of filtered_description | async"
+              [value]="b.PARAMETER_GUID"
+            >
+              {{ b.PARAMETER_NAME }}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+        <mat-form-field fxFlex>
+          <mat-label>Quantity</mat-label>
+          <input type="text" formControlName="Log_Quantity" matInput />
+        </mat-form-field>
+        <mat-form-field fxFlex>
+          <mat-label>Unit</mat-label>
+          <mat-select formControlName="Unit_GUID" placeholder="">
+            <mat-option>
+              <ngx-mat-select-search
+                formControlName="unit_Filter"
+                [placeholderLabel]="'search...'"
+                [noEntriesFoundLabel]="'no matching found!'"
+              >
+              </ngx-mat-select-search>
+            </mat-option>
+            <mat-option value="addUnit">+Add New</mat-option>
+            <mat-option
+              *ngFor="let b of filtered_unit | async"
+              [value]="b.PARAMETER_GUID"
+            >
+              {{ b.PARAMETER_NAME }}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+      </div>
+
+      <div fxLayout="column" fxLayout.gt-sm="row" fxLayoutGap.gt-sm="24px">
+        <div fxFlex>
+          <h3>Incoming Courier</h3>
+        </div>
+        <div fxFlex>
+          <h3>Outgoing Courier</h3>
+        </div>
+      </div>
+      <div fxLayout="column" fxLayout.gt-sm="row" fxLayoutGap.gt-sm="24px">
+        <mat-form-field fxFlex>
+          <mat-label>Courier</mat-label>
+          <mat-select formControlName="Courier_GUID" placeholder="">
+            <mat-option>
+              <ngx-mat-select-search
+                formControlName="courier_Filter"
+                [placeholderLabel]="'search...'"
+                [noEntriesFoundLabel]="'no matching found!'"
+              >
+              </ngx-mat-select-search>
+            </mat-option>
+            <mat-option
+              *ngFor="let b of filtered_courier | async"
+              [value]="b.PARAMETER_GUID"
+            >
+              {{ b.PARAMETER_NAME }}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+        <mat-form-field fxFlex>
+          <mat-label>AWB</mat-label>
+          <input type="text" formControlName="AWB" matInput />
+        </mat-form-field>
+
+        <mat-form-field fxFlex>
+          <mat-label>Outgoing Courier</mat-label>
+          <mat-select formControlName="Outgoing_Courier" placeholder="">
+            <mat-option>
+              <ngx-mat-select-search
+                formControlName="out_courier_Filter"
+                [placeholderLabel]="'search...'"
+                [noEntriesFoundLabel]="'no matching found!'"
+              >
+              </ngx-mat-select-search>
+            </mat-option>
+            <mat-option
+              *ngFor="let b of filtered_out_courier | async"
+              [value]="b.PARAMETER_GUID"
+            >
+              {{ b.PARAMETER_NAME }}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+        <mat-form-field fxFlex>
+          <mat-label>Outgoing AWB</mat-label>
+          <input type="text" formControlName="Outgoing_AWB" matInput />
+        </mat-form-field>
+      </div>
+
+      <div fxLayout="column" fxLayout.gt-sm="row" fxLayoutGap.gt-sm="24px">
+        <div fxFlex>
+          <mat-form-field fxFlex>
+            <mat-label>Date Received</mat-label>
+            <input
+              matInput
+              [matDatepicker]="Date_Recieved"
+              formControlName="Date_Recieved"
+            />
+            <mat-datepicker-toggle
+              matSuffix
+              [for]="Date_Recieved"
+            ></mat-datepicker-toggle>
+            <mat-datepicker #Date_Recieved></mat-datepicker>
+          </mat-form-field>
+          <mat-form-field fxFlex>
+            <mat-label>Received From</mat-label>
+            <mat-select formControlName="Recieved_From" placeholder="">
+              received_From_Filter
+              <mat-option value="addReceived">+Add new</mat-option>
+              <mat-option
+                *ngFor="let b of filtered_recievedFrom | async"
+                [value]="b.PARAMETER_GUID"
+              >
+                {{ b.PARAMETER_NAME }}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+        </div>
+        <div fxFlex>
+          <mat-form-field fxFlex>
+            <mat-label>Date Of Dispatch</mat-label>
+            <input
+              matInput
+              [matDatepicker]="Date_Of_Dispatch"
+              formControlName="Date_Of_Dispatch"
+            />
+            <mat-datepicker-toggle
+              matSuffix
+              [for]="Date_Of_Dispatch"
+            ></mat-datepicker-toggle>
+            <mat-datepicker #Date_Of_Dispatch></mat-datepicker>
+          </mat-form-field>
+        </div>
+      </div>
+      <div fxLayout="column" fxLayout.gt-sm="row" fxLayoutGap.gt-sm="24px">
+        <div fxFlex></div>
+        <div fxFlex>
+          <mat-form-field fxFlex>
+            <mat-label>Currency</mat-label>
+            <mat-select formControlName="Currency">
+              <mat-option
+                *ngFor="let b of filtered_currency | async"
+                [value]="b.CURRENCY_GUID"
+              >
+                {{ b.SHORT_CODE }}
+              </mat-option>
+            </mat-select>
+            <mat-error
+              *ngIf="logisticsForm.get('Currency').hasError('required')"
+              >Currency is required</mat-error
+            >
+          </mat-form-field>
+          <mat-form-field fxFlex>
+            <mat-label>Amount</mat-label>
+            <input type="text" formControlName="Amount" matInput />
+          </mat-form-field>
+        </div>
+      </div>
+      <div fxLayout="column" fxLayout.gt-sm="row" fxLayoutGap.gt-sm="24px">
+        <div fxFlex>
+          <mat-form-field fxFlex class="two-divide">
+            <mat-label>Destination</mat-label>
+            <mat-select formControlName="Destination" placeholder="">
+              <mat-option>
+                <ngx-mat-select-search
+                  formControlName="destination_Filter"
+                  [placeholderLabel]="'search...'"
+                  [noEntriesFoundLabel]="'no matching found!'"
+                >
+                </ngx-mat-select-search>
+              </mat-option>
+              <mat-option value="addDestination">+Add New</mat-option>
+              <mat-option
+                *ngFor="let b of filtered_destination | async"
+                [value]="b.PARAMETER_GUID"
+              >
+                {{ b.PARAMETER_NAME }}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+          <mat-form-field fxFlex class="two-divide">
+            <mat-label>Follow Up</mat-label>
+            <mat-select formControlName="Followup_GUID" placeholder="">
+              <mat-option>
+                <ngx-mat-select-search
+                  formControlName="followup_Filter"
+                  [placeholderLabel]="'search...'"
+                  [noEntriesFoundLabel]="'no matching found!'"
+                >
+                </ngx-mat-select-search>
+              </mat-option>
+              <mat-option
+                *ngFor="let b of filtered_followUp | async"
+                [value]="b.PARAMETER_GUID"
+              >
+                {{ b.PARAMETER_NAME }}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+        </div>
+        <div fxFlex>
+          <div fxLayout="column" fxLayout.gt-sm="row" fxLayoutGap.gt-sm="24px">
+            <label class="drop-label"> Upload Outgoing Attachment : </label>
+            <div
+              *ngIf="logisticsForm.value.Outgoing_Attachment"
+              class="file-visible"
+            >
+              <a
+                target="_blank"
+                [href]="getFileURL(logisticsForm.value.Outgoing_Attachment)"
+              >
+                <mat-icon [matTooltip]="logisticsForm.value.Outgoing_Attachment"
+                  >attach_file</mat-icon
+                >
+              </a>
+              <a
+                *ngIf="
+                  logisticsForm.value.Status_GUID !=
+                  'WdVGpZR7Z94675122-4e9c-40d7-80dd-e01f2893400b'
+                "
+                href="javascript:void(0)"
+                (click)="fileDelete()"
+                ><mat-icon>delete</mat-icon></a
+              >
+            </div>
+            <div
+              *ngIf="!logisticsForm.value.Outgoing_Attachment"
+              class="container"
+            >
+              <button type="button" mat-raised-button>
+                <label class="drop-label" for="uploadFile1"> Upload File</label>
+              </button>
+              <input
+                type="file"
+                id="uploadFile1"
+                style="opacity: 0"
+                (change)="uploadFileEvt($event)"
+                name="uploadFile"
+                accept="image/*"
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+      <div style="margin-bottom: 20px">
+        <div fxFlex>
+          <mat-form-field fxFlex>
+            <mat-label>Delivery Date</mat-label>
+            <input
+              matInput
+              [matDatepicker]="DeliveryDate"
+              formControlName="Delivery_Date"
+            />
+            <mat-datepicker-toggle
+              matSuffix
+              [for]="DeliveryDate"
+            ></mat-datepicker-toggle>
+            <mat-datepicker #DeliveryDate></mat-datepicker>
+          </mat-form-field>
+        </div>
+
+        <div fxFlex>
+          <mat-radio-group
+            fxLayout="row"
+            fxLayoutGap="16px"
+            formControlName="Billable"
+          >
+            <mat-label>Billable</mat-label>
+            <mat-radio-button
+              value="1"
+              [checked]="logisticsForm.get('Billable').value == 1"
+              >Yes</mat-radio-button
+            >
+            <mat-radio-button
+              value="0"
+              [checked]="logisticsForm.get('Billable').value == 0"
+              >No</mat-radio-button
+            >
+          </mat-radio-group>
+        </div>
+      </div>
+      <div fxLayout="column" fxLayout.gt-sm="row" fxLayoutGap.gt-sm="24px">
+        <mat-form-field fxFlex class="two-divide">
+          <mat-label>Remarks</mat-label>
+          <textarea rows="3" formControlName="Remarks" matInput></textarea>
+        </mat-form-field>
+        <mat-form-field fxFlex class="two-divide">
+          <mat-label>Outgoing Remarks</mat-label>
+          <textarea
+            rows="3"
+            formControlName="Outgoing_Remark"
+            matInput
+          ></textarea>
+        </mat-form-field>
+      </div>
+
+      <div fxLayout="column" fxLayout.gt-sm="row" fxLayoutGap.gt-sm="24px">
+        <mat-form-field fxFlex class="two-divide">
+          <mat-label>Status</mat-label>
+          <mat-select formControlName="Status_GUID" placeholder="">
+            <mat-option
+              *ngFor="let b of filtered_status | async"
+              [value]="b.PARAMETER_GUID"
+            >
+              {{ b.PARAMETER_NAME }}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+      </div>
+      <div
+        fxLayout="column"
+        fxLayout.gt-sm="row"
+        fxLayoutGap.gt-sm="24px"
+        *ngIf="ErrorMessage"
+      >
+        <h6 style="color: #ff0000">{{ ErrorMessage }}</h6>
+      </div>
+    </div>
+  </form>
+</mat-dialog-content>
+<mat-dialog-actions fxLayout="row" fxLayoutAlign="end center">
+  <button
+    mat-raised-button
+    color="primary"
+    (click)="SaveLogistics()"
+    class="save-btn"
+    [disabled]="!logisticsForm.valid"
+  >
+    SAVE
+  </button>
+  <button mat-raised-button color="warn" (click)="CloseModal()">CLOSE</button>
+</mat-dialog-actions>

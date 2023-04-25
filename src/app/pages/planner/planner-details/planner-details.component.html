@@ -1,0 +1,632 @@
+<fury-page-layout mode="card" class="planner-details">
+  <div style="display: flex; justify-content: space-between">
+    <table class="mat-table call-details-table width-70">
+      <tr>
+        <th colspan="4">Planner Details</th>
+      </tr>
+      <tr class="mat-row">
+        <td class="mat-cell head right-text">Megentis ref number :</td>
+        <td class="mat-cell">{{ plannerData?.REF_NUM }}</td>
+        <td class="mat-cell right-text">Port :</td>
+        <td class="mat-cell">{{ plannerData?.Port_Name }}</td>
+      </tr>
+
+      <tr class="mat-row">
+        <td class="mat-cell right-text">Principal :</td>
+        <td class="mat-cell">{{ plannerData?.COMPANY_NAME }}</td>
+        <td class="mat-cell right-text">Principal Appointment ref :</td>
+        <td class="mat-cell">{{ plannerData?.APPOINTMENT_REF }}</td>
+      </tr>
+      <tr class="mat-row">
+        <td class="mat-cell right-text">Vessel :</td>
+        <td class="mat-cell">{{ plannerData?.VESSEL_NAME }}</td>
+        <td class="mat-cell right-text">Vessel Type :</td>
+        <td class="mat-cell">{{ plannerData?.VESSEL_TYPE_NAME }}</td>
+      </tr>
+
+      <tr class="mat-row">
+        <td class="mat-cell right-text">ETA :</td>
+        <td class="mat-cell">
+          {{ plannerData?.VESSEL_ETA | date: "dd MMM YYYY HH:mm" }}
+        </td>
+        <td class="mat-cell right-text">Arrival Date / Time :</td>
+        <td class="mat-cell">
+          {{ plannerData?.VESSEL_ACTUAL_ARR | date: "dd MMM YYYY HH:mm" }}
+        </td>
+      </tr>
+      <tr class="mat-row">
+        <td class="mat-cell right-text">ETD :</td>
+        <td class="mat-cell">
+          {{ plannerData?.VESSEL_ETD | date: "dd MMM YYYY HH:mm" }}
+        </td>
+        <td class="mat-cell right-text">Departure Date / Time :</td>
+        <td class="mat-cell">
+          {{ plannerData?.VESSEL_ACTUAL_DEP | date: "dd MMM YYYY HH:mm" }}
+        </td>
+      </tr>
+      <tr class="mat-row">
+        <td class="mat-cell right-text">Appointment Type :</td>
+        <td class="mat-cell">{{ plannerData?.APPOINTMENT_TYPE_NAME }}</td>
+        <td class="mat-cell right-text">Crew Change :</td>
+        <td class="mat-cell">
+          {{ plannerData?.Crew_Change === 1 ? "Yes" : "No" }}
+        </td>
+      </tr>
+
+      <tr class="mat-row">
+        <td class="mat-cell right-text">CTM :</td>
+        <td class="mat-cell" colspan="3">
+          {{
+            (serviceSummery.CTM_Summery.Total_Amount
+              ? serviceSummery.CTM_Summery.Total_Amount
+              : plannerData?.CTM_Amount
+            ) | currency: "USD"
+          }}
+          /{{ serviceSummery.CTM_Summery.Vendor_Name }} /{{
+            serviceSummery.CTM_Summery.Status_Name
+          }}
+        </td>
+      </tr>
+      <tr class="mat-row">
+        <td class="mat-cell right-text">Plan Status :</td>
+        <td class="mat-cell" colspan="3">{{ plannerData?.STATUS_NAME }}</td>
+      </tr>
+      <tr>
+        <td class="mat-cell center-text" colspan="4">
+          <button
+            *ngIf="
+              authGuard.checkPermission(
+                'oPk6Fh2BP24443f12-c950-46b3-b22c-fff14f4d9ed1',
+                'edit'
+              ) &&
+              plannerData?.PLAN_STATUS_GUID !==
+                '20pQd3MaDd7ea9dd2-e2e7-42b1-9614-b51669e87984'
+            "
+            class="create"
+            mat-raised-button
+            color="primary"
+            class="filter-btn"
+            (click)="handleServiceStatus()"
+          >
+            Close Record
+          </button>
+          <button
+            *ngIf="
+              authGuard.checkPermission(
+                'oPk6Fh2BP24443f12-c950-46b3-b22c-fff14f4d9ed1',
+                'edit'
+              ) &&
+              plannerData?.PLAN_STATUS_GUID !==
+                '20pQd3MaDd7ea9dd2-e2e7-42b1-9614-b51669e87984'
+            "
+            mat-raised-button
+            color="primary"
+            (click)="EditPlanner()"
+            style="margin-left: 10px"
+          >
+            Edit Call Detail
+          </button>
+        </td>
+      </tr>
+    </table>
+    <table class="mat-table call-details-table width-30">
+      <tr>
+        <th colspan="2">Billable Summery</th>
+      </tr>
+
+      <tr class="mat-row" *ngFor="let service of systemParameterSummery">
+        <td
+          class="mat-cell border-item right-text"
+          *ngIf="
+            service['PARAMETER_GUID'] ===
+            '9mY6JkMJj72a8a16b-27e2-444d-8776-d930860cfd10'
+          "
+        >
+          <p class="zeropad">Crew Planned :</p>
+          <p class="zeropad">Crew Actual :</p>
+        </td>
+        <td
+          class="mat-cell border-item right-text"
+          *ngIf="
+            service['PARAMETER_GUID'] !==
+            '9mY6JkMJj72a8a16b-27e2-444d-8776-d930860cfd10'
+          "
+        >
+          {{ service["Service_Type_Name"] }} :
+        </td>
+        <td
+          class="mat-cell border-item right-text"
+          *ngIf="
+            service['PARAMETER_GUID'] ===
+            'vcryU7qKZ540c23dc-04ea-4e04-b18e-49600e155e99'
+          "
+        >
+          <a
+            class="filter-text"
+            (click)="filterServicesByType(service['PARAMETER_GUID'])"
+          >
+            SGD
+            {{
+              serviceSummery?.CTM_Summery.Applicable_Exchange *
+                serviceSummery?.CTM_Summery.USD_Amount_Due || 0
+                | number: "1.2-2"
+            }}
+          </a>
+        </td>
+        <td
+          class="mat-cell border-item right-text"
+          *ngIf="
+            service['PARAMETER_GUID'] ===
+            'JCpugXSwB7a89deff-4cce-47ea-ae1d-795d1383d175'
+          "
+        >
+          <a
+            class="filter-text"
+            (click)="
+              filterServicesByType(
+                'JCpugXSwB7a89deff-4cce-47ea-ae1d-795d1383d175'
+              )
+            "
+          >
+            {{ numberWithCommas(serviceSummery?.Agency_Fee) }}
+            {{ serviceSummery["Agency_Fee_Currency"] }}
+          </a>
+        </td>
+        <td
+          class="mat-cell border-item right-text"
+          *ngIf="
+            service['PARAMETER_GUID'] ===
+            '9mY6JkMJj72a8a16b-27e2-444d-8776-d930860cfd10'
+          "
+        >
+          <p class="zeropad">
+            <a
+              class="filter-text"
+              (click)="
+                filterServicesByType(
+                  '9mY6JkMJj72a8a16b-27e2-444d-8776-d930860cfd10'
+                )
+              "
+            >
+              {{ serviceSummery?.Crew_Handling?.planned_joiner || 0 }} on /
+              {{ serviceSummery?.Crew_Handling?.planned_off_signer || 0 }} off
+            </a>
+          </p>
+          <p class="zeropad">
+            <a
+              class="filter-text"
+              (click)="
+                filterServicesByType(
+                  '9mY6JkMJj72a8a16b-27e2-444d-8776-d930860cfd10'
+                )
+              "
+            >
+              {{ serviceSummery?.Crew_Handling?.joiners || 0 }} on /
+              {{ serviceSummery?.Crew_Handling?.off_signer || 0 }} off
+            </a>
+          </p>
+        </td>
+        <td
+          class="mat-cell border-item right-text"
+          *ngIf="
+            service['PARAMETER_GUID'] ===
+            'fDuweTWYJdd925e31-0ae0-4e7c-800c-9e6aef7f4bb4'
+          "
+        >
+          <a
+            class="filter-text"
+            (click)="
+              filterServicesByType(
+                'fDuweTWYJdd925e31-0ae0-4e7c-800c-9e6aef7f4bb4'
+              )
+            "
+          >
+            {{ serviceSummery?.Boat }}
+          </a>
+        </td>
+        <td class="mat-cell border-item right-text" *ngIf="!service['custom']">
+          <a
+            class="filter-text"
+            (click)="filterServicesByType(service['PARAMETER_GUID'])"
+          >
+            {{ service["VALUE"] }}
+          </a>
+        </td>
+      </tr>
+    </table>
+  </div>
+  <div style="padding: 20px 10px">
+    <form
+      [formGroup]="firstFormGroup"
+      [ngStyle]="{ 'margin-top': '7px' }"
+      (ngSubmit)="onClickSubmit(firstFormGroup.value)"
+    >
+      <div class="service-header">
+        <h3>Service Details</h3>
+        <div class="actions">
+          <div class="float-left">
+            <mat-form-field>
+              <mat-label>Service Type</mat-label>
+              <mat-select formControlName="Service_Type">
+                <mat-option>
+                  <ngx-mat-select-search
+                    formControlName="service_type_filter"
+                    [placeholderLabel]="'search...'"
+                    [noEntriesFoundLabel]="'no matching found!'"
+                  >
+                  </ngx-mat-select-search>
+                </mat-option>
+                <mat-option
+                  *ngFor="let b of filtered_service_type | async"
+                  [value]="b.PARAMETER_GUID"
+                >
+                  {{ b.PARAMETER_NAME }}
+                </mat-option>
+              </mat-select>
+            </mat-form-field>
+          </div>
+          <div
+            class="float-left"
+            *ngIf="
+              firstFormGroup.value.Service_Type ==
+              'fDuweTWYJdd925e31-0ae0-4e7c-800c-9e6aef7f4bb4'
+            "
+          >
+            <mat-form-field>
+              <mat-label>Boat type</mat-label>
+              <mat-select formControlName="BOAT_TYPE">
+                <mat-option
+                  *ngFor="let b of filtered_boat_type | async"
+                  [value]="b.PARAMETER_GUID"
+                >
+                  {{ b.PARAMETER_NAME }}
+                </mat-option>
+              </mat-select>
+            </mat-form-field>
+          </div>
+          <div class="float-left">
+            <mat-form-field>
+              <mat-label>Select vendor</mat-label>
+              <mat-select formControlName="Service_Vendor">
+                <mat-option>
+                  <ngx-mat-select-search
+                    formControlName="vendor_Filter"
+                    [placeholderLabel]="'search...'"
+                    [noEntriesFoundLabel]="'no matching found!'"
+                  >
+                  </ngx-mat-select-search>
+                </mat-option>
+                <mat-option
+                  *ngFor="let b of filtered_vendor | async"
+                  [value]="b.Vendor_GUID"
+                >
+                  {{ b.Vendor_Name }}
+                </mat-option>
+              </mat-select>
+            </mat-form-field>
+          </div>
+          <div class="float-left">
+            <mat-form-field>
+              <mat-label>Select status</mat-label>
+              <mat-select formControlName="Status_GUID">
+                <mat-option value="all">All</mat-option>
+                <mat-option
+                  *ngFor="let b of filtered_status | async"
+                  [value]="b.PARAMETER_GUID"
+                >
+                  {{ b.PARAMETER_NAME }}
+                </mat-option>
+              </mat-select>
+            </mat-form-field>
+          </div>
+          <div class="float-left" style="padding: 5px">
+            <button
+              class="create"
+              mat-raised-button
+              color="primary"
+              class="filter-btn"
+            >
+              Search
+            </button>
+          </div>
+          <div class="float-left" style="padding: 5px">
+            <button
+              class="create"
+              (click)="clearFilter()"
+              mat-raised-button
+              color="warn"
+              class="filter-btn"
+              type="button"
+            >
+              Clear
+            </button>
+          </div>
+          <div class="float-left">
+            <button
+              *ngIf="
+                plannerData?.PLAN_STATUS_GUID ===
+                  'ZVqQ6nM4ddd3c03b6-78ec-4c4c-8e98-f22ff5c09b0a' &&
+                authGuard.checkPermission(
+                  'oPk6Fh2BP24443f12-c950-46b3-add-service',
+                  'create'
+                )
+              "
+              class="create"
+              (click)="showAddService(plannerData)"
+              type="button"
+              mat-mini-fab
+              color="primary"
+            >
+              <mat-icon>add</mat-icon>
+            </button>
+          </div>
+          <div class="float-left">
+            <div>
+              <span
+                (click)="exportAsExcel()"
+                style="cursor: pointer"
+                *ngIf="
+                  authGuard.checkPermission(
+                    'oPk6Fh2BP24443f12-c950-46b3-add-service',
+                    'export'
+                  )
+                "
+              >
+                <img
+                  src="../../../../assets/img/excel.png"
+                  class="logo"
+                  alt="excel"
+                />
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </form>
+  </div>
+  <div #TABLE>
+    <table
+      [dataSource]="dataSource"
+      mat-table
+      matSort
+      #table
+      class="width-100"
+      (matSortChange)="sortData($event)"
+    >
+      <ng-container matColumnDef="Services_Category">
+        <th
+          *matHeaderCellDef
+          class="actions-cell"
+          mat-header-cell
+          mat-sort-header
+        >
+          Services Category
+        </th>
+        <td *matCellDef="let row" class="actions-cell" mat-cell>
+          {{ row.Service_Category_Name }}
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="Service_Type">
+        <th
+          *matHeaderCellDef
+          class="actions-cell"
+          mat-header-cell
+          mat-sort-header
+        >
+          Service Type
+        </th>
+        <td *matCellDef="let row" class="actions-cell" mat-cell>
+          {{ row.Service_Type_Name }} {{ getBoatType(row.Boat_Type_GUID) }}
+        </td>
+      </ng-container>
+      <ng-container matColumnDef="Service_Date">
+        <th
+          *matHeaderCellDef
+          class="actions-cell"
+          mat-header-cell
+          mat-sort-header
+        >
+          Service Date
+        </th>
+        <td *matCellDef="let row" class="actions-cell" mat-cell>
+          {{
+            (row?.Boat_Date ? row?.Boat_Date : row?.Service_date)
+              | date: "d MMM yyyy HH:mm"
+          }}
+        </td>
+      </ng-container>
+      <ng-container matColumnDef="Vendor_Name">
+        <th
+          *matHeaderCellDef
+          class="actions-cell"
+          mat-header-cell
+          mat-sort-header
+        >
+          Vendor Name
+        </th>
+        <td *matCellDef="let row" class="actions-cell" mat-cell>
+          {{ row.Vendor_Name }}
+        </td>
+      </ng-container>
+      <ng-container matColumnDef="Svc_Quantity">
+        <th
+          *matHeaderCellDef
+          class="actions-cell center-text"
+          mat-header-cell
+          mat-sort-header
+        >
+          Quantity
+        </th>
+        <td *matCellDef="let row" class="actions-cell center-text" mat-cell>
+          {{ row.Svc_Quantity }}
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="Currency_Name">
+        <th
+          *matHeaderCellDef
+          class="actions-cell"
+          mat-header-cell
+          mat-sort-header
+        >
+          Currency
+        </th>
+        <td *matCellDef="let row" class="actions-cell datetime-class" mat-cell>
+          <p>{{ row.Currency_Name }}</p>
+        </td>
+      </ng-container>
+      <ng-container matColumnDef="Svc_Amount">
+        <th *matHeaderCellDef class="actions-cell right-text" mat-header-cell>
+          Amount
+        </th>
+        <td *matCellDef="let row" class="actions-cell datetime-class" mat-cell>
+          <p class="right-text">{{ printAmount(row) | number: "1.2-2" }}</p>
+        </td>
+      </ng-container>
+      <ng-container matColumnDef="Remarks">
+        <th
+          *matHeaderCellDef
+          class="actions-cell"
+          mat-header-cell
+          mat-sort-header
+        >
+          Remark
+        </th>
+        <td *matCellDef="let row" class="actions-cell datetime-class" mat-cell>
+          <p [matTooltip]="row.Remarks">
+            {{
+              row.Remarks && row.Remarks.length > 10
+                ? (row.Remarks | slice: 0:10) + "..."
+                : row.Remarks
+            }}
+          </p>
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="Status_GUID">
+        <th
+          *matHeaderCellDef
+          class="actions-cell"
+          mat-header-cell
+          mat-sort-header
+        >
+          Status
+        </th>
+        <td *matCellDef="let row" class="actions-cell datetime-class" mat-cell>
+          {{ row.Status_Name }}
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="Action">
+        <th
+          *matHeaderCellDef
+          class="actions-cell"
+          mat-header-cell
+          mat-sort-header
+        >
+          Action
+        </th>
+        <td *matCellDef="let row" class="actions-cell" mat-cell>
+          <a
+            *ngIf="
+              row.Service_Type ===
+                'vcryU7qKZ540c23dc-04ea-4e04-b18e-49600e155e99' &&
+              '20pQd3MaDd7ea9dd2-e2e7-42b1-9614-b51669e87984' !=
+                plannerData['PLAN_STATUS_GUID'] &&
+              authGuard.checkPermission(
+                'oPk6Fh2BP24443f12-c950-46b3-add-service',
+                'edit'
+              )
+            "
+            routerLink="/support-ctm/edit-service/{{ row.Services_GUID }}"
+            target="_blank"
+          >
+            <button mat-icon-button>
+              <mat-icon class="icon-display">edit</mat-icon>
+            </button>
+          </a>
+          <button
+            *ngIf="
+              row.Service_Type !==
+                'vcryU7qKZ540c23dc-04ea-4e04-b18e-49600e155e99' &&
+              '20pQd3MaDd7ea9dd2-e2e7-42b1-9614-b51669e87984' !=
+                plannerData['PLAN_STATUS_GUID'] &&
+              authGuard.checkPermission(
+                'oPk6Fh2BP24443f12-c950-46b3-add-service',
+                'delete'
+              )
+            "
+            mat-icon-button
+            (click)="editService(row, true)"
+          >
+            <mat-icon class="icon-display">edit</mat-icon>
+          </button>
+          <button
+            mat-icon-button
+            (click)="ChangeStatus(row)"
+            *ngIf="
+              '20pQd3MaDd7ea9dd2-e2e7-42b1-9614-b51669e87984' !=
+                plannerData['PLAN_STATUS_GUID'] &&
+              authGuard.checkPermission(
+                'oPk6Fh2BP24443f12-c950-46b3-add-service',
+                'delete'
+              )
+            "
+          >
+            <mat-icon
+              class="icon-display"
+              [ngStyle]="{ color: 'red', 'font-weight': 'bold' }"
+              >{{ "close" }}</mat-icon
+            >
+          </button>
+          <button
+            mat-icon-button
+            (click)="editService(row, true, true)"
+            *ngIf="
+              '20pQd3MaDd7ea9dd2-e2e7-42b1-9614-b51669e87984' ==
+              plannerData['PLAN_STATUS_GUID']
+            "
+          >
+            <mat-icon class="icon-display" [ngStyle]="{ 'font-weight': 'bold' }"
+              >visibility</mat-icon
+            >
+          </button>
+
+          <button
+            mat-icon-button
+            [matTooltip]="
+              'Created By : ' +
+              row.CREATED_BY +
+              ' | ' +
+              (row.DATE_CREATED | date: 'dd MMM yyyy HH:mm:ss') +
+              '&#13;
+            ' +
+              (row.MODIFIED_BY
+                ? 'Modified By : ' +
+                  row.MODIFIED_BY +
+                  ' | ' +
+                  (row.DATE_MODIFIED | date: 'd MMM yyyy HH:mm:ss')
+                : '')
+            "
+          >
+            <mat-icon class="icon-display">info</mat-icon>
+          </button>
+        </td>
+      </ng-container>
+
+      <tr *matHeaderRowDef="visibleColumns" mat-header-row></tr>
+      <tr
+        *matRowDef="let row; columns: visibleColumns"
+        class="clickable route-animations-elements"
+        mat-row
+      ></tr>
+      <tr class="mat-row" *matNoDataRow>
+        <td class="mat-cell" colspan="9999">No data found</td>
+      </tr>
+    </table>
+  </div>
+</fury-page-layout>
+<!-- <mat-dialog-actions fxLayout="row" fxLayoutAlign="end center">
+  <button mat-raised-button color="warn" (click)="CloseModal()">CLOSE</button>
+</mat-dialog-actions> -->

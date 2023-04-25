@@ -1,0 +1,76 @@
+<div mat-dialog-title>Service Working Hours</div>
+
+<mat-dialog-content style="height: 100% !important;">
+  
+  <div *ngFor="let b of Hours; let i = index" [ngStyle]="{'padding': '10px','border': '1px dashed #d3d3d3', 'margin-bottom': '20px'}">
+
+    <div fxLayout="column" fxLayout.gt-sm="row"  fxLayoutGap="10px">
+
+      <div fxLayout="row" fxLayout.gt-sm="row">
+
+        <mat-icon fontSet="material-icons" color="primary" [ngStyle]="{'font-size': '30px', 'cursor': 'pointer', 'margin-right': '8px'}" *ngIf="Hours.length > 1" (click)="RemoveHours(b, i)">close</mat-icon>
+        <mat-icon fontSet="material-icons" color="primary" [ngStyle]="{'font-size': '30px', 'cursor': 'pointer'}" *ngIf="i == Hours.length-1" (click)="AddHours()">library_add</mat-icon>
+  
+      </div>
+
+      <mat-form-field appearance="outline" fxFlex>
+        <mat-label>Day</mat-label>
+        <input type="text" [(ngModel)]="b.day" matInput>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" fxFlex>
+        <mat-label>Start Time</mat-label>
+        <input matInput [matDatepicker]="start" [(ngModel)]="b.startTime" disabled>
+        <mat-datepicker-toggle matSuffix [for]="start"></mat-datepicker-toggle>
+        <mat-datepicker #start disabled="false"></mat-datepicker>
+      </mat-form-field>
+
+      <mat-form-field  appearance="outline" fxFlex>
+        <mat-label>End Time</mat-label>
+        <input matInput [matDatepicker]="end" [(ngModel)]="b.endTime" disabled>
+        <mat-datepicker-toggle matSuffix [for]="end"></mat-datepicker-toggle>
+        <mat-datepicker #end disabled="false"></mat-datepicker>
+      </mat-form-field>
+
+    </div>
+
+
+    <div fxLayout="column" fxLayout.gt-sm="row" fxLayoutGap="15px">
+
+      <div fxLayout="row" fxLayoutAlign="space-between center" fxFlex  [ngStyle]="{'padding-bottom': '10px','border-bottom': '1px dashed #d3d3d3'}">
+        <div>Always On</div>
+        <mat-checkbox
+          [color]="'accent'"
+          [(ngModel)]="b.alwaysOn"
+        >
+        </mat-checkbox>
+      </div>
+
+      <div fxLayout="row" fxLayoutAlign="space-between center" fxFlex  [ngStyle]="{'padding-bottom': '10px','border-bottom': '1px dashed #d3d3d3'}">
+        <div>Week Off</div>
+        <mat-checkbox
+          [color]="'accent'"
+          [(ngModel)]="b.weekOff"
+        >
+        </mat-checkbox>
+      </div>
+
+      <div fxLayout="row" fxLayoutAlign="space-between center" fxFlex  [ngStyle]="{'padding-bottom': '10px','border-bottom': '1px dashed #d3d3d3'}">
+        <div>Enabled</div>
+        <mat-checkbox
+          [color]="'accent'"
+          [(ngModel)]="b.enabled"
+        >
+        </mat-checkbox>
+      </div>
+    </div>
+    
+
+  </div>
+
+</mat-dialog-content>
+
+<mat-dialog-actions fxLayout="row" fxLayoutAlign="end center">
+  <button mat-raised-button color="primary" (click)="Save()">SAVE</button>
+  <button mat-raised-button color="primary" (click)="CloseModal()">CLOSE</button>
+</mat-dialog-actions>

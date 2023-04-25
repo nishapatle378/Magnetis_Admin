@@ -1,0 +1,979 @@
+<fury-page-layout style="height: 100% !important">
+  <div class="add-ctm">
+    <form
+      [formGroup]="ctmForm"
+      [ngStyle]="{ 'margin-top': '7px' }"
+      class="crew-form"
+    >
+      <table class="mat-table details-table">
+        <tr class="mat-row">
+          <th class="mat-cell">Planner REF</th>
+          <th class="mat-cell">PORT</th>
+          <th class="mat-cell">PRINCIPAL</th>
+          <th class="mat-cell">VESSEL</th>
+          <th class="mat-cell">ETA</th>
+          <th class="mat-cell">PIC</th>
+          <th class="mat-cell" style="width: 122px; font-size: 12px">
+            Planned Amount - USD
+          </th>
+          <th class="mat-cell" style="width: 122px; font-size: 12px">
+            Total Amount - USD
+          </th>
+        </tr>
+        <tr class="mat-row mat-row-top">
+          <td class="mat-cell ref-code">
+            <mat-form-field fxFlex class="two-divide" *ngIf="!IsEdit">
+              <mat-label>Select a Planner</mat-label>
+              <mat-select
+                formControlName="Planner_GUID"
+                placeholder="Please Magentis ref number"
+              >
+                <mat-option>
+                  <ngx-mat-select-search
+                    formControlName="Planner_Filter"
+                    [placeholderLabel]="'search...'"
+                    [noEntriesFoundLabel]="'no matching found!'"
+                  >
+                  </ngx-mat-select-search>
+                </mat-option>
+                <mat-option
+                  *ngFor="let b of filtered_planner | async"
+                  [value]="b.GUID"
+                >
+                {{ b.REF_NUM }} - {{b.VESSEL_NAME}} - {{(b.VESSEL_ACTUAL_ARR ? b.VESSEL_ACTUAL_ARR : b.VESSEL_ETA) | date:"dd MMM YYYY"}}
+                </mat-option>
+              </mat-select>
+            </mat-form-field>
+            <label class="label-class" *ngIf="IsEdit">{{
+              selectedPlannerDetails ? selectedPlannerDetails.REF_NUM : ""
+            }}</label>
+          </td>
+          <td class="mat-cell">
+            <label class="label-class">{{
+              selectedPlannerDetails ? selectedPlannerDetails.Port_Name : ""
+            }}</label>
+          </td>
+          <td class="mat-cell">
+            <label class="label-class">{{
+              selectedPlannerDetails ? selectedPlannerDetails.COMPANY_NAME : ""
+            }}</label>
+          </td>
+          <td class="mat-cell">
+            <label class="label-class">{{
+              selectedPlannerDetails ? selectedPlannerDetails.VESSEL_NAME : ""
+            }}</label>
+          </td>
+          <td class="mat-cell">
+            <label class="label-class">{{
+              (selectedPlannerDetails ? selectedPlannerDetails.VESSEL_ETA : "")
+                | date: "dd MMM YYYY HH:mm"
+            }}</label>
+          </td>
+          <td class="mat-cell">
+            <label class="label-class">{{
+              selectedPlannerDetails ? selectedPlannerDetails.AGENT_NAME : ""
+            }}</label>
+          </td>
+          <td class="mat-cell">
+            <label class="label-class">{{
+              selectedPlannerDetails?.Planned_Amount || 0 | currency: "USD"
+            }}</label>
+          </td>
+          <td class="mat-cell">
+            <label class="label-class">{{
+              ctmForm.get("Total_Amount").value || 0 | currency: "USD"
+            }}</label>
+          </td>
+        </tr>
+      </table>
+      <div class="main-section">
+        <div class="left-panel">
+          <div class="up-sec">
+            <table class="details-table demo-table" #denomination>
+              <tr class="mat-row content-left">
+                <th colspan="3" class="mat-cell">
+                  <label class="crew-label"
+                    >Denominations : Request / Final</label
+                  >
+                </th>
+              </tr>
+              <tr class="mat-row">
+                <th class="mat-cell">
+                  <label class="crew-label">Quantity</label>
+                </th>
+                <th class="mat-cell"><label class="crew-label">Bill</label></th>
+                <th class="mat-cell">
+                  <label class="crew-label">Total</label>
+                </th>
+              </tr>
+              <tr class="mat-row" *ngFor="let dimon of dimonArray">
+                <td class="mat-cell">
+                  <mat-form-field fxFlex class="two-divide">
+                    <input
+                      matInput
+                      formControlName="Quantity_{{
+                        dimon.PARAMETER_SHORT_NAME
+                      }}"
+                      (keypress)="validateNo($event)"
+                      placeholder="Enter value"
+                    />
+                  </mat-form-field>
+                </td>
+                <td class="mat-cell">
+                  <input
+                    type="hidden"
+                    formControlName="Bill_{{ dimon.PARAMETER_SHORT_NAME }}"
+                  />
+                  <label class="crew-label">{{
+                    ctmForm.get("Bill_" + dimon.PARAMETER_SHORT_NAME).value
+                  }}</label>
+                </td>
+                <td class="mat-cell text-right">
+                  <input
+                    type="hidden"
+                    formControlName="Total_{{ dimon.PARAMETER_SHORT_NAME }}"
+                  />
+                  <label class="crew-label">{{
+                    ctmForm.get("Total_" + dimon.PARAMETER_SHORT_NAME).value
+                      | currency: "USD"
+                  }}</label>
+                </td>
+              </tr>
+              <tr class="mat-row">
+                <td class="mat-cell text-right" colspan="3">
+                  <input type="hidden" formControlName="Total_Amount" />
+                  <label class="crew-label">{{
+                    ctmForm.get("Total_Amount").value | currency: "USD"
+                  }}</label>
+                </td>
+              </tr>
+            </table>
+          </div>
+        </div>
+        <div class="right-panel padding-left">
+          <div class="up-sec">
+            <table class="details-table demo-table">
+              <table class="details-table vendor-table">
+                <tr class="mat-row content-left">
+                  <th colspan="3" class="mat-cell">
+                    <label class="crew-label">CTM Status</label>
+                  </th>
+                </tr>
+                <tr class="mat-row">
+                  <td class="mat-cell">
+                    <label class="crew-label">Remitance Received</label>
+                  </td>
+                  <td class="mat-cell">
+                    <mat-form-field fxFlex>
+                      <input
+                        matInput
+                        [matDatepicker]="Remittance_Received"
+                        formControlName="Remittance_Received"
+                        (change)="getStatusClicked(this)"
+                      />
+                      <mat-datepicker-toggle
+                        matSuffix
+                        [for]="Remittance_Received"
+                      ></mat-datepicker-toggle>
+                      <mat-datepicker #Remittance_Received></mat-datepicker>
+                    </mat-form-field>
+                  </td>
+                  <td class="mat-cell" *ngIf="hideUpload">
+                    <div
+                      *ngIf="ctmForm.value.Remittance_Received_Attach"
+                      class="file-visible"
+                    >
+                      <mat-icon
+                        [matTooltip]="ctmForm.value.Remittance_Received_Attach"
+                        >attach_file</mat-icon
+                      ><a
+                        href="javascript:void(0)"
+                        (click)="fileDelete('Remittance_Received_Attach')"
+                        ><mat-icon>delete</mat-icon></a
+                      >
+                    </div>
+                    <div
+                      *ngIf="!ctmForm.value.Remittance_Received_Attach"
+                      class="container"
+                      appDnd
+                      (fileDropped)="
+                        uploadFileEvt($event, 'Remittance_Received_Attach')
+                      "
+                    >
+                      <label class="drop-label" for="uploadFile1">
+                        Upload File</label
+                      >
+                      <span class="margin-7">Or Drop file here</span>
+                      <input
+                        type="file"
+                        id="uploadFile1"
+                        style="opacity: 0"
+                        (change)="
+                          uploadFileEvt($event, 'Remittance_Received_Attach')
+                        "
+                        name="uploadFile"
+                        accept="image/*"
+                      />
+                    </div>
+                  </td>
+                </tr>
+                <tr class="mat-row">
+                  <td class="mat-cell">
+                    <label class="crew-label">CTM Ordered</label>
+                  </td>
+                  <td class="mat-cell">
+                    <mat-form-field fxFlex>
+                      <input
+                        matInput
+                        [matDatepicker]="CTM_Ordered"
+                        formControlName="CTM_Ordered"
+                        (change)="getStatusClicked(this)"
+                      />
+                      <mat-datepicker-toggle
+                        matSuffix
+                        [for]="CTM_Ordered"
+                      ></mat-datepicker-toggle>
+                      <mat-datepicker #CTM_Ordered></mat-datepicker>
+                    </mat-form-field>
+                  </td>
+                  <td class="mat-cell" *ngIf="hideUpload">
+                    <div
+                      *ngIf="ctmForm.value.CTM_Ordered_Attach"
+                      class="file-visible"
+                    >
+                      <span
+                        ><mat-icon
+                          [matTooltip]="ctmForm.value.CTM_Ordered_Attach"
+                          >attach_file</mat-icon
+                        ><a
+                          href="javascript:void(0)"
+                          (click)="fileDelete('CTM_Ordered_Attach')"
+                          ><mat-icon>delete</mat-icon></a
+                        ></span
+                      >
+                    </div>
+                    <div
+                      *ngIf="!ctmForm.value.CTM_Ordered_Attach"
+                      class="container"
+                      appDnd
+                      (fileDropped)="
+                        uploadFileEvt($event, 'CTM_Ordered_Attach')
+                      "
+                    >
+                      <label class="drop-label" for="uploadFile2">
+                        Upload File</label
+                      >
+                      <span class="margin-7">Or Drop file here</span>
+                      <input
+                        type="file"
+                        id="uploadFile2"
+                        (change)="uploadFileEvt($event, 'CTM_Ordered_Attach')"
+                        name="uploadFile"
+                        accept="image/*"
+                      />
+                    </div>
+                  </td>
+                </tr>
+                <tr class="mat-row">
+                  <td class="mat-cell">
+                    <label class="crew-label">CTM in Office</label>
+                  </td>
+                  <td class="mat-cell">
+                    <mat-form-field fxFlex>
+                      <input
+                        matInput
+                        [matDatepicker]="CTM_in_Office"
+                        formControlName="CTM_in_Office"
+                        (change)="getStatusClicked(this)"
+                      />
+                      <mat-datepicker-toggle
+                        matSuffix
+                        [for]="CTM_in_Office"
+                      ></mat-datepicker-toggle>
+                      <mat-datepicker #CTM_in_Office></mat-datepicker>
+                    </mat-form-field>
+                  </td>
+                  <td class="mat-cell" *ngIf="hideUpload">
+                    <div
+                      *ngIf="ctmForm.value.CTM_in_Office_Attach"
+                      class="file-visible"
+                    >
+                      <span
+                        ><mat-icon
+                          [matTooltip]="ctmForm.value.CTM_in_Office_Attach"
+                          >attach_file</mat-icon
+                        ><a
+                          href="javascript:void(0)"
+                          (click)="fileDelete('CTM_in_Office_Attach')"
+                          ><mat-icon>delete</mat-icon></a
+                        ></span
+                      >
+                    </div>
+                    <div
+                      *ngIf="!ctmForm.value.CTM_in_Office_Attach"
+                      class="container"
+                      appDnd
+                      (fileDropped)="
+                        uploadFileEvt($event, 'CTM_in_Office_Attach')
+                      "
+                    >
+                      <label class="drop-label" for="uploadFile3">
+                        Upload File</label
+                      >
+                      <span class="margin-7">Or Drop file here</span>
+                      <input
+                        type="file"
+                        id="uploadFile3"
+                        (change)="uploadFileEvt($event, 'CTM_in_Office_Attach')"
+                        name="uploadFile"
+                        accept="image/*"
+                      />
+                    </div>
+                  </td>
+                </tr>
+                <tr class="mat-row" *ngIf="hideUpload">
+                  <td class="mat-cell">
+                    <label class="crew-label">Pending remitance</label>
+                  </td>
+                  <td class="mat-cell">
+                    <mat-form-field fxFlex>
+                      <input
+                        matInput
+                        [matDatepicker]="CTM_with_agent"
+                        formControlName="CTM_with_agent"
+                        (change)="getStatusClicked(this)"
+                      />
+                      <mat-datepicker-toggle
+                        matSuffix
+                        [for]="CTM_with_agent"
+                      ></mat-datepicker-toggle>
+                      <mat-datepicker #CTM_with_agent></mat-datepicker>
+                    </mat-form-field>
+                  </td>
+                  <td class="mat-cell" *ngIf="hideUpload">
+                    <div
+                      *ngIf="ctmForm.value.CTM_with_agent_Attach"
+                      class="file-visible"
+                    >
+                      <span *ngIf="ctmForm.value.CTM_with_agent_Attach"
+                        ><mat-icon
+                          [matTooltip]="ctmForm.value.CTM_with_agent_Attach"
+                          >attach_file</mat-icon
+                        ><a
+                          href="javascript:void(0)"
+                          (click)="fileDelete('CTM_with_agent_Attach')"
+                          ><mat-icon>delete</mat-icon></a
+                        ></span
+                      >
+                    </div>
+                    <div
+                      *ngIf="!ctmForm.value.CTM_with_agent_Attach"
+                      class="container"
+                      appDnd
+                      (fileDropped)="
+                        uploadFileEvt($event, 'CTM_with_agent_Attach')
+                      "
+                    >
+                      <label class="drop-label" for="uploadFile4">
+                        Upload File</label
+                      >
+                      <span class="margin-7">Or Drop file here</span>
+                      <input
+                        type="file"
+                        id="uploadFile4"
+                        (change)="
+                          uploadFileEvt($event, 'CTM_with_agent_Attach')
+                        "
+                        name="uploadFile"
+                        accept="image/*"
+                      />
+                    </div>
+                  </td>
+                </tr>
+                <tr class="mat-row">
+                  <td class="mat-cell">
+                    <label class="crew-label">Vessel Acknowledgement</label>
+                  </td>
+                  <td class="mat-cell">
+                    <mat-form-field fxFlex>
+                      <input
+                        matInput
+                        [matDatepicker]="Vessel_Acknowledgement"
+                        formControlName="Vessel_Acknowledgement"
+                        (change)="getStatusClicked(this)"
+                      />
+                      <mat-datepicker-toggle
+                        matSuffix
+                        [for]="Vessel_Acknowledgement"
+                      ></mat-datepicker-toggle>
+                      <mat-datepicker #Vessel_Acknowledgement></mat-datepicker>
+                    </mat-form-field>
+                  </td>
+                  <td class="mat-cell">
+                    <div
+                      *ngIf="ctmForm.value.Vessel_Acknowledgement_Attach"
+                      class="file-visible"
+                    >
+                      <span *ngIf="ctmForm.value.Vessel_Acknowledgement_Attach"
+                        ><mat-icon
+                          [matTooltip]="
+                            ctmForm.value.Vessel_Acknowledgement_Attach
+                          "
+                          >attach_file</mat-icon
+                        ><a
+                        *ngIf="!readOnly"
+                          href="javascript:void(0)"
+                          (click)="fileDelete('Vessel_Acknowledgement_Attach')"
+                          ><mat-icon>delete</mat-icon></a
+                        ></span
+                      >
+                    </div>
+                    <div
+                      *ngIf="!ctmForm.value.Vessel_Acknowledgement_Attach"
+                      class="container"
+                      appDnd
+                      (fileDropped)="
+                        uploadFileEvt($event, 'Vessel_Acknowledgement_Attach')
+                      "
+                    >
+                      <label class="drop-label" for="uploadFile5">
+                        Upload File</label
+                      >
+                      <span class="margin-7">Or Drop file here</span>
+                      <input
+                        *ngIf="!ctmForm.value.Vessel_Acknowledgement_Attach"
+                        type="file"
+                        id="uploadFile5"
+                        (change)="
+                          uploadFileEvt($event, 'Vessel_Acknowledgement_Attach')
+                        "
+                        name="uploadFile"
+                        accept="image/*"
+                      />
+                    </div>
+                  </td>
+                </tr>
+                <tr class="mat-row" *ngIf="hideUpload">
+                  <td class="mat-cell">
+                    <label class="crew-label"
+                      >Amount Remitted Back To Client</label
+                    >
+                  </td>
+                  <td class="mat-cell">
+                    <mat-form-field fxFlex>
+                      <input
+                        matInput
+                        [matDatepicker]="Amount_Remitted_Back_To_Client"
+                        formControlName="Amount_Remitted_Back_To_Client"
+                        (change)="getStatusClicked(this)"
+                      />
+                      <mat-datepicker-toggle
+                        matSuffix
+                        [for]="Amount_Remitted_Back_To_Client"
+                      ></mat-datepicker-toggle>
+                      <mat-datepicker
+                        #Amount_Remitted_Back_To_Client
+                      ></mat-datepicker>
+                    </mat-form-field>
+                  </td>
+                  <td class="mat-cell">
+                    <div
+                      class="file-visible"
+                      *ngIf="
+                        ctmForm.value.Amount_Remitted_Back_To_Client_Attach
+                      "
+                    >
+                      <span
+                        *ngIf="
+                          ctmForm.value.Amount_Remitted_Back_To_Client_Attach
+                        "
+                        ><mat-icon
+                          [matTooltip]="
+                            ctmForm.value.Amount_Remitted_Back_To_Client_Attach
+                          "
+                          >attach_file</mat-icon
+                        ><a
+                          href="javascript:void(0)"
+                          (click)="
+                            fileDelete('Amount_Remitted_Back_To_Client_Attach')
+                          "
+                          ><mat-icon>delete</mat-icon></a
+                        ></span
+                      >
+                    </div>
+                    <div
+                      *ngIf="
+                        !ctmForm.value.Amount_Remitted_Back_To_Client_Attach
+                      "
+                      class="container"
+                      appDnd
+                      (fileDropped)="
+                        uploadFileEvt(
+                          $event,
+                          'Amount_Remitted_Back_To_Client_Attach'
+                        )
+                      "
+                    >
+                      <label class="drop-label" for="uploadFile6">
+                        Upload File</label
+                      >
+                      <span class="margin-7">Or Drop file here</span>
+                      <input
+                        *ngIf="
+                          !ctmForm.value.Amount_Remitted_Back_To_Client_Attach
+                        "
+                        type="file"
+                        id="uploadFile6"
+                        (change)="
+                          uploadFileEvt(
+                            $event,
+                            'Amount_Remitted_Back_To_Client_Attach'
+                          )
+                        "
+                        name="uploadFile"
+                        accept="image/*"
+                      />
+                    </div>
+                  </td>
+                </tr>
+                <tr class="mat-row" *ngIf="hideUpload">
+                  <td class="mat-cell">
+                    <label class="crew-label">Cancelled Request</label>
+                  </td>
+                  <td class="mat-cell">
+                    <mat-form-field fxFlex>
+                      <input
+                        matInput
+                        [matDatepicker]="Cancelled_Request"
+                        formControlName="Cancelled_Request"
+                        (change)="getStatusClicked(this)"
+                      />
+                      <mat-datepicker-toggle
+                        matSuffix
+                        [for]="Cancelled_Request"
+                      ></mat-datepicker-toggle>
+                      <mat-datepicker #Cancelled_Request></mat-datepicker>
+                    </mat-form-field>
+                  </td>
+                  <td class="mat-cell">
+                    <div
+                      class="file-visible"
+                      *ngIf="ctmForm.value.Cancelled_Request_Attach"
+                    >
+                      <span
+                        ><mat-icon
+                          [matTooltip]="ctmForm.value.Cancelled_Request_Attach"
+                          >attach_file</mat-icon
+                        ><a
+                          href="javascript:void(0)"
+                          (click)="fileDelete('Cancelled_Request_Attach')"
+                          ><mat-icon>delete</mat-icon></a
+                        ></span
+                      >
+                    </div>
+                    <div
+                      class="container"
+                      *ngIf="!ctmForm.value.Cancelled_Request_Attach"
+                      appDnd
+                      (fileDropped)="
+                        uploadFileEvt($event, 'Cancelled_Request_Attach')
+                      "
+                    >
+                      <label class="drop-label" for="uploadFile7">
+                        Upload File</label
+                      >
+                      <span class="margin-7">Or Drop file here</span>
+                      <input
+                        type="file"
+                        id="uploadFile7"
+                        (change)="
+                          uploadFileEvt($event, 'Cancelled_Request_Attach')
+                        "
+                        name="uploadFile"
+                        accept="image/*"
+                      />
+                    </div>
+                  </td>
+                </tr>
+                <tr class="mat-row" *ngIf="hideUpload">
+                  <td class="mat-cell">
+                    <label class="crew-label">Transfer to new Vessel</label>
+                  </td>
+                  <td class="mat-cell">
+                    <mat-form-field fxFlex>
+                      <input
+                        matInput
+                        [matDatepicker]="Transfer_To_New_Vessel"
+                        formControlName="Transfer_To_New_Vessel"
+                        (dateChange)="transferToVessleInvoke()"
+                      />
+                      <mat-datepicker-toggle
+                        matSuffix
+                        [for]="Transfer_To_New_Vessel"
+                      ></mat-datepicker-toggle>
+                      <mat-datepicker #Transfer_To_New_Vessel></mat-datepicker>
+                    </mat-form-field>
+                  </td>
+                  <td class="mat-cell">
+                    <div
+                      class="file-visible"
+                      *ngIf="ctmForm.value.Transfer_To_New_Vessel_Attach"
+                    >
+                      <span
+                        ><mat-icon
+                          [matTooltip]="
+                            ctmForm.value.Transfer_To_New_Vessel_Attach
+                          "
+                          >attach_file</mat-icon
+                        ><a
+                          href="javascript:void(0)"
+                          (click)="fileDelete('Transfer_To_New_Vessel_Attach')"
+                          ><mat-icon>delete</mat-icon></a
+                        ></span
+                      >
+                    </div>
+                    <div
+                      *ngIf="!ctmForm.value.Transfer_To_New_Vessel_Attach"
+                      class="container"
+                      appDnd
+                      (fileDropped)="
+                        uploadFileEvt($event, 'Transfer_To_New_Vessel_Attach')
+                      "
+                    >
+                      <label class="drop-label" for="uploadFile8">
+                        Upload File</label
+                      >
+                      <span class="margin-7"> Or Drop file here</span>
+                      <input
+                        type="file"
+                        id="uploadFile8"
+                        (change)="
+                          uploadFileEvt($event, 'Transfer_To_New_Vessel_Attach')
+                        "
+                        name="uploadFile"
+                        accept="image/*"
+                      />
+                    </div>
+                  </td>
+                </tr>
+                <tr class="mat-row" *ngIf="hideUpload">
+                  <td class="mat-cell">
+                    <label class="crew-label">Closed Request</label>
+                  </td>
+                  <td class="mat-cell">
+                    <mat-form-field fxFlex>
+                      <input
+                        matInput
+                        [matDatepicker]="Closed_Request"
+                        formControlName="Closed_Request"
+                      />
+                      <mat-datepicker-toggle
+                        matSuffix
+                        [for]="Closed_Request"
+                      ></mat-datepicker-toggle>
+                      <mat-datepicker #Closed_Request></mat-datepicker>
+                    </mat-form-field>
+                  </td>
+                  <td class="mat-cell">
+                    <div
+                      class="file-visible"
+                      *ngIf="ctmForm.value.Closed_Request_Attach"
+                    >
+                      <span
+                        ><mat-icon
+                          [matTooltip]="ctmForm.value.Closed_Request_Attach"
+                          >attach_file</mat-icon
+                        ><a
+                          href="javascript:void(0)"
+                          (click)="fileDelete('Closed_Request_Attach')"
+                          ><mat-icon>delete</mat-icon></a
+                        ></span
+                      >
+                    </div>
+                    <div
+                      *ngIf="!ctmForm.value.Closed_Request_Attach"
+                      class="container"
+                      appDnd
+                      (fileDropped)="
+                        uploadFileEvt($event, 'Closed_Request_Attach')
+                      "
+                    >
+                      <label class="drop-label" for="uploadFile9">
+                        Upload File</label
+                      >
+                      <span class="margin-7">Or Drop file here</span>
+                      <input
+                        type="file"
+                        id="uploadFile9"
+                        (change)="
+                          uploadFileEvt($event, 'Closed_Request_Attach')
+                        "
+                        name="uploadFile"
+                        accept="image/*"
+                      />
+                    </div>
+                  </td>
+                </tr>
+              </table>
+            </table>
+          </div>
+        </div>
+      </div>
+      <div class="main-section">
+        <div class="left-panel">
+          <div class="down-sec">
+            <table class="details-table vendor-table">
+              <tr class="mat-row">
+                <td class="mat-cell">
+                  <label class="crew-label">CTM PIC</label>
+                </td>
+                <td class="mat-cell">
+                  <mat-form-field fxFlex>
+                    <mat-select
+                      formControlName="CTM_PIC"
+                      placeholder="Please Select CTM PIC"
+                    >
+                      <mat-option
+                        *ngFor="let b of filtered_ctm_pic | async"
+                        [value]="b.USER_GUID"
+                      >
+                        {{ b.USER_FIRST_NAME }} {{ b.USER_MIDDLE_NAME }}
+                        {{ b.USER_LAST_NAME }}
+                      </mat-option>
+                    </mat-select>
+                  </mat-form-field>
+                </td>
+              </tr>
+              <tr class="mat-row">
+                <td class="mat-cell">
+                  <label class="crew-label">Vendor</label>
+                </td>
+                <td class="mat-cell">
+                  <input type="hidden" formControlName="Vendor_Name" />
+                  <mat-form-field fxFlex>
+                    <mat-select
+                      formControlName="Vendor_GUID"
+                      placeholder="Please Select Vendor"
+                    >
+                      <mat-option
+                        *ngFor="let b of filtered_ctm_vendors | async"
+                        [value]="b.Vendor_GUID"
+                      >
+                        {{ b.Vendor_Name }}
+                      </mat-option>
+                    </mat-select>
+                  </mat-form-field>
+                </td>
+              </tr>
+              <tr class="mat-row">
+                <td class="mat-cell">
+                  <label class="crew-label">Handling Fee</label>
+                </td>
+                <td class="mat-cell text-right">
+                  <input type="hidden" formControlName="VENDOR_HANDLING_FEE" />
+                  <label class="crew-label">{{
+                    ctmForm.get("VENDOR_HANDLING_FEE").value | currency: "USD"
+                  }}</label>
+                </td>
+              </tr>
+              <tr class="mat-row">
+                <td class="mat-cell">
+                  <label class="crew-label">Total USD Due</label>
+                </td>
+                <td class="mat-cell text-right">
+                  <input type="hidden" formControlName="Total_Due_Amt_USD" />
+                  <label class="crew-label">{{
+                    ctmForm.get("Total_Due_Amt_USD").value | currency: "USD"
+                  }}</label>
+                </td>
+              </tr>
+              <tr class="mat-row">
+                <td class="mat-cell">
+                  <label class="crew-label">Remarks</label>
+                </td>
+                <td class="mat-cell">
+                  <mat-form-field fxFlex class="two-divide">
+                    <textarea
+                      matInput
+                      formControlName="Remarks"
+                      placeholder=""
+                      rows="5"
+                    ></textarea>
+                  </mat-form-field>
+                </td>
+              </tr>
+            </table>
+          </div>
+        </div>
+        <div class="right-panel padding-left">
+          <div class="down-sec">
+            <table class="details-table demo-table">
+              <tr class="mat-row">
+                <td class="mat-cell">
+                  <label class="crew-label">CTM Billable</label>
+                  <label class="crew-label float-right">(Manual)</label>
+                </td>
+                <td class="mat-cell text-right">
+                  <mat-form-field fxFlex class="two-divide text-right">
+                    <input matInput formControlName="Billable" />
+                  </mat-form-field>
+                </td>
+              </tr>
+              <tr class="mat-row">
+                <td class="mat-cell">
+                  <label class="crew-label">SWS Handling Fee (%) </label>
+                  <label class="crew-label float-right">(Manual)</label>
+                </td>
+                <td class="mat-cell text-right">
+                  <mat-form-field fxFlex class="two-divide text-right">
+                    <input
+                      matInput
+                      formControlName="Handling_Fee"
+                      placeholder="Handling Fee"
+                    />
+                    <label matSuffix>%</label>
+                  </mat-form-field>
+                </td>
+              </tr>
+              <tr class="mat-row">
+                <td class="mat-cell">
+                  <label class="crew-label">Amount Due</label>
+                </td>
+                <td class="mat-cell text-right">
+                  <input type="hidden" formControlName="Amount_Due" />
+                  <label class="crew-label">{{
+                    ctmForm.get("Amount_Due").value | currency: "USD"
+                  }}</label>
+                </td>
+              </tr>
+              <tr class="mat-row">
+                <td class="mat-cell">
+                  <label class="crew-label">Amount Received</label>
+                  <label class="crew-label float-right">(Manual)</label>
+                </td>
+                <td class="mat-cell text-right">
+                  <mat-form-field fxFlex class="two-divide text-right">
+                    <input
+                      matInput
+                      formControlName="Amount_Recieved"
+                      placeholder="Enter Recieved Amount"
+                    />
+                  </mat-form-field>
+                </td>
+              </tr>
+              <tr class="mat-row">
+                <td class="mat-cell">
+                  <label class="crew-label">Date Received</label>
+                </td>
+                <td class="mat-cell text-right">
+                  <input type="hidden" formControlName="Date_Recieved" />
+                  <label class="crew-label">{{
+                    ctmForm.get("Date_Recieved").value | date: "dd MMM YYYY"
+                  }}</label>
+                </td>
+              </tr>
+              <tr class="mat-row">
+                <td class="mat-cell">
+                  <label class="crew-label">Amount Due USD</label>
+                </td>
+                <td class="mat-cell text-right">
+                  <input type="hidden" formControlName="USD_Amount_Due" />
+                  <label class="crew-label">{{
+                    ctmForm.get("USD_Amount_Due").value | currency: "USD"
+                  }}</label>
+                </td>
+              </tr>
+              <tr class="mat-row">
+                <td class="mat-cell">
+                  <label class="crew-label">Applicable Exchange</label>
+                  <label class="crew-label float-right">(Manual)</label>
+                </td>
+                <td class="mat-cell text-right">
+                  <mat-form-field fxFlex class="two-divide text-right">
+                    <input
+                      matInput
+                      formControlName="Applicable_Exchange"
+                      placeholder=""
+                    />
+                  </mat-form-field>
+                </td>
+              </tr>
+              <tr class="mat-row">
+                <td class="mat-cell">
+                  <label class="crew-label">Amount Due SGD</label>
+                </td>
+                <td class="mat-cell text-right">
+                  <input type="hidden" formControlName="Amount_Due_SGD" />
+                  <label class="crew-label">SGD {{
+                    ctmForm.get("Amount_Due_SGD").value | number : '1.2-2'
+                  }}</label>
+                </td>
+              </tr>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <div
+        fxLayout="column"
+        fxLayout.gt-sm="row"
+        fxLayoutGap.gt-sm="24px"
+        *ngIf="ErrorMessage"
+      >
+        <h6 style="color: #ff0000">{{ ErrorMessage }}</h6>
+      </div>
+    </form>
+
+    <div class="button-section">
+      
+      <div>
+        <button
+          [disabled]="!IsEdit || ctmForm.value.Vendor_GUID === '' || ctmForm.value.Vendor_GUID === null"
+          mat-raised-button
+          class="gn-form-btn dark-btn"
+          (click)="sendEmail(true)"
+        >
+          Send Email To Vendor (USD)
+        </button>
+        <button
+          [disabled]="!IsEdit || ctmForm.value.Vendor_GUID === '' || ctmForm.value.Vendor_GUID === null"
+          mat-raised-button
+          class="gn-form-btn dark-btn"
+          (click)="sendEmail(false)"
+        >
+          Send Email To Vendor (SGD)
+        </button>
+        <button
+          [disabled]="!IsEdit"
+          mat-raised-button
+          (click)="downloadAsPDF()"
+          class="gn-form-btn dark-btn"
+        >
+          Generate Form For Vessel
+        </button>
+      </div>
+      <div>
+        <button
+          *ngIf="!readOnly"
+          mat-raised-button
+          color="primary"
+          (click)="closeCTMRecord()"
+          class="gn-form-btn"
+          [disabled]="ctmForm.value.Status_GUID === '8DIB0IVWH30a4b68c-d66c-48ef-bfaf-fc87a3f4415c'"
+        >
+          CLOSE RECORD
+        </button>
+        <button
+          *ngIf="!readOnly"
+          mat-raised-button
+          color="primary"
+          (click)="SaveCTMVendor()"
+          class="gn-form-btn save-btn"
+          [disabled]="!ctmForm.valid"
+        >
+          SAVE
+        </button>
+      </div>
+    </div>
+  </div>
+</fury-page-layout>

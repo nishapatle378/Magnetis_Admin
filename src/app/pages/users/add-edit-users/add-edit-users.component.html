@@ -1,0 +1,409 @@
+<div mat-dialog-title>User</div>
+
+<mat-dialog-content style="height: 100% !important">
+  <form [formGroup]="firstFormGroup" [ngStyle]="{ 'margin-top': '7px' }">
+    <div class="table-out-section">
+      <div fxLayout="column" fxLayout.gt-sm="row" fxLayoutGap.gt-sm="24px">
+        <mat-form-field fxFlex>
+          <mat-label>First Name</mat-label>
+          <input type="text" formControlName="USER_FIRST_NAME" matInput autocomplete="off"/>
+          <mat-error
+            *ngIf="firstFormGroup.get('USER_FIRST_NAME').hasError('required')"
+            >First name is required</mat-error
+          >
+        </mat-form-field>
+        <mat-form-field fxFlex>
+          <mat-label>Middle Name</mat-label>
+          <input type="text" formControlName="USER_MIDDLE_NAME" matInput />
+          <mat-error
+            *ngIf="firstFormGroup.get('USER_MIDDLE_NAME').hasError('required')"
+            >Middle name is required</mat-error
+          >
+        </mat-form-field>
+        <mat-form-field fxFlex>
+          <mat-label>Last Name</mat-label>
+          <input type="text" formControlName="USER_LAST_NAME" matInput />
+          <mat-error
+            *ngIf="firstFormGroup.get('USER_LAST_NAME').hasError('required')"
+            >Last name is required</mat-error
+          >
+        </mat-form-field>
+      </div>
+
+      <div fxLayout="column" fxLayout.gt-sm="row" fxLayoutGap.gt-sm="24px">
+        <mat-form-field fxFlex>
+          <mat-label>Login Id</mat-label>
+          <input type="text" formControlName="LOGIN_ID" matInput />
+          <mat-error *ngIf="firstFormGroup.get('LOGIN_ID').hasError('required')"
+            >Login ID is required</mat-error
+          >
+        </mat-form-field>
+        <mat-form-field fxFlex>
+          <mat-label>Email Id</mat-label>
+          <input type="text" formControlName="EMAIL_ID" matInput autocomplete="off"/>
+          <!-- <mat-error *ngIf="firstFormGroup.get('EMAIL_ID').hasError('required')">Email ID is required</mat-error> -->
+          <mat-error
+            *ngIf="firstFormGroup.get('EMAIL_ID').hasError('invalidEmail')"
+            >Invalid Email</mat-error
+          >
+        </mat-form-field>
+      </div>
+
+      <div fxLayout="column" fxLayout.gt-sm="row" fxLayoutGap.gt-sm="24px">
+        <mat-form-field fxFlex>
+          <mat-label>Password</mat-label>
+          <input
+            formControlName="PASSWORD"
+            matInput
+            [type]="hide ? 'password' : 'text'"
+            autocomplete="off"
+          />
+          <button
+            mat-icon-button
+            matSuffix
+            (click)="hide = !hide"
+            [attr.aria-label]="'Hide password'"
+            [attr.aria-pressed]="hide"
+          >
+            <mat-icon>{{ hide ? "visibility_off" : "visibility" }}</mat-icon>
+          </button>
+          <mat-error *ngIf="firstFormGroup.get('PASSWORD').hasError('required')"
+            >Password is required</mat-error
+          >
+          <mat-error
+            *ngIf="
+              firstFormGroup.get('PASSWORD').hasError('cannotContainSpace')
+            "
+            >Password can not contain space.</mat-error
+          >
+        </mat-form-field>
+        <mat-form-field fxFlex>
+          <mat-label>Confirm Password</mat-label>
+          <input
+            formControlName="confirmPassword"
+            matInput
+            [type]="hideC ? 'password' : 'text'"
+            autocomplete="off"
+          />
+          <button
+            mat-icon-button
+            matSuffix
+            (click)="hideC = !hideC"
+            [attr.aria-label]="'Hide password'"
+            [attr.aria-pressed]="hide"
+          >
+            <mat-icon>{{ hideC ? "visibility_off" : "visibility" }}</mat-icon>
+          </button>
+          <mat-error
+            *ngIf="firstFormGroup.get('confirmPassword').hasError('required')"
+            >Confirm password is required</mat-error
+          >
+          <mat-error
+            *ngIf="
+              firstFormGroup
+                .get('confirmPassword')
+                .hasError('cannotContainSpace')
+            "
+            >Confirm Password can not contain space.</mat-error
+          >
+          <mat-error
+            *ngIf="
+              firstFormGroup
+                .get('confirmPassword')
+                .hasError('confirmedValidator')
+            "
+            >Password not matching</mat-error
+          >
+        </mat-form-field>
+      </div>
+
+      <div fxLayout="column" fxLayout.gt-sm="row" fxLayoutGap.gt-sm="24px">
+        <mat-form-field fxFlex>
+          <mat-label>Country</mat-label>
+          <mat-select formControlName="COMPANY_GUID">
+            <mat-option>
+              <ngx-mat-select-search
+                formControlName="country_Filter"
+                [placeholderLabel]="'search...'"
+                [noEntriesFoundLabel]="'no matching found!'"
+              >
+              </ngx-mat-select-search>
+            </mat-option>
+            <mat-option
+              *ngFor="let b of filtered_country | async"
+              [value]="b.COUNTRY_GUID"
+            >
+              {{ b.COUNTRY_NAME }}
+            </mat-option>
+          </mat-select>
+          <mat-error
+            *ngIf="firstFormGroup.get('COMPANY_GUID').hasError('required')"
+            >Country is required</mat-error
+          >
+        </mat-form-field>
+        <mat-form-field fxFlex>
+          <div class="phone-input">
+            <mat-label>Phone No</mat-label>
+            <span *ngIf="iddCode">{{ iddCode }}</span>
+            <input
+              type="text"
+              class="custom-mat-input-element"
+              formControlName="PHONE_NUMBER"
+              (input)="ValidNumberInput('PHONE_NUMBER', $event.target.value)"
+              maxlength="14"
+              matInput
+            />
+          </div>
+          <mat-error
+            *ngIf="firstFormGroup.get('PHONE_NUMBER').hasError('required')"
+            >Phone No is required</mat-error
+          >
+          <mat-error
+            *ngIf="firstFormGroup.get('PHONE_NUMBER').hasError('maxLength')"
+            >Phone No can contain upto 10 digits</mat-error
+          >
+        </mat-form-field>
+      </div>
+
+      <div fxLayout="column" fxLayout.gt-sm="row" fxLayoutGap.gt-sm="24px">
+        <mat-form-field fxFlex class="two-divide">
+          <mat-label>DOB</mat-label>
+          <input
+            matInput
+            [matDatepicker]="DOB"
+            [max]="maxDate"
+            formControlName="DOB"
+          />
+          <mat-datepicker-toggle matSuffix [for]="DOB"></mat-datepicker-toggle>
+          <mat-datepicker #DOB></mat-datepicker>
+          <mat-error *ngIf="firstFormGroup.get('DOB').hasError('required')"
+            >DOB is required</mat-error
+          >
+          <mat-error *ngIf="firstFormGroup.get('DOB').invalid"
+            >Invalid Date</mat-error
+          >
+        </mat-form-field>
+        <mat-form-field fxFlex>
+          <mat-label>Designation</mat-label>
+          <mat-select formControlName="USER_DESIGNATION">
+            <mat-option value="Super Admin">Super Admin</mat-option>
+            <mat-option value="Admin">Admin</mat-option>
+          </mat-select>
+          <mat-error
+            *ngIf="firstFormGroup.get('USER_DESIGNATION').hasError('required')"
+            >Designation is required</mat-error
+          >
+        </mat-form-field>
+      </div>
+
+      <div fxLayout="column" fxLayout.gt-sm="row" fxLayoutGap.gt-sm="24px">
+        <mat-form-field fxFlex>
+          <mat-label>Present Address</mat-label>
+          <textarea
+            type="text"
+            formControlName="PRESENT_ADDRESS"
+            rows="3"
+            matInput
+          ></textarea>
+          <mat-error
+            *ngIf="firstFormGroup.get('PRESENT_ADDRESS').hasError('required')"
+            >Present address is required</mat-error
+          >
+        </mat-form-field>
+      </div>
+      <div fxLayout="column" fxLayout.gt-sm="row" fxLayoutGap.gt-sm="24px">
+        <mat-form-field fxFlex>
+          <mat-label>Permanent Address</mat-label>
+          <textarea
+            type="text"
+            formControlName="PERMANENT_ADDRESS"
+            rows="3"
+            matInput
+          ></textarea>
+          <mat-error
+            *ngIf="firstFormGroup.get('PERMANENT_ADDRESS').hasError('required')"
+            >Present address is required</mat-error
+          >
+        </mat-form-field>
+      </div>
+      <div fxLayout="column" fxLayout.gt-sm="row" fxLayoutGap.gt-sm="24px">
+        <mat-form-field fxFlex>
+          <mat-label>Landing Page</mat-label>
+          <mat-select formControlName="Landing_Page">
+            <mat-option value="dashboard">Dashboard</mat-option>
+            <mat-option value="add_service">Add Service</mat-option>
+          </mat-select>
+        </mat-form-field>
+      </div>
+      <div fxLayout="column" fxLayout.gt-sm="row" fxLayoutGap.gt-sm="24px">
+        <mat-form-field fxFlex class="two-divide">
+          <mat-label>Date of Joining</mat-label>
+          <input
+            matInput
+            [matDatepicker]="DATE_OF_JOINING"
+            formControlName="DATE_OF_JOINING"
+          />
+          <mat-datepicker-toggle
+            matSuffix
+            [for]="DATE_OF_JOINING"
+          ></mat-datepicker-toggle>
+          <mat-datepicker #DATE_OF_JOINING></mat-datepicker>
+          <mat-error
+            *ngIf="firstFormGroup.get('DATE_OF_JOINING').hasError('required')"
+            >Joining date is required</mat-error
+          >
+          <mat-error *ngIf="firstFormGroup.get('DATE_OF_JOINING').invalid"
+            >Invalid Date</mat-error
+          >
+        </mat-form-field>
+        <mat-form-field fxFlex class="two-divide">
+          <mat-label>Date of Probation</mat-label>
+          <input
+            matInput
+            [matDatepicker]="DATE_OF_PROBATION"
+            formControlName="DATE_OF_PROBATION"
+          />
+          <mat-datepicker-toggle
+            matSuffix
+            [for]="DATE_OF_PROBATION"
+          ></mat-datepicker-toggle>
+          <mat-datepicker #DATE_OF_PROBATION></mat-datepicker>
+          <mat-error
+            *ngIf="firstFormGroup.get('DATE_OF_PROBATION').hasError('required')"
+            >Probation date is required</mat-error
+          >
+          <mat-error *ngIf="firstFormGroup.get('DATE_OF_PROBATION').invalid"
+            >Invalid Date</mat-error
+          >
+        </mat-form-field>
+        <mat-form-field fxFlex class="two-divide">
+          <mat-label>Date of Confirmation</mat-label>
+          <input
+            matInput
+            [matDatepicker]="DATE_OF_CONFIRMATION"
+            formControlName="DATE_OF_CONFIRMATION"
+          />
+          <mat-datepicker-toggle
+            matSuffix
+            [for]="DATE_OF_CONFIRMATION"
+          ></mat-datepicker-toggle>
+          <mat-datepicker #DATE_OF_CONFIRMATION></mat-datepicker>
+          <mat-error
+            *ngIf="
+              firstFormGroup.get('DATE_OF_CONFIRMATION').hasError('required')
+            "
+            >Confirmation date is required</mat-error
+          >
+          <mat-error *ngIf="firstFormGroup.get('DATE_OF_CONFIRMATION').invalid"
+            >Invalid Date</mat-error
+          >
+        </mat-form-field>
+        <mat-form-field fxFlex class="two-divide">
+          <mat-label>Date of Termination</mat-label>
+          <input
+            matInput
+            [matDatepicker]="DATE_OF_TERMINATION"
+            formControlName="DATE_OF_TERMINATION"
+          />
+          <mat-datepicker-toggle
+            matSuffix
+            [for]="DATE_OF_TERMINATION"
+          ></mat-datepicker-toggle>
+          <mat-datepicker #DATE_OF_TERMINATION></mat-datepicker>
+          <mat-error
+            *ngIf="
+              firstFormGroup.get('DATE_OF_TERMINATION').hasError('required')
+            "
+            >Termination date is required</mat-error
+          >
+          <mat-error *ngIf="firstFormGroup.get('DATE_OF_TERMINATION').invalid"
+            >Invalid Date</mat-error
+          >
+        </mat-form-field>
+      </div>
+      <div fxLayout="column" fxLayout.gt-sm="row" fxLayoutGap.gt-sm="24px">
+        <h2>SMTP Configuration</h2>
+      </div>
+
+      <div fxLayout="column" fxLayout.gt-sm="row" fxLayoutGap.gt-sm="24px">
+        <mat-form-field fxFlex>
+          <mat-label>SMTP Host</mat-label>
+          <input type="text" formControlName="Smtp_Host" matInput />
+          <mat-error
+            *ngIf="firstFormGroup.get('Smtp_Host').hasError('required')"
+            >First name is required</mat-error
+          >
+        </mat-form-field>
+        <mat-form-field fxFlex>
+          <mat-label>SMTP Outgoing Port</mat-label>
+          <input type="text" formControlName="Smtp_Port" matInput />
+          <mat-error
+            *ngIf="firstFormGroup.get('Smtp_Port').hasError('required')"
+            >Middle name is required</mat-error
+          >
+        </mat-form-field>
+      </div>
+      <div fxLayout="column" fxLayout.gt-sm="row" fxLayoutGap.gt-sm="24px">
+        <mat-form-field fxFlex>
+          <mat-label>SMTP Username</mat-label>
+          <input type="text" formControlName="Smtp_Username" matInput />
+          <mat-error
+            *ngIf="firstFormGroup.get('Smtp_Username').hasError('required')"
+            >Last name is required</mat-error
+          >
+        </mat-form-field>
+        <mat-form-field fxFlex>
+          <mat-label>SMTP Password</mat-label>
+          <input type="text" formControlName="Smtp_Password" matInput />
+          <mat-error
+            *ngIf="firstFormGroup.get('Smtp_Password').hasError('required')"
+            >Last name is required</mat-error
+          >
+        </mat-form-field>
+      </div>
+      <div fxLayout="column" fxLayout.gt-sm="row" fxLayoutGap.gt-sm="24px">
+        <mat-form-field fxFlex>
+          <mat-label class="left-label">Secure</mat-label>
+          <mat-select formControlName="Smtp_Secure">
+            <mat-option [value]="1"> Yes </mat-option>
+            <mat-option [value]="0"> No </mat-option>
+          </mat-select>
+          <mat-error
+            *ngIf="firstFormGroup.get('Smtp_Secure').hasError('required')"
+            >Secure is required</mat-error
+          >
+        </mat-form-field>
+      </div>
+    </div>
+
+    <!-- <div fxLayout="row" fxLayoutAlign="space-between center" [ngStyle]="{'padding-bottom': '10px','border-bottom': '1px dashed #d3d3d3', 'margin-bottom': '20px'}">
+            <div>Active Status</div>
+            <mat-checkbox
+                [color]="'accent'"
+                formControlName="ACTIVE_STATUS"
+            >
+            </mat-checkbox>
+        </div> -->
+
+    <div
+      fxLayout="column"
+      fxLayout.gt-sm="row"
+      fxLayoutGap.gt-sm="24px"
+      *ngIf="ErrorMessage"
+    >
+      <h6 style="color: #ff0000">{{ ErrorMessage }}</h6>
+    </div>
+  </form>
+</mat-dialog-content>
+<mat-dialog-actions fxLayout="row" fxLayoutAlign="end center">
+  <button
+    mat-raised-button
+    color="primary"
+    [ngClass]="[!firstFormGroup.valid && !IsEdit ? '' : 'save-btn']"
+    (click)="SaveUser()"
+    [disabled]="!firstFormGroup.valid && !IsEdit"
+  >
+    SAVE
+  </button>
+  <button mat-raised-button color="warn" (click)="CloseModal()">CLOSE</button>
+</mat-dialog-actions>

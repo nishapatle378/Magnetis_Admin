@@ -1,0 +1,1090 @@
+<fury-page-layout mode="card" class="planner-view">
+  <fury-page-layout-content [@fadeInUp] class="content-area">
+    <table class="mat-table call-details-table">
+      <tr>
+        <th colspan="8" class="mat-header-cell">Invoice Details</th>
+      </tr>
+      <tr>
+        <td class="head text-right">Magentis Number :</td>
+        <td class="">{{ plannerData?.REF_NUM }}</td>
+        <td class="text-right">Vessel NAME :</td>
+        <td class="">{{ plannerData?.VESSEL_NAME }}</td>
+        <td class="text-right">Principal :</td>
+        <td class="">{{ plannerData?.COMPANY_NAME }}</td>
+        <td class="text-right">Appointment Type :</td>
+        <td class="">{{ plannerData?.APPOINTMENT_TYPE_NAME }}</td>
+      </tr>
+
+      <tr>
+        <td class="text-right">Port :</td>
+        <td class="">{{ plannerData?.Port_Name }}</td>
+        <td class="text-right">Principal Appointment Number :</td>
+        <td class="">{{ plannerData?.APPOINTMENT_REF }}</td>
+        <td class="text-right">Arrival Date / Time :</td>
+        <td class="">
+          {{ plannerData?.VESSEL_ACTUAL_ARR | date: "dd MMM YYYY HH:mm" }}
+        </td>
+
+        <td class="text-right">Departure Date / Time :</td>
+        <td class="">
+          {{ plannerData?.VESSEL_ACTUAL_DEP | date: "dd MMM YYYY HH:mm" }}
+        </td>
+      </tr>
+      <tr>
+        <td></td>
+        <td></td>
+        <td class="text-right">Pending Follow Ups :</td>
+        <td>{{ pendingFollowUp }}</td>
+      </tr>
+    </table>
+    <form [formGroup]="fdaSummeryForm" [ngStyle]="{ 'margin-top': '7px' }">
+      <div class="main-section">
+        <div class="category-summery">
+          <div class="section-header">
+            <mat-form-field>
+              <mat-label>Invoice #:</mat-label>
+              <input type="text" formControlName="Invoice_Number" matInput />
+              <mat-error
+                *ngIf="
+                  fdaSummeryForm.get('Invoice_Number').hasError('required')
+                "
+              >
+                Exchange rate is required
+              </mat-error>
+            </mat-form-field>
+          </div>
+          <table class="mat-table details-table">
+            <thead>
+              <tr class="mat-row">
+                <th class="mat-header-cell width-100">Category</th>
+                <th class="mat-header-cell"></th>
+                <th class="mat-header-cell">Currency</th>
+                <th class="mat-header-cell text-right">Total</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr
+                *ngFor="let category of serviceCategory"
+                [class]="
+                  category.Service_Guid === activeService
+                    ? 'clickable-tr active-tr'
+                    : 'clickable-tr'
+                "
+                (click)="onServiceClick(category)"
+              >
+                <td class="cat-title">
+                  <a
+                    ><b>{{ category.Service_Name }}</b></a
+                  >
+                </td>
+                <td>
+                  <button
+                    mat-icon-button
+                    (click)="printService(category)"
+                    [disabled]="isPrintable(category)"
+                  >
+                    <mat-icon class="icon-display">print</mat-icon>
+                  </button>
+                </td>
+                <td>
+                  <span *ngFor="let amount of category.Amount">
+                    {{ amount?.Currency_Name }} <br />
+                  </span>
+                </td>
+                <td class="text-right">
+                  <span *ngFor="let amount of category.Amount">
+                    {{ amount?.Amount || 0 | number: "2.2" }} <br />
+                  </span>
+                </td>
+              </tr>
+              <tr>
+                <td class="cat-title">
+                  <b>Grand Total</b>
+                </td>
+                <td colspan="2">
+                  <span *ngFor="let amount of grandTotal">
+                    {{ amount?.Currency_Name }} <br />
+                  </span>
+                </td>
+                <td class="text-right">
+                  <span *ngFor="let amount of grandTotal">
+                    <b>{{ amount?.Amount || 0 | number: "2.2" }}</b
+                    ><br />
+                  </span>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+          <table class="mat-table services-table">
+            <tbody>
+              <tr>
+                <td class="cat-title width-160">
+                  <label class="crew-label">Deductable Currency</label>
+                </td>
+                <td>
+                  <mat-form-field>
+                    <mat-label>Deductable Currency</mat-label>
+                    <mat-select formControlName="Deductable">
+                      <mat-option
+                        *ngFor="let b of filtered_currency | async"
+                        [value]="b.CURRENCY_GUID"
+                      >
+                        {{ b.SHORT_CODE }}
+                      </mat-option>
+                    </mat-select>
+                  </mat-form-field>
+                </td>
+              </tr>
+              <tr>
+                <td class="cat-title">
+                  <label class="crew-label width-100">Deductable Amount</label>
+                </td>
+                <td>
+                  <mat-form-field>
+                    <mat-label>Deductable Amount</mat-label>
+                    <input
+                      type="text"
+                      formControlName="Deductable_Amount"
+                      matInput
+                      class="text-right"
+                    />
+                    <mat-error
+                      *ngIf="
+                        fdaSummeryForm
+                          .get('Deductable_Amount')
+                          .hasError('required')
+                      "
+                    >
+                      Deductable Amount is required
+                    </mat-error>
+                  </mat-form-field>
+                </td>
+              </tr>
+              <tr>
+                <td class="cat-title">
+                  <label class="crew-label width-100">Exchange Rate</label>
+                </td>
+                <td>
+                  <mat-form-field>
+                    <mat-label>Exchange Rate</mat-label>
+                    <input
+                      type="text"
+                      formControlName="Exchange_Rate"
+                      matInput
+                    />
+                    <mat-error
+                      *ngIf="
+                        fdaSummeryForm.get('Exchange_Rate').hasError('required')
+                      "
+                    >
+                      Exchange rate is required
+                    </mat-error>
+                  </mat-form-field>
+                </td>
+              </tr>
+
+              <!-- <tr>
+                <td class="cat-title">
+                  <label class="crew-label">Type</label>
+                </td>
+                <td>
+                  <mat-form-field>
+                    <mat-label>Type</mat-label>
+                    <mat-select formControlName="Type">
+                      <mat-option
+                        *ngFor="let b of filtered_type | async"
+                        [value]="b.PARAMETER_GUID"
+                      >
+                        {{ b.PARAMETER_NAME }}
+                      </mat-option>
+                    </mat-select>
+                  </mat-form-field>
+                </td>
+              </tr> -->
+              <tr>
+                <td class="cat-title">
+                  <label class="crew-label width-100">Invoice Date</label>
+                </td>
+                <td>
+                  <mat-form-field>
+                    <mat-label>Invoice Date</mat-label>
+                    <input
+                      matInput
+                      formControlName="Invoice_Date"
+                      placeholder="DD MMM YYYY"
+                      (keyup)="validateDateOnly($event, 'Invoice_Date')"
+                    />
+                    <mat-error
+                      *ngIf="
+                        fdaSummeryForm.get('Invoice_Date').hasError('incorrect')
+                      "
+                      >You have entered incorrect date
+                    </mat-error>
+                  </mat-form-field>
+                </td>
+              </tr>
+              <tr>
+                <td class="cat-title">
+                  <label class="crew-label width-100">Invoice Remarks</label>
+                </td>
+                <td>
+                  <mat-form-field>
+                    <mat-label>Invoice Remarks</mat-label>
+                    <textarea
+                      rows="5"
+                      matInput
+                      formControlName="Remarks"
+                      placeholder="Remarks"
+                    ></textarea>
+                  </mat-form-field>
+                </td>
+              </tr>
+              <tr *ngIf="!isFinalInvoice">
+                <td colspan="2" class="text-right">
+                  <button
+                    mat-raised-button
+                    color="primary"
+                    class="save-btn"
+                    (click)="saveFdaDetails(fdaSummeryForm.value)"
+                  >
+                    Save
+                  </button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="service-list">
+          <div class="section-header">
+            <div>
+              <span *ngIf="activeService && !isFinalInvoice">
+                <button
+                  class="create"
+                  (click)="addNewService()"
+                  type="button"
+                  mat-mini-fab
+                  color="primary"
+                >
+                  <mat-icon>add</mat-icon>
+                </button>
+                Add Charge
+              </span>
+            </div>
+
+            <div style="display: flex">
+              <div *ngIf="activeService">
+                <button
+                  mat-raised-button
+                  [class]="serviceFilter === 'all' ? 'blue-btn' : 'btn'"
+                  type="button"
+                  (click)="applyServicesFilter()"
+                >
+                  Show all
+                </button>
+                <button
+                  mat-raised-button
+                  [class]="
+                    serviceFilter === 'with-invoice' ? 'blue-btn' : 'btn'
+                  "
+                  type="button"
+                  (click)="applyServicesFilter('with-invoice')"
+                >
+                  With Invoice
+                </button>
+                <button
+                  mat-raised-button
+                  [class]="
+                    serviceFilter === 'without-invoice' ? 'blue-btn' : 'btn'
+                  "
+                  type="button"
+                  (click)="applyServicesFilter('without-invoice')"
+                >
+                  Without Invoice
+                </button>
+              </div>
+              <div>
+                <span (click)="exportAsExcel()" style="cursor: pointer">
+                  <img
+                    src="../../../../assets/img/excel.png"
+                    class="logo"
+                    alt="excel"
+                  />
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <div class="table-wrapper">
+            <table class="mat-table services-table">
+              <thead>
+                <tr class="mat-row">
+                  <th class="mat-header-cell">Service Type</th>
+                  <th
+                    *ngIf="
+                      activeService ===
+                      'fDuweTWYJdd925e31-0ae0-4e7c-800c-9e6aef7f4bb4'
+                    "
+                    class="mat-header-cell"
+                  >
+                    Boat Type
+                  </th>
+                  <th class="mat-header-cell">Service Date</th>
+                  <th class="mat-header-cell">Vendor</th>
+                  <th class="mat-header-cell">Quantity</th>
+                  <th class="mat-header-cell">Currency</th>
+                  <th class="mat-header-cell">Vendor Invoice Number</th>
+                  <th class="mat-header-cell text-right">Amount</th>
+                  <th class="mat-header-cell">Remarks</th>
+                  <th class="mat-header-cell width-80">Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr
+                  *ngFor="let childservice of selectedServiceList"
+                  [class]="
+                    childservice.index === activeChildService
+                      ? 'clickable-tr active-tr'
+                      : 'clickable-tr'
+                  "
+                  (click)="EditSingleService(childservice)"
+                >
+                  <td>
+                    <mat-form-field class="large-input">
+                      <mat-select
+                        formControlName="Service_Type_{{ childservice.index }}"
+                      >
+                        <mat-option
+                          *ngFor="let b of filtered_service_types | async"
+                          [value]="b.PARAMETER_GUID"
+                        >
+                          {{ b.PARAMETER_NAME }}
+                        </mat-option>
+                      </mat-select>
+                    </mat-form-field>
+                  </td>
+                  <td
+                    *ngIf="
+                      activeService ===
+                      'fDuweTWYJdd925e31-0ae0-4e7c-800c-9e6aef7f4bb4'
+                    "
+                  >
+                    <mat-form-field class="small-input">
+                      <mat-select
+                        formControlName="Boat_Type_GUID_{{
+                          childservice.index
+                        }}"
+                      >
+                        <mat-option
+                          *ngFor="let b of filtered_boat_types | async"
+                          [value]="b.PARAMETER_GUID"
+                        >
+                          {{ b.PARAMETER_NAME }}
+                        </mat-option>
+                      </mat-select>
+                    </mat-form-field>
+                  </td>
+                  <td>
+                    <mat-form-field class="large-input">
+                      <input
+                        matInput
+                        formControlName="Service_date_{{ childservice.index }}"
+                        placeholder="DD MMM YYYY HH:mm"
+                        (keyup)="validateDate($event, 'Invoice_Date')"
+                      />
+                    </mat-form-field>
+                  </td>
+                  <td>
+                    <mat-form-field class="large-input">
+                      <mat-select
+                        formControlName="Vendor_GUID_{{ childservice.index }}"
+                      >
+                        <mat-option
+                          *ngFor="let b of filtered_vendor | async"
+                          [value]="b.Vendor_GUID"
+                          [style]="
+                            displayVendor(
+                              b,
+                              fdaSummeryForm.value[
+                                'Service_Type_' + childservice.index
+                              ],
+                              fdaSummeryForm.value[
+                                'Boat_Type_GUID_' + childservice.index
+                              ]
+                            )
+                          "
+                        >
+                          {{ b.Vendor_Name }}
+                        </mat-option>
+                      </mat-select>
+                    </mat-form-field>
+                  </td>
+                  <td>
+                    <mat-form-field class="small-input">
+                      <input
+                        type="text"
+                        placeholder="Quantity"
+                        formControlName="Svc_Quantity_{{ childservice.index }}"
+                        matInput
+                      />
+                    </mat-form-field>
+                  </td>
+                  <td>
+                    <mat-form-field class="small-input">
+                      <mat-select
+                        formControlName="Svc_Currency_GUID_{{
+                          childservice.index
+                        }}"
+                      >
+                        <mat-option>Please select</mat-option>
+                        <mat-option
+                          *ngFor="let b of filtered_currency | async"
+                          [value]="b.CURRENCY_GUID"
+                        >
+                          {{ b.SHORT_CODE }}
+                        </mat-option>
+                      </mat-select>
+                    </mat-form-field>
+                  </td>
+                  <td>
+                    <mat-form-field class="medium-input">
+                      <input
+                        type="text"
+                        placeholder="Invoice Number"
+                        formControlName="Invoice_Number_{{
+                          childservice.index
+                        }}"
+                        matInput
+                      />
+                    </mat-form-field>
+                  </td>
+                  <td>
+                    <mat-form-field class="small-input">
+                      <input
+                        type="text"
+                        formControlName="Svc_Amount_{{ childservice.index }}"
+                        matInput
+                        class="text-right"
+                        placeholder="Amount"
+                        [readonly]="
+                          activeService ===
+                          '9mY6JkMJj72a8a16b-27e2-444d-8776-d930860cfd10'
+                        "
+                      />
+                    </mat-form-field>
+                  </td>
+                  <td>
+                    <mat-form-field>
+                      <textarea
+                        type="text"
+                        formControlName="Remarks_{{ childservice.index }}"
+                        matInput
+                        rows="2"
+                        cols="20"
+                      ></textarea>
+                    </mat-form-field>
+                  </td>
+                  <td class="text-center">
+                    <!-- <button
+                      [color]="
+                        childservice.Remarks?.length > 0 ? 'accent' : 'warn'
+                      "
+                      mat-icon-button
+                      [matTooltip]="childservice.Remarks"
+                    >
+                      <mat-icon class="icon-display">chat</mat-icon>
+                    </button> -->
+                    <!-- <button
+                      mat-icon-button
+                      (click)="EditSingleService(childservice)"
+                      *ngIf="!isFinalInvoice"
+                    >
+                      <mat-icon class="icon-display">edit</mat-icon>
+                    </button> -->
+                    <button
+                      mat-icon-button
+                      *ngIf="!isFinalInvoice"
+                      (click)="DeleteService(childservice)"
+                    >
+                      <mat-icon
+                        class="icon-display"
+                        [ngStyle]="{ color: 'red', 'font-weight': 'bold' }"
+                        >{{ "close" }}</mat-icon
+                      >
+                    </button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="service-footer">
+            <div
+              *ngIf="
+                activeServiceObject &&
+                activeServiceObject.Service_Guid ===
+                  'fDuweTWYJdd925e31-0ae0-4e7c-800c-9e6aef7f4bb4'
+              "
+            >
+              <mat-radio-group formControlName="Print_Options">
+                <mat-radio-button
+                  value="1"
+                  class="mat-radio"
+                  [checked]="fdaSummeryForm.get('Print_Options').value == 1"
+                  >Print With Details</mat-radio-button
+                >
+                <mat-radio-button
+                  value="0"
+                  class="mat-radio"
+                  [checked]="fdaSummeryForm.get('Print_Options').value == 0"
+                  >Print Without Details</mat-radio-button
+                >
+              </mat-radio-group>
+            </div>
+            <div>
+              <button
+                *ngIf="
+                  selectedServiceList &&
+                  selectedServiceList.length > 0 &&
+                  !isFinalInvoice
+                "
+                mat-raised-button
+                color="primary"
+                class="save-btn"
+                (click)="saveBulkService(fdaSummeryForm.value)"
+              >
+                Save All
+              </button>
+              <button
+                *ngIf="
+                  activeService ===
+                    '3BgIl9pcdc29059dd-6a5c-47f8-8906-0d45671699f9' &&
+                  isRecordsWithZeroAmount()
+                "
+                mat-raised-button
+                color="primary"
+                class="save-btn"
+                (click)="removeTransportLog()"
+              >
+                Remove all records with amount 0
+              </button>
+            </div>
+          </div>
+          <div
+            *ngIf="
+              activeServiceObject &&
+              ![
+                'vcryU7qKZ540c23dc-04ea-4e04-b18e-49600e155e99',
+                '9mY6JkMJj72a8a16b-27e2-444d-8776-d930860cfd10'
+              ].includes(activeServiceObject.Service_Guid) &&
+              serviceVendorSummery.length &&
+              fdaSummeryForm.get('Print_Options').value == 1
+            "
+          >
+            <table
+              class="mat-table details-table"
+              style="width: 300px; border: 1px solid #efefef; margin-top: 20px"
+            >
+              <tr class="mat-row">
+                <th class="mat-cell">Vendor Name</th>
+                <th class="mat-cell">Count</th>
+              </tr>
+              <tr class="mat-row" *ngFor="let summery of serviceVendorSummery">
+                <td style="padding: 0px 10px; height: 30px">
+                  {{ summery[0] }}
+                </td>
+                <td
+                  style="text-align: center; height: 30px; cursor: pointer"
+                  (click)="filterListByVendor(summery[0])"
+                >
+                  {{ summery[1] }}
+                </td>
+              </tr>
+            </table>
+          </div>
+        </div>
+        <div class="service-form">
+          <div class="section-header"></div>
+          <table class="mat-table services-table">
+            <thead>
+              <tr class="mat-row">
+                <th colspan="5" class="mat-header-cell text-center">
+                  Edit Service Detail
+                </th>
+              </tr>
+            </thead>
+            <tbody *ngIf="editServiceFlag == 'crew'">
+              <tr>
+                <th class="sub-header medium-input">Category</th>
+                <th class="sub-header">Planned Quantity</th>
+                <th class="sub-header">Actual Quantity</th>
+                <th class="sub-header">Charge</th>
+                <th class="sub-header width-100">Total</th>
+              </tr>
+              <tr class="mat-row" *ngFor="let dimon of filtered_crew_category">
+                <td class="mat-cell">
+                  <input
+                    type="hidden"
+                    formControlName="Category_{{ dimon.index }}"
+                  />
+                  <label class="crew-label">{{ dimon.PARAMETER_NAME }}</label>
+                </td>
+                <td class="mat-cell">
+                  <mat-form-field class="two-divide exsmall-input">
+                    <input
+                      matInput
+                      formControlName="Planned_Quantity_{{ dimon.index }}"
+                      (keypress)="validateNo($event)"
+                      placeholder="Enter value"
+                    />
+                  </mat-form-field>
+                </td>
+                <td class="mat-cell">
+                  <mat-form-field class="two-divide exsmall-input">
+                    <input
+                      matInput
+                      formControlName="Actual_Quantity_{{ dimon.index }}"
+                      (keypress)="validateNo($event)"
+                      placeholder="Enter value"
+                    />
+                  </mat-form-field>
+                </td>
+                <td class="mat-cell">
+                  <mat-form-field class="two-divide exsmall-input">
+                    <input
+                      matInput
+                      formControlName="Charge_{{ dimon.index }}"
+                      placeholder="Enter value"
+                      class="text-right"
+                    />
+                  </mat-form-field>
+                </td>
+                <td class="mat-cell text-right">
+                  <input
+                    type="hidden"
+                    formControlName="Total_{{ dimon.index }}"
+                  />
+                  <label class="crew-label">{{
+                    fdaSummeryForm.get("Total_" + dimon.index).value
+                      | currency: "USD"
+                  }}</label>
+                </td>
+              </tr>
+              <tr>
+                <td colspan="4">
+                  <label class="crew-label">Total Amount</label>
+                </td>
+                <td>
+                  <label class="crew-label">{{
+                    fdaSummeryForm.get("Crew_Total_Amount").value
+                      | currency: "USD"
+                  }}</label>
+                </td>
+              </tr>
+            </tbody>
+            <tbody *ngIf="editServiceFlag == 'boat'">
+              <tr>
+                <td>
+                  <mat-form-field>
+                    <mat-label>Type</mat-label>
+                    <mat-select formControlName="Boat_Type_GUID">
+                      <mat-option
+                        *ngFor="let b of filtered_boat_types | async"
+                        [value]="b.PARAMETER_GUID"
+                      >
+                        {{ b.PARAMETER_NAME }}
+                      </mat-option>
+                    </mat-select>
+                  </mat-form-field>
+                </td>
+                <td>
+                  <mat-form-field>
+                    <mat-label>Vendor</mat-label>
+                    <mat-select formControlName="Boat_Vendor_GUID">
+                      <mat-option
+                        *ngFor="let b of filtered_boat_vendor | async"
+                        [value]="b.Vendor_GUID"
+                      >
+                        {{ b.Vendor_Name }}
+                      </mat-option>
+                    </mat-select>
+                  </mat-form-field>
+                </td>
+              </tr>
+              <tr>
+                <td colspan="2">
+                  <mat-form-field>
+                    <mat-label>Boat Date</mat-label>
+                    <input
+                      matInput
+                      formControlName="Boat_Date"
+                      placeholder="DD MMM YYYY HH:mm"
+                      (keyup)="validateDate($event, 'Boat_Date')"
+                    />
+                  </mat-form-field>
+                </td>
+                <td></td>
+              </tr>
+              <tr>
+                <td>
+                  <mat-form-field>
+                    <mat-label>From</mat-label>
+                    <mat-select formControlName="Boat_From_GUID">
+                      <mat-option
+                        *ngFor="let b of filtered_from | async"
+                        [value]="b.PARAMETER_GUID"
+                      >
+                        {{ b.PARAMETER_NAME }}
+                      </mat-option>
+                    </mat-select>
+                  </mat-form-field>
+                </td>
+                <td>
+                  <mat-form-field>
+                    <mat-label>To</mat-label>
+                    <mat-select formControlName="Boat_To_GUID">
+                      <mat-option
+                        *ngFor="let b of filtered_to | async"
+                        [value]="b.PARAMETER_GUID"
+                      >
+                        {{ b.PARAMETER_NAME }}
+                      </mat-option>
+                    </mat-select>
+                  </mat-form-field>
+                </td>
+              </tr>
+              <tr>
+                <td colspan="2">
+                  <mat-radio-group
+                    fxLayout="row"
+                    fxLayoutGap="16px"
+                    formControlName="Trip_Type"
+                  >
+                    <mat-label>Trip Type</mat-label>
+                    <mat-radio-button
+                      value="one-way"
+                      [checked]="
+                        fdaSummeryForm.get('Trip_Type').value == 'one-way'
+                      "
+                      >One-Way</mat-radio-button
+                    >
+                    <mat-radio-button
+                      value="round-trip"
+                      [disabled]="isDisabled"
+                      [checked]="
+                        fdaSummeryForm.get('Trip_Type').value == 'round-trip'
+                      "
+                      >Round-Trip</mat-radio-button
+                    >
+                  </mat-radio-group>
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  <mat-form-field>
+                    <mat-label>Along Side</mat-label>
+                    <input
+                      matInput
+                      placeholder="HH:MM"
+                      (keyup)="formatTime($event)"
+                      formControlName="Boat_Alongside"
+                    />
+                  </mat-form-field>
+                </td>
+                <td>
+                  <mat-form-field>
+                    <mat-label>Cast Off</mat-label>
+                    <input
+                      matInput
+                      placeholder="HH:MM"
+                      (keyup)="formatTime($event)"
+                      formControlName="Boat_Cast_Off"
+                    />
+                  </mat-form-field>
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  <mat-form-field>
+                    <mat-label>Currency</mat-label>
+                    <mat-select formControlName="Boat_Currency">
+                      <mat-option
+                        *ngFor="let b of filtered_currency | async"
+                        [value]="b.CURRENCY_GUID"
+                      >
+                        {{ b.SHORT_CODE }}
+                      </mat-option>
+                    </mat-select>
+                  </mat-form-field>
+                </td>
+                <td>
+                  <mat-form-field class="two-divide">
+                    <mat-label>Amount</mat-label>
+                    <input
+                      matInput
+                      formControlName="Boat_RATE"
+                      (keypress)="validateNo($event)"
+                      class="text-right"
+                    />
+                  </mat-form-field>
+                </td>
+              </tr>
+              <!-- <tr>
+                <td colspan="2">
+                  <mat-form-field class="two-divide">
+                    <mat-label>Remarks</mat-label>
+                    <textarea
+                      type="text"
+                      formControlName="Boat_Remarks"
+                      rows="3"
+                      cols="3"
+                      matInput
+                    ></textarea>
+                  </mat-form-field>
+                </td>
+              </tr> -->
+            </tbody>
+            <tbody *ngIf="editServiceFlag == 'ctm'">
+              <tr class="mat-row">
+                <td class="mat-cell">
+                  <label class="crew-label">CTM Billable</label>
+                  <label class="crew-label float-right">(Manual)</label>
+                </td>
+                <td class="mat-cell text-right">
+                  <mat-form-field class="two-divide text-right">
+                    <input matInput formControlName="Billable" />
+                  </mat-form-field>
+                </td>
+              </tr>
+              <tr class="mat-row">
+                <td class="mat-cell">
+                  <label class="crew-label">SWS Handling Fee (%) </label>
+                  <label class="crew-label float-right">(Manual)</label>
+                </td>
+                <td class="mat-cell">
+                  <mat-form-field class="two-divide text-right">
+                    <input
+                      matInput
+                      formControlName="Handling_Fee"
+                      placeholder="Handling Fee"
+                    />
+                    <label matSuffix>%</label>
+                  </mat-form-field>
+                </td>
+              </tr>
+              <tr class="mat-row">
+                <td class="mat-cell">
+                  <label class="crew-label">Amount Due</label>
+                </td>
+                <td class="mat-cell">
+                  <input type="hidden" formControlName="Amount_Due" />
+                  <label class="crew-label text-right">{{
+                    fdaSummeryForm.get("Amount_Due").value | currency: "USD"
+                  }}</label>
+                </td>
+              </tr>
+              <tr class="mat-row">
+                <td class="mat-cell">
+                  <label class="crew-label">Amount Received</label>
+                  <label class="crew-label float-right">(Manual)</label>
+                </td>
+                <td class="mat-cell">
+                  <mat-form-field class="two-divide text-right">
+                    <input
+                      matInput
+                      formControlName="Amount_Recieved"
+                      placeholder="Enter Recieved Amount"
+                    />
+                  </mat-form-field>
+                </td>
+              </tr>
+              <tr class="mat-row">
+                <td class="mat-cell">
+                  <label class="crew-label">Date Received</label>
+                </td>
+                <td class="mat-cell">
+                  <input type="hidden" formControlName="Remittance_Received" />
+                  <label class="crew-label text-right">{{
+                    fdaSummeryForm.get("Remittance_Received").value
+                      | date: "dd MMM YYYY"
+                  }}</label>
+                </td>
+              </tr>
+              <tr class="mat-row">
+                <td class="mat-cell">
+                  <label class="crew-label">Amount Due USD</label>
+                </td>
+                <td class="mat-cell">
+                  <input type="hidden" formControlName="USD_Amount_Due" />
+                  <label class="crew-label text-right">{{
+                    fdaSummeryForm.get("USD_Amount_Due").value | currency: "USD"
+                  }}</label>
+                </td>
+              </tr>
+              <tr class="mat-row">
+                <td class="mat-cell">
+                  <label class="crew-label">Applicable Exchange</label>
+                  <label class="crew-label float-right">(Manual)</label>
+                </td>
+                <td class="mat-cell">
+                  <mat-form-field class="two-divide text-right">
+                    <input
+                      matInput
+                      class="text-right"
+                      formControlName="Applicable_Exchange"
+                      placeholder=""
+                    />
+                  </mat-form-field>
+                </td>
+              </tr>
+              <tr class="mat-row">
+                <td class="mat-cell">
+                  <label class="crew-label">Amount Due SGD</label>
+                </td>
+                <td class="mat-cell">
+                  <input type="hidden" formControlName="Amount_Due_SGD" />
+                  <label class="crew-label text-right"
+                    >SGD
+                    {{
+                      fdaSummeryForm.get("Amount_Due_SGD").value
+                        | number: "1.2-2"
+                    }}</label
+                  >
+                </td>
+              </tr>
+            </tbody>
+            <tfoot *ngIf="editServiceFlag">
+              <tr>
+                <td class="mat-cell" colspan="1000">
+                  <mat-form-field>
+                    <mat-label>Service Remarks</mat-label>
+                    <textarea
+                      rows="5"
+                      matInput
+                      formControlName="Service_Remarks"
+                    ></textarea>
+                  </mat-form-field>
+                </td>
+              </tr>
+              <tr>
+                <td class="mat-cell">
+                  <label class="crew-label">Service Amount #</label>
+                </td>
+                <td class="mat-cell" colspan="1000">
+                  <mat-form-field>
+                    <mat-label>Service Amount</mat-label>
+                    <input
+                      matInput
+                      formControlName="FDA_Amount"
+                      placeholder=""
+                    />
+                  </mat-form-field>
+                </td>
+              </tr>
+              <tr>
+                <td class="mat-cell">
+                  <label class="crew-label">Vendor Invoice #</label>
+                </td>
+                <td class="mat-cell" colspan="1000">
+                  <mat-form-field>
+                    <mat-label>Vendor Invoice #</mat-label>
+                    <input
+                      matInput
+                      formControlName="Vendor_Invoice_Number"
+                      placeholder=""
+                    />
+                  </mat-form-field>
+                </td>
+              </tr>
+              <tr>
+                <td
+                  *ngIf="
+                    editServiceFlag == 'ctm' &&
+                    activeChildServiceValue['CTM_GUID']
+                  "
+                >
+                  <a
+                    routerLink="/support-ctm/edit/{{
+                      activeChildServiceValue.CTM_GUID
+                    }}"
+                    target="_blank"
+                    mat-raised-button
+                    color="primary"
+                    class="save-btn"
+                  >
+                    View CTM
+                  </a>
+                </td>
+                <td colspan="1000" class="text-right">
+                  <button
+                    *ngIf="!isFinalInvoice"
+                    mat-raised-button
+                    color="primary"
+                    class="save-btn"
+                    (click)="saveFdaService(fdaSummeryForm.value)"
+                  >
+                    Save
+                  </button>
+                </td>
+              </tr>
+            </tfoot>
+          </table>
+        </div>
+      </div>
+    </form>
+    <mat-dialog-actions fxLayout="row" fxLayoutAlign="space-between">
+      <div class="float-left">
+        <button
+          mat-raised-button
+          color="primary"
+          class="save-btn"
+          (click)="printAllServices()"
+        >
+          Print Cover Page & Chits
+        </button>
+        <button
+          mat-raised-button
+          color="primary"
+          class="save-btn"
+          (click)="printService()"
+        >
+          Print Invoice
+        </button>
+        <button
+          *ngIf="!isFinalInvoice"
+          mat-raised-button
+          color="primary"
+          class="blue-btn"
+          (click)="finalizeInvoice()"
+        >
+          Finalize Invoice
+        </button>
+        <button
+          *ngIf="
+            !isFinalInvoice &&
+            plannerData['Company_Billing_Address'] != '' &&
+            plannerData['Company_Billing_Address'] != null
+          "
+          mat-raised-button
+          color="primary"
+          class="blue-btn"
+          (click)="changeAddress()"
+        >
+          Change Billing Address
+        </button>
+        <button
+          *ngIf="
+            !isFinalInvoice &&
+            (plannerData['Company_Billing_Address'] == '' ||
+              plannerData['Company_Billing_Address'] == null)
+          "
+          mat-raised-button
+          color="primary"
+          class="blue-btn"
+          (click)="changeAddress()"
+        >
+          Select Billing Address
+        </button>
+      </div>
+      <div></div>
+    </mat-dialog-actions>
+  </fury-page-layout-content>
+</fury-page-layout>

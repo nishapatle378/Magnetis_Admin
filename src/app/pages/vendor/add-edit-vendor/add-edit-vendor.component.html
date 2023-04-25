@@ -1,0 +1,231 @@
+<div mat-dialog-title>{{ IsEdit ? "Edit" : "Add" }} Vendor</div>
+
+<mat-dialog-content style="height: 100% !important" class="add-vendors">
+  <form
+    class="form-horizontal"
+    [formGroup]="firstFormGroup"
+    [ngStyle]="{ 'margin-top': '7px' }"
+  >
+    <div class="table-out-section">
+      <div fxLayout="column" fxLayout.gt-sm="row" fxLayoutGap.gt-sm="24px">
+        <mat-form-field fxFlex>
+          <mat-label>Vendor Name</mat-label>
+          <input type="text" formControlName="Vendor_Name" matInput />
+          <mat-error
+            *ngIf="firstFormGroup.get('Vendor_Name').hasError('required')"
+            >Vendor name is required</mat-error
+          >
+        </mat-form-field>
+      </div>
+
+      <div fxLayout="column" fxLayout.gt-sm="row" fxLayoutGap.gt-sm="24px">
+        <mat-form-field fxFlex appearance="fill">
+          <mat-label>Vendor Service</mat-label>
+          <mat-select formControlName="Vendor_Service_GUID" multiple>
+            <mat-option>
+              <ngx-mat-select-search
+                formControlName="service_Filter"
+                [placeholderLabel]="'search...'"
+                [noEntriesFoundLabel]="'no matching found!'"
+              >
+              </ngx-mat-select-search>
+            </mat-option>
+
+            <mat-option
+              *ngFor="let b of serviceType | async"
+              [value]="b.PARAMETER_GUID"
+            >
+              {{ b.PARAMETER_NAME }}
+            </mat-option>
+          </mat-select>
+          <mat-error
+            *ngIf="
+              firstFormGroup.get('Vendor_Service_GUID').hasError('required')
+            "
+            >Vendor Service is required</mat-error
+          >
+        </mat-form-field>
+        <mat-form-field fxFlex appearance="fill" *ngIf="isBoat">
+          <mat-label>Boat Types</mat-label>
+          <mat-select formControlName="Boat_Types" multiple>
+            <mat-option
+              *ngFor="let b of filteredBoatType | async"
+              [value]="b.PARAMETER_GUID"
+            >
+              {{ b.PARAMETER_NAME }}
+            </mat-option>
+          </mat-select>
+          <mat-error
+            *ngIf="firstFormGroup.get('Boat_Types').hasError('required')"
+            >Boat Service is required</mat-error
+          >
+        </mat-form-field>
+      </div>
+
+      <div fxLayout="column" fxLayout.gt-sm="row" fxLayoutGap.gt-sm="24px">
+        <mat-form-field fxFlex>
+          <mat-label>Vendor Port</mat-label>
+          <mat-select formControlName="Vendor_Port">
+            <mat-option>
+              <ngx-mat-select-search
+                formControlName="port_Filter"
+                [placeholderLabel]="'search...'"
+                [noEntriesFoundLabel]="'no matching found!'"
+              >
+              </ngx-mat-select-search>
+            </mat-option>
+
+            <mat-option
+              *ngFor="let b of filtered_port | async"
+              [value]="b.PORT_GUID"
+            >
+              {{ b.COUNTRY_NAME }} - {{ b.Port_Name }}
+            </mat-option>
+          </mat-select>
+          <mat-error
+            *ngIf="firstFormGroup.get('Vendor_Port').hasError('required')"
+            >Vendor Port is required</mat-error
+          >
+        </mat-form-field>
+        <mat-form-field fxFlex>
+          <mat-label>Vendor Currency</mat-label>
+          <mat-select formControlName="Vendor_Currency">
+            <mat-option>
+              <ngx-mat-select-search
+                formControlName="currency_Filter"
+                [placeholderLabel]="'search...'"
+                [noEntriesFoundLabel]="'no matching found!'"
+              >
+              </ngx-mat-select-search>
+            </mat-option>
+            <mat-option
+              *ngFor="let b of filtered_currency | async"
+              [value]="b.CURRENCY_GUID"
+            >
+              {{ b.SHORT_CODE }}
+            </mat-option>
+          </mat-select>
+          <mat-error
+            *ngIf="firstFormGroup.get('Vendor_Currency').hasError('required')"
+            >Vendor Currency is required</mat-error
+          >
+        </mat-form-field>
+      </div>
+      <div fxLayout="column" fxLayout.gt-sm="row" fxLayoutGap.gt-sm="24px">
+        <mat-form-field fxFlex>
+          <mat-label>Handling Fee (%)</mat-label>
+          <input type="text" formControlName="Handling_Fee" matInput />
+          <mat-error
+            *ngIf="firstFormGroup.get('Handling_Fee').hasError('required')"
+            >Vendor name is required</mat-error
+          >
+        </mat-form-field>
+      </div>
+      <div fxLayout="column" fxLayout.gt-sm="row" fxLayoutGap.gt-sm="24px">
+        <mat-form-field fxFlex>
+          <mat-label>Vendor Address</mat-label>
+          <textarea
+            matInput
+            cdkAutosizeMinRows="3"
+            cdkAutosizeMaxRows="5"
+            formControlName="Vendor_Address"
+          >
+          </textarea>
+
+          <mat-error
+            *ngIf="firstFormGroup.get('Vendor_Address').hasError('required')"
+            >Vendor Address is required</mat-error
+          >
+        </mat-form-field>
+      </div>
+      <div fxLayout="column" fxLayout.gt-sm="row" fxLayoutGap.gt-sm="24px">
+        <mat-form-field fxFlex>
+          <mat-label>Contact 1</mat-label>
+          <input type="text" formControlName="Vendor_Contact1" matInput />
+          <mat-error
+            *ngIf="firstFormGroup.get('Vendor_Contact1').hasError('required')"
+            >Contact 1 is required</mat-error
+          >
+        </mat-form-field>
+      </div>
+
+      <div fxLayout="column" fxLayout.gt-sm="row" fxLayoutGap.gt-sm="24px">
+        <mat-form-field fxFlex>
+          <input type="text" formControlName="EMAIL_ID1" matInput />
+          <mat-label>Email 1</mat-label>
+          <mat-error
+            *ngIf="firstFormGroup.get('EMAIL_ID1').hasError('required')"
+            >Email 1 is required</mat-error
+          >
+        </mat-form-field>
+        <mat-form-field fxFlex>
+          <mat-label>Phone 1</mat-label>
+          <input type="text" formControlName="PHONE_NO1" matInput />
+          <mat-error
+            *ngIf="firstFormGroup.get('PHONE_NO1').hasError('required')"
+            >Phone 1 is required</mat-error
+          >
+        </mat-form-field>
+      </div>
+      <div fxLayout="column" fxLayout.gt-sm="row" fxLayoutGap.gt-sm="24px">
+        <mat-form-field fxFlex>
+          <mat-label>Contact 2</mat-label>
+          <input type="text" formControlName="Vendor_Contact2" matInput />
+          <mat-error
+            *ngIf="firstFormGroup.get('Vendor_Contact2').hasError('required')"
+            >Contact 2 is required</mat-error
+          >
+        </mat-form-field>
+      </div>
+      <div fxLayout="column" fxLayout.gt-sm="row" fxLayoutGap.gt-sm="24px">
+        <mat-form-field fxFlex>
+          <mat-label>Email 2</mat-label>
+          <input type="text" formControlName="EMAIL_ID2" matInput />
+          <mat-error
+            *ngIf="firstFormGroup.get('EMAIL_ID2').hasError('required')"
+            >Email 2 is required</mat-error
+          >
+        </mat-form-field>
+
+        <mat-form-field fxFlex>
+          <mat-label>Phone 2</mat-label>
+          <input type="text" formControlName="PHONE_NO2" matInput />
+          <mat-error
+            *ngIf="firstFormGroup.get('PHONE_NO2').hasError('required')"
+            >Phone 2 is required</mat-error
+          >
+        </mat-form-field>
+      </div>
+
+      <div
+        fxLayout="column"
+        fxLayout.gt-sm="row"
+        fxLayoutGap.gt-sm="24px"
+        *ngIf="ErrorMessage"
+      >
+        <h6 style="color: #ff0000">{{ ErrorMessage }}</h6>
+      </div>
+    </div>
+  </form>
+</mat-dialog-content>
+<mat-dialog-actions fxLayout="row" fxLayoutAlign="end center">
+  <button
+    mat-raised-button
+    color="primary"
+    (click)="SaveVendor(true)"
+    class="save-btn"
+    [disabled]="!firstFormGroup.valid"
+  >
+    SAVE AND ADD NEW
+  </button>
+  <button
+    mat-raised-button
+    color="primary"
+    (click)="SaveVendor()"
+    class="save-btn"
+    [disabled]="!firstFormGroup.valid"
+  >
+    SAVE
+  </button>
+  <button mat-raised-button color="warn" (click)="CloseModal()">CLOSE</button>
+</mat-dialog-actions>

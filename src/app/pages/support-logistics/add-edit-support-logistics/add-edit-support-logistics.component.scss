@@ -1,0 +1,16 @@
+.logistic-dialog {
+  .mat-form-field-infix {
+    border-top: 0.84375em solid transparent;
+  }
+  .mat-input-element {
+    font-size: 14px !important;
+  }
+  .mat-form-field-infix {
+    width: auto !important;
+  }
+  input#uploadFile1 {
+    position: absolute;
+    width: 10px;
+    left: 0;
+  }
+}

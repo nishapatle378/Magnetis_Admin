@@ -1,0 +1,58 @@
+/* You can add global styles to this file, and also import other style files */
+@import "./@fury/styles/core";
+@import "./app/app.theme";
+
+// .mat-raised-button.mat-primary
+// {
+//     background-color: #0784C0;
+// }
+
+.save-btn {
+  background-color: #4ead49 !important;
+}
+
+.save-btn:hover {
+  background-color: #388f35 !important;
+}
+
+.mat-tooltip {
+  white-space: pre-line !important;
+}
+.mat-dialog-title {
+  background-color: #000;
+  padding: 10px 23px;
+  border-radius: 1px;
+  color: #fff;
+  margin: -24px -25px 0px -24px !important;
+  display: block;
+  border-radius: 5px 5px 0px 0px;
+}
+.mat-dialog-content {
+  padding-top: 12px !important;
+}
+.mat-error {
+  font-size: 1rem;
+}
+// .mat-form-field-infix{
+//     border-top: 0;
+// }
+.table-out-section .mat-form-field-infix .mat-input-element {
+  font-size: 1.3rem;
+}
+.table-out-section .mat-form-field-appearance-outline .mat-form-field-infix {
+  padding: 18px 0 1em 0;
+  font-size: 1.3rem;
+}
+.table-out-section .left-label {
+  font-size: 1.3rem;
+  font-weight: 400;
+}
+.table-out-section
+  .mat-form-field-appearance-outline
+  .mat-form-field-subscript-wrapper {
+  padding: 0;
+  margin-top: 5px;
+}
+.fury-scrollbar .sidenav-items {
+  overflow-y: scroll;
+}

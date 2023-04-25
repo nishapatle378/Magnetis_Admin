@@ -1,0 +1,44 @@
+<div mat-dialog-title>Billing Address</div>
+<form [formGroup]="logisticForm">
+  <div mat-dialog-content>
+    <div fxLayout="column" fxLayout.gt-sm="row" fxLayoutGap.gt-sm="24px">
+      <mat-form-field fxFlex class="two-divide">
+        <mat-label>Status</mat-label>
+        <mat-select formControlName="Status_GUID" placeholder="">
+          <mat-option
+            *ngFor="let b of filtered_status | async"
+            [value]="b.PARAMETER_GUID"
+          >
+            {{ b.PARAMETER_NAME }}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+    </div>
+  </div>
+</form>
+
+<mat-dialog-actions fxLayout="row" fxLayoutAlign="end center">
+  <button
+    mat-raised-button
+    color="primary"
+    (click)="updateStatus()"
+    [disabled]="!logisticForm.valid"
+  >
+    Update Status
+  </button>
+  <button mat-raised-button color="primary" (click)="closeModal()">
+    Close
+  </button>
+</mat-dialog-actions>
+<style>
+  table,
+  th,
+  td {
+    border: 1px solid #dadada;
+    border-collapse: collapse;
+  }
+  td {
+    padding: 10px 10px;
+  }
+</style>
+

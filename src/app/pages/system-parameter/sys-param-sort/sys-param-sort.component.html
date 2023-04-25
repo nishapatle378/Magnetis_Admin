@@ -1,0 +1,63 @@
+<div mat-dialog-title>Sort</div>
+
+<mat-dialog-content style="height: 100% !important" class="sys-sort">
+  <div #TABLE>
+    <mat-card-content>
+      <table
+        [dataSource]="moduleDataSource"
+        mat-table
+        style="width: 100%; margin-top: 5px"
+      >
+        <ng-container matColumnDef="name">
+          <th *matHeaderCellDef class="actions-cell" mat-header-cell>Name</th>
+          <td *matCellDef="let row" class="actions-cell" mat-cell>
+            {{ row.PARAMETER_NAME }}
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="Action">
+          <th *matHeaderCellDef class="actions-cell" mat-header-cell>Action</th>
+          <td *matCellDef="let row" class="actions-cell" mat-cell>
+            <button
+              type="button"
+              mat-icon-button
+              class="action-btn"
+              (click)="handleMoveUp(row.PARAMETER_GUID)"
+            >
+              <mat-icon>keyboard_arrow_up</mat-icon>
+            </button>
+            <button
+              type="button"
+              mat-icon-button
+              class="action-btn"
+              (click)="handleMoveDown(row.PARAMETER_GUID)"
+            >
+              <mat-icon>keyboard_arrow_down</mat-icon>
+            </button>
+          </td>
+        </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="visibleColumns"></tr>
+        <tr
+          mat-row
+          *matRowDef="let row; columns: visibleColumns"
+          [ngClass]="row.selected ? 'sp-data-row-s' : 'sp-data-row'"
+        ></tr>
+      </table>
+      <div *ngIf="moduleDataSource.data.length == 0">
+        <p style="text-align: center">records not found</p>
+      </div>
+      <mat-paginator
+        #modulePaginator
+        class="paginator"
+        [pageSizeOptions]="[10, 25, 50, 100]"
+        [pageSize]="pageSize"
+      ></mat-paginator>
+    </mat-card-content>
+  </div>
+</mat-dialog-content>
+<mat-dialog-actions fxLayout="row" fxLayoutAlign="end center">
+  <button mat-raised-button color="primary" (click)="SaveData()" class="save-btn" >SAVE</button>
+  <button mat-raised-button color="warn" (click)="CloseModal()">CLOSE</button>
+</mat-dialog-actions>
+

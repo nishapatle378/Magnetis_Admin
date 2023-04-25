@@ -1,0 +1,412 @@
+<fury-page-layout mode="card" class="planner-view">
+  <fury-page-layout-header>
+    <form
+      [formGroup]="filterFormGroup"
+      [ngStyle]="{ 'margin-top': '7px' }"
+      (ngSubmit)="onClickSubmit(filterFormGroup.value)"
+    >
+      <div class="filter-area" fxFlex>
+        <div fxLayout="row" fxLayoutAlign="start">
+          <div fxFlex>
+            <mat-form-field>
+              <mat-label>Principal Name</mat-label>
+              <mat-select formControlName="PRINCIPAL_GUID">
+                <mat-option
+                  *ngFor="let b of filtered_principal | async"
+                  [value]="b.COMPANY_GUID"
+                >
+                  {{ b.COMPANY_NAME }}
+                </mat-option>
+              </mat-select>
+            </mat-form-field>
+            <mat-form-field>
+              <mat-label>Vessel</mat-label>
+              <mat-select formControlName="VESSEL_GUID">
+                <mat-option>
+                  <ngx-mat-select-search
+                    formControlName="vessel_Filter"
+                    [placeholderLabel]="'search...'"
+                    [noEntriesFoundLabel]="'no matching found!'"
+                  >
+                  </ngx-mat-select-search>
+                </mat-option>
+                <mat-option
+                  *ngFor="let b of filtered_vessel | async"
+                  [value]="b.VESSEL_GUID"
+                >
+                  {{ b.VESSEL_NAME }}
+                </mat-option>
+              </mat-select>
+            </mat-form-field>
+          </div>
+          <div fxFlex>
+            <mat-form-field>
+              <mat-label>Planner Ref</mat-label>
+              <mat-select formControlName="PLANNER_GUID">
+                <mat-option>
+                  <ngx-mat-select-search
+                    formControlName="planner_Filter"
+                    [placeholderLabel]="'search...'"
+                    [noEntriesFoundLabel]="'no matching found!'"
+                  >
+                  </ngx-mat-select-search>
+                </mat-option>
+                <mat-option
+                  *ngFor="let b of filtered_planner | async"
+                  [value]="b.GUID"
+                >
+                  {{ b.REF_NUM }} - {{ b.VESSEL_NAME }} -
+                  {{
+                    (b.VESSEL_ACTUAL_ARR ? b.VESSEL_ACTUAL_ARR : b.VESSEL_ETA)
+                      | date: "dd MMM YYYY"
+                  }}
+                </mat-option>
+              </mat-select>
+            </mat-form-field>
+            <!-- <mat-form-field>
+              <mat-label>Plan Status</mat-label>
+              <mat-select formControlName="PLAN_STATUS_GUID" multiple>
+                <mat-option>
+                  <ngx-mat-select-search
+                    formControlName="status_Filter"
+                    [placeholderLabel]="'search...'"
+                    [noEntriesFoundLabel]="'no matching found!'"
+                  >
+                  </ngx-mat-select-search>
+                </mat-option>
+                <mat-option value="all"> All </mat-option>
+                <mat-option
+                  *ngFor="let b of filtered_status | async"
+                  [value]="b.PARAMETER_GUID"
+                >
+                  {{ b.PARAMETER_NAME }}
+                </mat-option>
+              </mat-select>
+            </mat-form-field> -->
+          </div>
+          <div fxFlex>
+            <mat-form-field>
+              <mat-label>Invoice Number</mat-label>
+              <input formControlName="INVOICE_NUMBER" matInput />
+            </mat-form-field>
+            <mat-form-field>
+              <mat-label>Invoice Status</mat-label>
+              <mat-select formControlName="INVOICE_STATUS" multiple>
+                <mat-option value="all"> All </mat-option>
+                <mat-option
+                  *ngFor="let b of filtered_invoice_status | async"
+                  [value]="b.PARAMETER_GUID"
+                >
+                  {{ b.PARAMETER_NAME }}
+                </mat-option>
+              </mat-select>
+            </mat-form-field>
+          </div>
+          <div fxFlex>
+            <mat-form-field>
+              <mat-label>Date Departure from</mat-label>
+              <input
+                matInput
+                formControlName="DATE_FROM"
+                [matDatepicker]="pickerFrom"
+              />
+              <mat-datepicker-toggle
+                matSuffix
+                [for]="pickerFrom"
+              ></mat-datepicker-toggle>
+              <mat-datepicker #pickerFrom></mat-datepicker>
+            </mat-form-field>
+
+            <mat-form-field>
+              <mat-label>Date Departure to</mat-label>
+              <input
+                matInput
+                formControlName="DATE_TO"
+                [matDatepicker]="pickerTo"
+              />
+              <mat-datepicker-toggle
+                matSuffix
+                [for]="pickerTo"
+              ></mat-datepicker-toggle>
+              <mat-datepicker #pickerTo></mat-datepicker>
+            </mat-form-field>
+          </div>
+          <div class="filter-btn-area" fxFlex>
+            <div>
+              <button
+                class="create"
+                mat-raised-button
+                color="primary"
+                class="filter-btn"
+              >
+                Search
+              </button>
+            </div>
+
+            <div>
+              <button
+                class="create"
+                (click)="clearFilter()"
+                mat-raised-button
+                color="warn"
+                class="filter-btn"
+                type="button"
+              >
+                Clear
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </form>
+  </fury-page-layout-header>
+
+  <fury-page-layout-content [@fadeInUp] class="content-area">
+    <div #TABLE>
+      <div class="actions-area">
+        <div>
+          <span
+            (click)="exportAsExcel()"
+            style="cursor: pointer"
+            *ngIf="
+              authGuard.checkPermission(
+                'oPk6Fh2BP24443f12-c950-46b3-fda-list',
+                'export'
+              )
+            "
+          >
+            <img
+              src="../../../../assets/img/excel.png"
+              class="logo"
+              alt="excel"
+            />
+          </span>
+        </div>
+      </div>
+      <div *ngIf="loading" class="content-loader">
+        <mat-progress-spinner
+          mode="indeterminate"
+          color="accent"
+        ></mat-progress-spinner>
+      </div>
+
+      <table
+        [dataSource]="dataSource"
+        mat-table
+        matSort
+        #table
+        (matSortChange)="sortData($event)"
+      >
+        <ng-container matColumnDef="REF_NUM">
+          <th
+            *matHeaderCellDef
+            class="actions-cell"
+            mat-header-cell
+            mat-sort-header
+          >
+            Planner REF NUM
+          </th>
+          <td *matCellDef="let row" class="actions-cell" mat-cell>
+            <a routerLink="/fda/detail/{{ row.REF_NUM }}" target="_blank">
+              <p class="tbl-row-item">
+                {{ row.REF_NUM }}
+              </p>
+            </a>
+          </td>
+        </ng-container>
+        <ng-container matColumnDef="COMPANY_NAME">
+          <th
+            *matHeaderCellDef
+            class="actions-cell"
+            mat-header-cell
+            mat-sort-header
+          >
+            Principal Name
+          </th>
+          <td *matCellDef="let row" class="actions-cell" mat-cell>
+            <p class="tbl-row-item">
+              {{ row.COMPANY_NAME }}
+            </p>
+          </td>
+        </ng-container>
+        <ng-container matColumnDef="VESSEL_NAME">
+          <th
+            *matHeaderCellDef
+            class="actions-cell"
+            mat-header-cell
+            mat-sort-header
+          >
+            Vessel Name
+          </th>
+          <td *matCellDef="let row" class="actions-cell" mat-cell>
+            <p class="tbl-row-item">
+              {{ row.VESSEL_NAME }}
+            </p>
+          </td>
+        </ng-container>
+        <ng-container matColumnDef="VESSEL_ACTUAL_ARR">
+          <th
+            *matHeaderCellDef
+            class="actions-cell"
+            mat-header-cell
+            mat-sort-header
+          >
+            Date Arrival
+          </th>
+          <td *matCellDef="let row" class="actions-cell" mat-cell>
+            <p class="tbl-row-item">
+              {{ row.VESSEL_ACTUAL_ARR | date: "dd MMM YYYY" }}
+            </p>
+          </td>
+        </ng-container>
+        <ng-container matColumnDef="VESSEL_ACTUAL_DEP">
+          <th
+            *matHeaderCellDef
+            class="actions-cell"
+            mat-header-cell
+            mat-sort-header
+          >
+            Date Departure
+          </th>
+          <td *matCellDef="let row" class="actions-cell" mat-cell>
+            <p class="tbl-row-item">
+              {{ row.VESSEL_ACTUAL_DEP | date: "dd MMM YYYY" }}
+            </p>
+          </td>
+        </ng-container>
+        <ng-container matColumnDef="AMOUNT">
+          <th
+            *matHeaderCellDef
+            class="actions-cell"
+            mat-header-cell
+            mat-sort-header
+          >
+            Amount
+          </th>
+          <td *matCellDef="let row" class="actions-cell" mat-cell>
+            <p class="tbl-row-item">
+              {{ row.AMOUNT || 0 | currency: "USD" }}
+            </p>
+          </td>
+        </ng-container>
+        <ng-container matColumnDef="Invoice_Status_Name">
+          <th
+            *matHeaderCellDef
+            class="actions-cell"
+            mat-header-cell
+            mat-sort-header
+          >
+            Invoice Status
+          </th>
+          <td *matCellDef="let row" class="actions-cell" mat-cell>
+            <p class="tbl-row-item">
+              {{ row.Invoice_Status_Name || "Not Set" }}
+            </p>
+          </td>
+        </ng-container>
+        <ng-container matColumnDef="Invoice_Number">
+          <th
+            *matHeaderCellDef
+            class="actions-cell"
+            mat-header-cell
+            mat-sort-header
+          >
+            Invoice Number
+          </th>
+          <td *matCellDef="let row" class="actions-cell" mat-cell>
+            <p class="tbl-row-item">
+              {{ row.Invoice_Number || "" }}
+            </p>
+          </td>
+        </ng-container>
+        <ng-container matColumnDef="ACTION">
+          <th
+            *matHeaderCellDef
+            class="actions-cell"
+            mat-header-cell
+          >
+            Action
+          </th>
+          <td *matCellDef="let row" class="actions-cell" mat-cell>
+            <a
+              matTooltip="Not received invoice count"
+              [class]="getInvoiceCount(row) > 0 ? 'red-circle' : 'blue-circle'"
+              [routerLink]="
+                getInvoiceCount(row) > 0
+                  ? '/reports/vendor-invoice/report/' + row.GUID
+                  : '#'
+              "
+              target="_blank"
+            >
+              <span>{{ getInvoiceCount(row) || 0 }}</span>
+            </a>
+            <a
+              matTooltip="View FDA Detail"
+              routerLink="/fda/detail/{{ row.REF_NUM }}"
+              target="_blank"
+              *ngIf="
+                authGuard.checkPermission(
+                  'oPk6Fh2BP24443f12-c950-46b3-fda-list',
+                  'edit'
+                )
+              "
+            >
+              <button mat-icon-button>
+                <mat-icon class="icon-display">edit</mat-icon>
+              </button></a
+            >
+            <button
+              *ngIf="
+                row.Invoice_Status_Guid ==
+                  '5HdIlQ6Wo94d2d926-b8a6-4ed6-b909-67ae334f8ed9' &&
+                authGuard.checkPermission(
+                  'oPk6Fh2BP24443f12-c950-46b3-fda-list',
+                  'edit'
+                )
+              "
+              mat-icon-button
+              matTooltip="Uninvoice Plan"
+              (click)="handleUnInvoice(row.GUID)"
+            >
+              <mat-icon class="icon-display">settings_backup_restore</mat-icon>
+            </button>
+            <button
+              mat-icon-button
+              [matTooltip]="
+                'Created By : ' +
+                row.CREATED_BY +
+                ' | ' +
+                (row.DATE_CREATED | date: 'dd MMM yyyy HH:mm:ss') +
+                '\n' +
+                (row.MODIFIED_BY
+                  ? 'Modified By : ' +
+                    row.MODIFIED_BY +
+                    ' | ' +
+                    (row.DATE_MODIFIED | date: 'd MMM yyyy HH:mm:ss')
+                  : '')
+              "
+            >
+              <mat-icon class="icon-display">info</mat-icon>
+            </button>
+          </td>
+        </ng-container>
+        <tr *matHeaderRowDef="visibleColumns" mat-header-row></tr>
+        <tr
+          *matRowDef="let row; columns: visibleColumns"
+          class="clickable route-animations-elements"
+          mat-row
+        ></tr>
+        <tr class="mat-row" *matNoDataRow>
+          <td class="mat-cell" colspan="9999">No data found</td>
+        </tr>
+      </table>
+    </div>
+
+    <mat-paginator
+      class="paginator"
+      [pageSizeOptions]="[10, 25, 50, 100]"
+      [pageSize]="pageSize"
+    ></mat-paginator>
+    <!-- </fury-list> -->
+  </fury-page-layout-content>
+</fury-page-layout>

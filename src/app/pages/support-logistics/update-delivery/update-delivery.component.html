@@ -1,0 +1,97 @@
+<div mat-dialog-title>Update Delivery</div>
+
+<mat-dialog-content style="height: 100% !important" class="logistic-dialog">
+  <form
+    [formGroup]="deliveryForm"
+    [ngStyle]="{ 'margin-top': '7px' }"
+    class="logistic-form"
+  >
+    <div
+      fxLayout="column"
+      fxLayout.gt-sm="row"
+      fxLayoutGap.gt-sm="24px"
+      [ngStyle]="{ 'margin-bottom': '10px' }"
+    >
+      <input type="hidden" formControlName="DeliveryRef" />
+      <mat-label>Delivery Ref : {{ deliveryRef }}</mat-label>
+    </div>
+    <div
+      fxLayout="column"
+      fxLayout.gt-sm="row"
+      fxLayoutGap.gt-sm="24px"
+      [ngStyle]="{ 'margin-bottom': '10px' }"
+    >
+      <mat-form-field fxFlex>
+        <mat-label>Delivery Date</mat-label>
+        <input
+          matInput
+          [matDatepicker]="DeliveryDate"
+          formControlName="Delivery_Date"
+        />
+        <mat-datepicker-toggle
+          matSuffix
+          [for]="DeliveryDate"
+        ></mat-datepicker-toggle>
+        <mat-datepicker #DeliveryDate></mat-datepicker>
+      </mat-form-field>
+    </div>
+    <div fxLayout="column" fxLayout.gt-sm="row" fxLayoutGap.gt-sm="24px"  *ngIf="!onlyDeliveryData">
+      <mat-form-field fxFlex class="two-divide">
+        <mat-label>Remarks (will be appended to existing remarks)</mat-label>
+        <textarea rows="3" formControlName="Remarks" matInput></textarea>
+      </mat-form-field>
+    </div>
+    <div fxLayout="column" fxLayout.gt-sm="row" fxLayoutGap.gt-sm="24px"  *ngIf="!onlyDeliveryData">
+      <label class="drop-label"> Upload delivery attachment : </label>
+      <div *ngIf="deliveryForm.value.Acknowledgment" class="file-visible">
+        <a
+          target="_blank"
+          [href]="getFileURL(deliveryForm.value.Acknowledgment)"
+        >
+          <mat-icon [matTooltip]="deliveryForm.value.Acknowledgment"
+            >attach_file</mat-icon
+          ></a
+        >
+        <a href="javascript:void(0)" (click)="fileDelete()"
+          ><mat-icon>delete</mat-icon></a
+        >
+      </div>
+      <div *ngIf="!deliveryForm.value.Acknowledgment" class="container">
+        <button type="button" mat-raised-button>
+          <label class="drop-label" for="uploadFile1"> Upload File</label>
+        </button>
+
+        <input
+          type="file"
+          id="uploadFile1"
+          style="opacity: 0"
+          (change)="uploadFileEvt($event)"
+          name="uploadFile"
+          accept="image/*"
+        />
+      </div>
+    </div>
+  </form>
+</mat-dialog-content>
+<mat-dialog-actions fxLayout="row" fxLayoutAlign="end center">
+  <button
+    *ngIf="isOverwriteData"
+    mat-raised-button
+    color="primary"
+    (click)="UpdateDelivery(deliveryForm.value, false)"
+    class="save-btn"
+    [disabled]="!deliveryForm.valid"
+  >
+    OVERWRITE ALL
+  </button>
+  <button
+    mat-raised-button
+    color="primary"
+    (click)="UpdateDelivery(deliveryForm.value, true)"
+    class="save-btn"
+    [disabled]="!deliveryForm.valid"
+  >
+    {{ isOverwriteData ? "UPDATE ONLY BLANK RECORDS" : "UPDATE RECORDS" }}
+  </button>
+  <button mat-raised-button color="warn" (click)="CloseModal()">CLOSE</button>
+</mat-dialog-actions>

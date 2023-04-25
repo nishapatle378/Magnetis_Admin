@@ -1,0 +1,54 @@
+<div mat-dialog-title>You have chosen to close this Port Call.</div>
+
+<mat-dialog-content style="height: 100% !important" class="update-services">
+  <form
+    [formGroup]="servicesForm"
+    [ngStyle]="{ 'margin-top': '7px' }"
+    class="logistic-form"
+  >
+  <h3>Do you also want to mark all Services under this port call to COMPLETED?</h3>
+    <table class="mat-table details-table">
+      <tr>
+        <th class="mat-cell">Services Type</th>
+        <th class="mat-cell">In Progress</th>
+        <th class="mat-cell">Completed</th>
+      </tr>
+
+      <tr class="mat-row" *ngFor="let service of services">
+        <td>{{ service.Service_Type_Name }}</td>
+         <td>
+          <mat-radio-button
+            [name]="'Status_GUID_' + service.index"
+            (click)="radiobuttonClick(0, service.index)"
+            [checked]="
+              servicesForm.get('Status_GUID_' + service.index).value == 1
+            "
+            >In Progress</mat-radio-button
+          >
+        </td>
+        <td>
+          <mat-radio-button
+            [name]="'Status_GUID_' + service.index"
+            (click)="radiobuttonClick(1, service.index)"
+            [checked]="
+              servicesForm.get('Status_GUID_' + service.index).value == 1
+            "
+            >Completed</mat-radio-button
+          >
+        </td>
+      </tr>
+    </table>
+  </form>
+</mat-dialog-content>
+<mat-dialog-actions fxLayout="row" fxLayoutAlign="end center">
+  <button
+    mat-raised-button
+    color="primary"
+    (click)="SaveServices(servicesForm.value)"
+    class="save-btn"
+    [disabled]="!servicesForm.valid"
+  >
+    SAVE & CLOSE PLAN
+  </button>
+  <button mat-raised-button color="warn" (click)="CloseModal()">CLOSE</button>
+</mat-dialog-actions>

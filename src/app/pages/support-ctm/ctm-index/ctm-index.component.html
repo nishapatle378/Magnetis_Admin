@@ -1,0 +1,548 @@
+<fury-page-layout mode="card" class="view-ctm">
+  <fury-page-layout-header>
+    <form
+      [formGroup]="filterFormGroup"
+      (ngSubmit)="onClickSubmit(filterFormGroup.value)"
+    >
+      <div class="filter-area">
+        <div fxLayout="row" fxLayoutAlign="start">
+          <div fxFlex>
+            <mat-form-field>
+              <mat-label>Principal Name</mat-label>
+              <mat-select formControlName="PRINCIPAL_GUID">
+                <mat-option>
+                  <ngx-mat-select-search
+                    formControlName="principal_Filter"
+                    [placeholderLabel]="'search...'"
+                    [noEntriesFoundLabel]="'no matching found!'"
+                  >
+                  </ngx-mat-select-search>
+                </mat-option>
+
+                <mat-option
+                  *ngFor="let b of filtered_principal | async"
+                  [value]="b.COMPANY_GUID"
+                >
+                  {{ b.COMPANY_NAME }}
+                </mat-option>
+              </mat-select>
+            </mat-form-field>
+            <mat-form-field>
+              <mat-label>Vessel</mat-label>
+              <mat-select formControlName="VESSEL_GUID">
+                <mat-option>
+                  <ngx-mat-select-search
+                    formControlName="vessel_Filter"
+                    [placeholderLabel]="'search...'"
+                    [noEntriesFoundLabel]="'no matching found!'"
+                  >
+                  </ngx-mat-select-search>
+                </mat-option>
+
+                <mat-option
+                  *ngFor="let b of filtered_vessel | async"
+                  [value]="b.VESSEL_GUID"
+                >
+                  {{ b.VESSEL_NAME }}
+                </mat-option>
+              </mat-select>
+            </mat-form-field>
+            <mat-form-field>
+              <mat-label>Planner PIC</mat-label>
+              <mat-select formControlName="AGENT_GUID">
+                <mat-option>
+                  <ngx-mat-select-search
+                    formControlName="pic_Filter"
+                    [placeholderLabel]="'search...'"
+                    [noEntriesFoundLabel]="'no matching found!'"
+                  >
+                  </ngx-mat-select-search>
+                </mat-option>
+
+                <mat-option
+                  *ngFor="let b of filtered_pic | async"
+                  [value]="b.USER_GUID"
+                >
+                  {{ b.USER_FIRST_NAME }} {{ b.USER_MIDDLE_NAME }}
+                  {{ b.USER_LAST_NAME }}
+                </mat-option>
+              </mat-select>
+            </mat-form-field>
+          </div>
+
+          <div fxFlex>
+            <mat-form-field>
+              <mat-label>Planner</mat-label>
+              <mat-select formControlName="PLANNER_GUID">
+                <mat-option>
+                  <ngx-mat-select-search
+                    formControlName="planner_Filter"
+                    [placeholderLabel]="'search...'"
+                    [noEntriesFoundLabel]="'no matching found!'"
+                  >
+                  </ngx-mat-select-search>
+                </mat-option>
+
+                <mat-option
+                  *ngFor="let b of filtered_planner | async"
+                  [value]="b.GUID"
+                >
+                  {{ b.REF_NUM }} - {{ b.VESSEL_NAME }} -
+                  {{
+                    (b.VESSEL_ACTUAL_ARR ? b.VESSEL_ACTUAL_ARR : b.VESSEL_ETA)
+                      | date: "dd MMM YYYY"
+                  }}
+                </mat-option>
+              </mat-select>
+            </mat-form-field>
+            <mat-form-field>
+              <mat-label>CTM Status</mat-label>
+              <mat-select formControlName="STATUS_GUID" multiple>
+                <mat-option
+                  *ngFor="let b of filtered_Status | async"
+                  [value]="b.PARAMETER_GUID"
+                >
+                  {{ b.PARAMETER_NAME }}
+                </mat-option>
+              </mat-select>
+            </mat-form-field>
+          </div>
+
+          <div fxFlex>
+            <mat-form-field>
+              <mat-label>Vessel Ack. From Date</mat-label>
+              <input
+                matInput
+                formControlName="FROM_DATE"
+                [matDatepicker]="pickerFrom"
+              />
+              <mat-datepicker-toggle
+                matSuffix
+                [for]="pickerFrom"
+              ></mat-datepicker-toggle>
+              <mat-datepicker #pickerFrom></mat-datepicker>
+            </mat-form-field>
+
+            <mat-form-field>
+              <mat-label>Vessel Ack. To Date</mat-label>
+              <input
+                matInput
+                formControlName="TO_DATE"
+                [matDatepicker]="pickerTo"
+              />
+              <mat-datepicker-toggle
+                matSuffix
+                [for]="pickerTo"
+              ></mat-datepicker-toggle>
+              <mat-datepicker #pickerTo></mat-datepicker>
+            </mat-form-field>
+          </div>
+          <div style="padding: 10px 10px">
+            <div>
+              <button
+                class="create"
+                mat-raised-button
+                color="primary"
+                class="filter-btn"
+              >
+                Search
+              </button>
+            </div>
+            <div>
+              <button
+                class="create"
+                (click)="clearFilter()"
+                mat-raised-button
+                color="warn"
+                class="filter-btn"
+                type="button"
+              >
+                Clear
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </form>
+  </fury-page-layout-header>
+
+  <fury-page-layout-content [@fadeInUp]>
+    <div class="actions-area">
+      <div>
+        <span class="create">
+          <a
+            routerLink="/support-ctm/add"
+            *ngIf="
+              authGuard.checkPermission('oPk6Fh2BP24443f12-see41aaaa', 'create')
+            "
+          >
+            <button mat-mini-fab color="primary">
+              <mat-icon>add</mat-icon>
+            </button>
+          </a>
+        </span>
+      </div>
+
+      <div>
+        <span
+          (click)="exportAsExcel()"
+          style="cursor: pointer"
+          *ngIf="
+            authGuard.checkPermission('oPk6Fh2BP24443f12-see41aaaa', 'export')
+          "
+        >
+          <img
+            src="../../../../assets/img/excel.png"
+            class="logo"
+            alt="excel"
+          />
+        </span>
+      </div>
+    </div>
+
+    <div #TABLE class="horizontal-scroll">
+      <table [dataSource]="dataSource" mat-table matSort #table>
+        <ng-container matColumnDef="CTM_REF">
+          <th
+            *matHeaderCellDef
+            class="actions-cell"
+            mat-header-cell
+            mat-sort-header
+          >
+            Planner REF
+          </th>
+          <td
+            *matCellDef="let row; let i = index"
+            class="actions-cell"
+            mat-cell
+          >
+            <p class="tbl-row-item">{{ row.REF_NUM }}</p>
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="Port_Name">
+          <th
+            *matHeaderCellDef
+            class="actions-cell"
+            mat-header-cell
+            mat-sort-header
+          >
+            Port
+          </th>
+          <td
+            *matCellDef="let row"
+            [ngStyle]="{ 'white-space': 'initial' }"
+            class="actions-cell"
+            mat-cell
+          >
+            <p class="tbl-row-item">{{ row.Port_Name }}</p>
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="COMPANY_NAME">
+          <th
+            *matHeaderCellDef
+            class="actions-cell"
+            mat-header-cell
+            mat-sort-header
+          >
+            Principal
+          </th>
+          <td
+            *matCellDef="let row"
+            [ngStyle]="{ 'white-space': 'initial' }"
+            class="actions-cell"
+            mat-cell
+          >
+            <p class="tbl-row-item">{{ row.COMPANY_NAME }}</p>
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="VESSEL_NAME">
+          <th
+            *matHeaderCellDef
+            class="actions-cell"
+            mat-header-cell
+            mat-sort-header
+          >
+            Vessel
+          </th>
+          <td *matCellDef="let row" class="actions-cell" mat-cell>
+            <p class="tbl-row-item">{{ row.VESSEL_NAME }}</p>
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="VESSEL_ETA">
+          <th
+            *matHeaderCellDef
+            class="actions-cell"
+            mat-header-cell
+            mat-sort-header
+            style="min-width: 130px"
+          >
+            ETA
+          </th>
+          <td *matCellDef="let row" class="actions-cell" mat-cell>
+            <div
+              *ngIf="
+                checkDateWithin48Hours(
+                  row.VESSEL_ETA,
+                  row.Status_GUID,
+                  row.Plan_Status
+                );
+                then thenTemplateName;
+                else elseTemplateName
+              "
+            ></div>
+
+            <ng-template #thenTemplateName>
+              <mat-chip-list aria-label="Fish selection">
+                <mat-chip color="yellow" selected>
+                  <p class="tbl-row-item">
+                    {{ row.VESSEL_ETA | date: "dd MMM yyyy HH:mm" }}
+                  </p>
+                </mat-chip>
+              </mat-chip-list>
+            </ng-template>
+            <ng-template #elseTemplateName>
+              <div
+                *ngIf="
+                  checkDateIsInPast(
+                    row.VESSEL_ETA,
+                    row.Status_GUID,
+                    row.Plan_Status
+                  );
+                  then thenPastTemplateName;
+                  else elseFutureTemplateName
+                "
+              ></div>
+              <ng-template #thenPastTemplateName>
+                <mat-chip-list aria-label="Fish selection">
+                  <mat-chip color="warn" selected>
+                    <p class="tbl-row-item">
+                      {{ row.VESSEL_ETA | date: "dd MMM yyyy HH:mm" }}
+                    </p>
+                  </mat-chip>
+                </mat-chip-list>
+              </ng-template>
+              <ng-template #elseFutureTemplateName>
+                <p class="tbl-row-item text-center">
+                  {{ row.VESSEL_ETA | date: "dd MMM yyyy HH:mm" }}
+                </p>
+              </ng-template>
+            </ng-template>
+          </td>
+        </ng-container>
+        <ng-container matColumnDef="PLANNER_PIC">
+          <th
+            *matHeaderCellDef
+            class="actions-cell"
+            [ngStyle]="{ 'white-space': 'initial' }"
+            mat-header-cell
+            mat-sort-header
+          >
+            Planner PIC
+          </th>
+          <td
+            *matCellDef="let row"
+            class="actions-cell"
+            [ngStyle]="{ 'white-space': 'initial' }"
+            mat-cell
+          >
+            <p class="tbl-row-item">{{ row.PLANNER_PIC }}</p>
+          </td>
+        </ng-container>
+        <ng-container matColumnDef="Planner_Status">
+          <th
+            *matHeaderCellDef
+            class="actions-cell"
+            [ngStyle]="{ 'white-space': 'initial' }"
+            mat-header-cell
+            mat-sort-header
+          >
+            Planner Status
+          </th>
+          <td *matCellDef="let row" class="actions-cell" mat-cell>
+            <p class="tbl-row-item">{{ row.Plan_Status_Name }}</p>
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="CTM_PIC">
+          <th
+            *matHeaderCellDef
+            class="actions-cell"
+            [ngStyle]="{ 'white-space': 'initial' }"
+            mat-header-cell
+            mat-sort-header
+          >
+            CTM PIC
+          </th>
+          <td *matCellDef="let row" class="actions-cell" mat-cell>
+            <p class="tbl-row-item">{{ row.CTM_PIC_NAME }}</p>
+          </td>
+        </ng-container>
+        <ng-container matColumnDef="CTM_STATUS">
+          <th
+            *matHeaderCellDef
+            class="actions-cell"
+            [ngStyle]="{ 'white-space': 'initial' }"
+            mat-header-cell
+            mat-sort-header
+          >
+            CTM Status
+          </th>
+          <td
+            *matCellDef="let row"
+            [ngStyle]="{ 'white-space': 'initial' }"
+            class="actions-cell"
+            mat-cell
+          >
+            <p class="tbl-row-item">{{ row.Status_Name }}</p>
+          </td>
+        </ng-container>
+        <ng-container matColumnDef="Planned_Amount">
+          <th
+            *matHeaderCellDef
+            class="actions-cell text-right"
+            [ngStyle]="{ 'white-space': 'initial' }"
+            mat-header-cell
+          >
+            Planned Amount USD
+          </th>
+          <td *matCellDef="let row" class="actions-cell" mat-cell>
+            <p class="tbl-row-item text-right" style="padding-right: 20px">
+              {{ row.Planned_Amount || 0 | currency: "USD" }}
+            </p>
+          </td>
+        </ng-container>
+        <ng-container matColumnDef="USD_Amount_Due">
+          <th
+            *matHeaderCellDef
+            class="actions-cell text-right"
+            [ngStyle]="{ 'white-space': 'initial' }"
+            mat-header-cell
+          >
+            Actual Amount USD
+          </th>
+          <td *matCellDef="let row" class="actions-cell text-right" mat-cell>
+            <mat-chip-list
+              aria-label="Amount selection"
+              *ngIf="
+                compareAmounts(row.Planned_Amount, row.Total_Amount);
+                then thenAmount;
+                else elseAmount
+              "
+            >
+            </mat-chip-list>
+            <ng-template #thenAmount>
+              <mat-chip color="warn" selected
+                ><p class="tbl-row-item text-right">
+                  {{ row.Total_Amount || 0 | currency: "USD" }}
+                </p></mat-chip
+              >
+            </ng-template>
+            <ng-template #elseAmount>
+              <p class="tbl-row-item text-right" style="padding: 0px 10px">
+                {{ row.Total_Amount || 0 | currency: "USD" }}
+              </p>
+            </ng-template>
+          </td>
+        </ng-container>
+        <ng-container matColumnDef="USD_Amount_Sgd">
+          <th
+            *matHeaderCellDef
+            class="actions-cell text-right"
+            [ngStyle]="{ 'white-space': 'initial' }"
+            mat-header-cell
+          >
+            Amount Due SGD
+          </th>
+          <td *matCellDef="let row" class="actions-cell text-right" mat-cell>
+            <p class="tbl-row-item text-right">
+              {{
+                row.USD_Amount_Due * row.Applicable_Exchange | currency: "SGD "
+              }}
+            </p>
+          </td>
+        </ng-container>
+        <ng-container matColumnDef="Action">
+          <th
+            *matHeaderCellDef
+            class="actions-cell"
+            mat-header-cell
+            mat-sort-header
+          >
+            Action
+          </th>
+          <td *matCellDef="let row" class="actions-cell" mat-cell>
+            <a
+              *ngIf="
+                authGuard.checkPermission('oPk6Fh2BP24443f12-see41aaaa', 'edit')
+              "
+              routerLink="/support-ctm/edit/{{ row.CTM_GUID }}"
+              target="_blank"
+            >
+              <button mat-icon-button>
+                <mat-icon class="icon-display">edit</mat-icon>
+              </button>
+            </a>
+            <button
+              mat-icon-button
+              (click)="ChangeStatus(row)"
+              *ngIf="
+                row.ACTIVE_STATUS &&
+                authGuard.checkPermission(
+                  'oPk6Fh2BP24443f12-see41aaaa',
+                  'delete'
+                )
+              "
+            >
+              <mat-icon
+                class="icon-display"
+                [ngStyle]="{ color: 'red', 'font-weight': 'bold' }"
+                >{{ "close" }}</mat-icon
+              >
+            </button>
+            <button
+              mat-icon-button
+              [matTooltip]="
+                'Created By : ' +
+                row.CREATED_BY +
+                ' | ' +
+                (row.DATE_CREATED | date: 'dd MMM yyyy HH:mm:ss') +
+                '&#13;
+              ' +
+                (row.MODIFIED_BY
+                  ? 'Modified By : ' +
+                    row.MODIFIED_BY +
+                    ' | ' +
+                    (row.DATE_MODIFIED | date: 'd MMM yyyy HH:mm:ss')
+                  : '')
+              "
+            >
+              <mat-icon class="icon-display">info</mat-icon>
+            </button>
+          </td>
+        </ng-container>
+
+        <tr *matHeaderRowDef="visibleColumns" mat-header-row></tr>
+        <tr
+          *matRowDef="let row; columns: visibleColumns"
+          class="clickable route-animations-elements"
+          mat-row
+        ></tr>
+        <tr class="mat-row" *matNoDataRow>
+          <td class="mat-cell" colspan="9999">No data found</td>
+        </tr>
+      </table>
+    </div>
+
+    <mat-paginator
+      class="paginator"
+      [pageSizeOptions]="[10, 25, 50, 100]"
+      [pageSize]="pageSize"
+    ></mat-paginator>
+
+    <!-- </fury-list> -->
+  </fury-page-layout-content>
+</fury-page-layout>

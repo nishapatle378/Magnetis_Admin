@@ -1,0 +1,196 @@
+<div mat-dialog-title>Crew Handling</div>
+
+<mat-dialog-content style="height: 100% !important" class="add-crew-handling">
+  <form [formGroup]="firstFormGroup" [ngStyle]="{ 'margin-top': '7px' }">
+    <table class="mat-table details-table">
+      <tr class="mat-row">
+        <th class="mat-cell" style="width: 25%">Planner REF</th>
+        <th class="mat-cell" style="width: 25%">PORT</th>
+        <th class="mat-cell" style="width: 25%">PRINCIPAL</th>
+        <th class="mat-cell" style="width: 25%">VESSEL</th>
+      </tr>
+      <tr class="mat-row mat-row-top">
+        <td class="mat-cell ref-code" style="width: 25%">
+          <mat-form-field fxFlex class="two-divide" *ngIf="!IsEdit">
+            <mat-label>Select a Planner</mat-label>
+            <mat-select
+              formControlName="Planner_GUID"
+              placeholder="Please Magentis ref number"
+            >
+              <mat-option>
+                <ngx-mat-select-search
+                  formControlName="planner_Filter"
+                  [placeholderLabel]="'search...'"
+                  [noEntriesFoundLabel]="'no matching found!'"
+                >
+                </ngx-mat-select-search>
+              </mat-option>
+              <mat-option
+                *ngFor="let b of filtered_planner | async"
+                [value]="b.GUID"
+              >
+              {{ b.REF_NUM }} - {{b.VESSEL_NAME}} - {{(b.VESSEL_ACTUAL_ARR ? b.VESSEL_ACTUAL_ARR : b.VESSEL_ETA) | date:"dd MMM YYYY"}}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+          <label *ngIf="IsEdit" class="label-class">{{
+            plannerData ? plannerData?.REF_NUM : ""
+          }}</label>
+        </td>
+        <td class="mat-cell">
+          <label class="label-class">{{
+            plannerData ? plannerData?.Port_Name : ""
+          }}</label>
+        </td>
+        <td class="mat-cell">
+          <label class="label-class">{{
+            plannerData ? plannerData?.COMPANY_NAME : ""
+          }}</label>
+        </td>
+        <td class="mat-cell">
+          <label class="label-class">{{
+            plannerData ? plannerData?.VESSEL_NAME : ""
+          }}</label>
+        </td>
+      </tr>
+    </table>
+    <div
+      fxLayout="column"
+      fxLayout.gt-sm="row"
+      fxLayoutGap.gt-sm="24px"
+      style="margin-bottom: 20px"
+    >
+      <mat-form-field fxFlex class="two-divide">
+        <mat-label>Select a Vendor</mat-label>
+        <mat-select
+          formControlName="Vendor_GUID"
+          placeholder="Please select vendor"
+        >
+          <mat-option
+            *ngFor="let b of filtered_vendor | async"
+            [value]="b.Vendor_GUID"
+          >
+            {{ b.Vendor_Name }}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+      <mat-form-field fxFlex class="two-divide">
+        <mat-label>Select service currency</mat-label>
+        <mat-select
+          formControlName="Svc_Currency_GUID"
+          placeholder="Please select currenct"
+        >
+          <mat-option
+            *ngFor="let b of filtered_currency | async"
+            [value]="b.CURRENCY_GUID"
+          >
+            {{ b.SHORT_CODE }}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+    </div>
+    <div fxLayout="column" fxLayout.gt-sm="row" fxLayoutGap.gt-sm="24px">
+      <table class="mat-table details-table" #denomination>
+        <tr class="mat-row">
+          <th class="mat-cell">
+            <label class="crew-label">Category</label>
+          </th>
+          <th class="mat-cell">
+            <label class="crew-label">Planned Quantity</label>
+          </th>
+          <th class="mat-cell">
+            <label class="crew-label">Actual Quantity</label>
+          </th>
+          <th class="mat-cell"><label class="crew-label">Charge</label></th>
+          <th class="mat-cell" style="min-width: 140px">
+            <label class="crew-label">Total</label>
+          </th>
+        </tr>
+        <tr class="mat-row" *ngFor="let dimon of filtered_crew_category">
+          <td class="mat-cell">
+            <input type="hidden" formControlName="Category_{{ dimon.index }}" />
+            <label class="crew-label">{{ dimon.PARAMETER_NAME }}</label>
+          </td>
+          <td class="mat-cell">
+            <mat-form-field fxFlex class="two-divide">
+              <input
+                matInput
+                formControlName="Planned_Quantity_{{ dimon.index }}"
+                (keypress)="validateNo($event)"
+                placeholder="Enter value"
+              />
+            </mat-form-field>
+          </td>
+          <td class="mat-cell">
+            <mat-form-field fxFlex class="two-divide">
+              <input
+                matInput
+                formControlName="Actual_Quantity_{{ dimon.index }}"
+                (keypress)="validateNo($event)"
+                placeholder="Enter value"
+              />
+            </mat-form-field>
+          </td>
+          <td class="mat-cell">
+            <mat-form-field fxFlex class="two-divide">
+              <input
+                matInput
+                formControlName="Charge_{{ dimon.index }}"
+                placeholder="Enter value"
+                class="text-right"
+              />
+            </mat-form-field>
+          </td>
+          <td class="mat-cell text-right">
+            <input type="hidden" formControlName="Total_{{ dimon.index }}" />
+            <label class="crew-label">{{
+              firstFormGroup.get("Total_" + dimon.index).value | currency: "USD"
+            }}</label>
+          </td>
+        </tr>
+        <tr class="mat-row">
+          <td class="mat-cell text-right" colspan="4">
+            <label class="crew-label">Total Amount</label>
+          </td>
+          <td class="mat-cell text-right" colspan="1">
+            <input type="hidden" formControlName="Total_Amount" />
+            <label class="crew-label">{{
+              firstFormGroup.get("Total_Amount").value | currency: "USD"
+            }}</label>
+          </td>
+        </tr>
+      </table>
+    </div>
+    <div fxLayout="column" fxLayout.gt-sm="row" fxLayoutGap.gt-sm="24px">
+      <mat-form-field fxFlex>
+        <mat-label>Remarks</mat-label>
+        <textarea
+          matInput
+          formControlName="Remarks"
+          placeholder="Remarks"
+        ></textarea>
+      </mat-form-field>
+    </div>
+    <div
+      fxLayout="column"
+      fxLayout.gt-sm="row"
+      fxLayoutGap.gt-sm="24px"
+      *ngIf="ErrorMessage"
+    >
+      <h6 style="color: #ff0000">{{ ErrorMessage }}</h6>
+    </div>
+  </form>
+</mat-dialog-content>
+<mat-dialog-actions fxLayout="row" fxLayoutAlign="end center">
+  <button
+    *ngIf="!ReadOnly"
+    mat-raised-button
+    color="primary"
+    [ngClass]="[!firstFormGroup.valid ? '' : 'save-btn']"
+    [disabled]="!firstFormGroup.valid"
+    (click)="saveServiceData()"
+  >
+    SAVE
+  </button>
+  <button mat-raised-button color="warn" (click)="CloseModal()">CLOSE</button>
+</mat-dialog-actions>

@@ -1,0 +1,15 @@
+@import url('https://cdn.quilljs.com/1.2.6/quill.snow.css');
+
+.email-vendor{
+    .left-label {
+        width: 20%;
+        margin-top: 15px;
+    }
+    .mat-form-field-flex {
+        align-items: flex-start !important;
+      }
+    
+      .mat-form-field-infix {
+        border-top: 0.84375em solid transparent;
+      }
+}

@@ -1,0 +1,298 @@
+<fury-page-layout mode="card" class="vendor-screen">
+  <fury-page-layout-header>
+    <form
+      [formGroup]="filterFormGroup"
+      [ngStyle]="{ 'margin-top': '7px' }"
+      (ngSubmit)="onClickSubmit(filterFormGroup.value)"
+    >
+      <div class="filter-area" fxFlex>
+        <div fxLayout="row" fxLayoutAlign="start">
+          <div fxFlex>
+            <mat-form-field>
+              <mat-label>Search by name</mat-label>
+              <input matInput formControlName="SEARCH" />
+            </mat-form-field>
+          </div>
+          <div fxFlex>
+            <mat-form-field>
+              <mat-label>Vendor Service</mat-label>
+              <mat-select formControlName="VENDOR_SERVICE">
+                <mat-option>
+                  <ngx-mat-select-search
+                    formControlName="service_Filter"
+                    [placeholderLabel]="'search...'"
+                    [noEntriesFoundLabel]="'no matching found!'"
+                  >
+                  </ngx-mat-select-search>
+                </mat-option>
+
+                <mat-option
+                  *ngFor="let b of filtered_service | async"
+                  [value]="b.PARAMETER_GUID"
+                >
+                  {{ b.PARAMETER_NAME }}
+                </mat-option>
+              </mat-select>
+            </mat-form-field>
+          </div>
+          <div fxFlex>
+            <mat-form-field>
+              <mat-label>Vendor Port</mat-label>
+              <mat-select formControlName="Vendor_Port">
+                <mat-option>
+                  <ngx-mat-select-search
+                    formControlName="port_Filter"
+                    [placeholderLabel]="'search...'"
+                    [noEntriesFoundLabel]="'no matching found!'"
+                  >
+                  </ngx-mat-select-search>
+                </mat-option>
+
+                <mat-option
+                  *ngFor="let b of filtered_port | async"
+                  [value]="b.PORT_GUID"
+                >
+                  {{ b.Port_Name }}
+                </mat-option>
+              </mat-select>
+            </mat-form-field>
+          </div>
+          <div class="filter-btn-area">
+            <button
+              class="create"
+              mat-raised-button
+              color="primary"
+              class="filter-btn"
+            >
+              Search
+            </button>
+            <button
+              class="create"
+              (click)="clearFilter()"
+              mat-raised-button
+              color="warn"
+              class="filter-btn"
+              type="button"
+            >
+              Clear
+            </button>
+          </div>
+        </div>
+      </div>
+    </form>
+  </fury-page-layout-header>
+
+  <fury-page-layout-content [@fadeInUp]>
+    <div class="actions-area">
+      <div>
+        <button
+          class="create"
+          [ngStyle]="{ 'margin-top': '10px' }"
+          (click)="SaveData(null, false)"
+          type="button"
+          mat-mini-fab
+          color="primary"
+          *ngIf="
+            authGuard.checkPermission(
+              'kKduqeEaG2cf1b09c-c2c2-4505-9881-f5a854982re2',
+              'create'
+            )
+          "
+        >
+          <mat-icon>add</mat-icon>
+        </button>
+        Add Vendor
+      </div>
+      <div>
+        <span
+          style="cursor: pointer"
+          (click)="exportAsExcel()"
+          *ngIf="
+            authGuard.checkPermission(
+              'kKduqeEaG2cf1b09c-c2c2-4505-9881-f5a854982re2',
+              'export'
+            )
+          "
+          ><img
+            src="../../../../assets/img/excel.png"
+            class="logo"
+            alt="excel"
+          />
+        </span>
+      </div>
+    </div>
+    <div #TABLE>
+      <table [dataSource]="dataSource" mat-table matSort #table>
+        <!-- <ng-container matColumnDef="srn">
+              <th *matHeaderCellDef class="actions-cell" mat-header-cell mat-sort-header>Sr No</th>
+              <td *matCellDef="let row; let i =index" class="actions-cell" mat-cell>
+                <p class="tbl-row-item">{{i + 1}}</p>
+              </td>
+            </ng-container> -->
+
+        <ng-container matColumnDef="Vendor_Name">
+          <th
+            *matHeaderCellDef
+            class="actions-cell"
+            mat-header-cell
+            mat-sort-header
+          >
+            Vendor Name
+          </th>
+          <td *matCellDef="let row" class="actions-cell" mat-cell>
+            <p class="tbl-row-item">{{ row.Vendor_Name }}</p>
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="Vendor_Address">
+          <th
+            *matHeaderCellDef
+            class="actions-cell"
+            mat-header-cell
+            mat-sort-header
+          >
+            Vendor Address
+          </th>
+          <td *matCellDef="let row" class="actions-cell" mat-cell>
+            <p class="tbl-row-item">{{ row.Vendor_Address }}</p>
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="Vendor_Contact1">
+          <th
+            *matHeaderCellDef
+            class="actions-cell"
+            mat-header-cell
+            mat-sort-header
+          >
+            Contact 1
+          </th>
+          <td *matCellDef="let row" class="actions-cell" mat-cell>
+            <p class="tbl-row-item">{{ row.Vendor_Contact1 }}</p>
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="EMAIL_ID1">
+          <th
+            *matHeaderCellDef
+            class="actions-cell"
+            mat-header-cell
+            mat-sort-header
+          >
+            Email1
+          </th>
+          <td *matCellDef="let row" class="actions-cell" mat-cell>
+            <p class="tbl-row-item">{{ row.EMAIL_ID1 }}</p>
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="PHONE_NO1">
+          <th
+            *matHeaderCellDef
+            class="actions-cell"
+            mat-header-cell
+            mat-sort-header
+          >
+            Phone1
+          </th>
+          <td *matCellDef="let row" class="actions-cell" mat-cell>
+            <p class="tbl-row-item">{{ row.PHONE_NO1 }}</p>
+          </td>
+        </ng-container>
+
+        <!-- <ng-container matColumnDef="ISO_CODE_3CHAR">
+                  <th *matHeaderCellDef class="actions-cell" mat-header-cell mat-sort-header>ISO Code 3Char</th>
+                  <td *matCellDef="let row" class="actions-cell" mat-cell>
+                    {{row.ISO_CODE_3CHAR}}
+                  </td>
+              </ng-container>
+  
+              <ng-container matColumnDef="TIME_ZONE">
+                  <th *matHeaderCellDef class="actions-cell" mat-header-cell mat-sort-header>Time Zone</th>
+                  <td *matCellDef="let row" class="actions-cell" mat-cell>
+                    {{row.TIME_ZONE}}
+                  </td>
+              </ng-container> -->
+
+        <ng-container matColumnDef="Action">
+          <th
+            *matHeaderCellDef
+            class="actions-cell"
+            mat-header-cell
+            mat-sort-header
+          >
+            Action
+          </th>
+          <td *matCellDef="let row" class="actions-cell" mat-cell>
+            <!-- -->
+            <button
+              mat-icon-button
+              (click)="SaveData(row, true)"
+              *ngIf="
+                authGuard.checkPermission(
+                  'kKduqeEaG2cf1b09c-c2c2-4505-9881-f5a854982re2',
+                  'edit'
+                )
+              "
+            >
+              <mat-icon class="icon-display">edit</mat-icon>
+            </button>
+            <!--  -->
+            <button
+              mat-icon-button
+              (click)="ChangeStatus(row)"
+              *ngIf="
+                row.ACTIVE_STATUS &&
+                authGuard.checkPermission(
+                  'kKduqeEaG2cf1b09c-c2c2-4505-9881-f5a854982re2',
+                  'delete'
+                )
+              "
+            >
+              <mat-icon [ngStyle]="{ color: 'red', 'font-weight': 'bold' }">{{
+                "close"
+              }}</mat-icon>
+            </button>
+            <button
+              mat-icon-button
+              [matTooltip]="
+                'Created By : ' +
+                row.CREATED_BY +
+                ' | ' +
+                (row.DATE_CREATED | date: 'dd MMM yyyy HH:mm:ss') +
+                '&#13;
+              ' +
+                (row.MODIFIED_BY
+                  ? 'Modified By : ' +
+                    row.MODIFIED_BY +
+                    ' | ' +
+                    (row.DATE_MODIFIED | date: 'd MMM yyyy HH:mm:ss')
+                  : '')
+              "
+            >
+              <mat-icon class="icon-display">info</mat-icon>
+            </button>
+          </td>
+        </ng-container>
+
+        <tr *matHeaderRowDef="visibleColumns" mat-header-row></tr>
+        <tr
+          *matRowDef="let row; columns: visibleColumns"
+          class="clickable route-animations-elements"
+          mat-row
+        ></tr>
+        <tr class="mat-row" *matNoDataRow>
+          <td class="mat-cell" colspan="9999">No data found</td>
+        </tr>
+      </table>
+    </div>
+
+    <mat-paginator
+      class="paginator"
+      [pageSizeOptions]="[10, 25, 50, 100]"
+      [pageSize]="pageSize"
+    ></mat-paginator>
+
+    <!-- </fury-list> -->
+  </fury-page-layout-content>
+</fury-page-layout>

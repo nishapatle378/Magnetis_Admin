@@ -1,0 +1,128 @@
+<div mat-dialog-title>Assign Services</div>
+
+<mat-dialog-content style="height: 100% !important;">
+  
+  <!-- <div fxLayout="row" *ngFor="let s of MasterList" [ngStyle]="{'margin-top': '5px'}">
+    <mat-checkbox
+      [color]="'accent'"
+      [(ngModel)]="s.selected" 
+      [ngModelOptions]="{standalone: true}"
+    >
+    </mat-checkbox>
+    <div [ngStyle]="{'padding-left': '10px'}">{{s.serviceName}}</div>
+  </div> -->
+
+  <div fxLayout="column" *ngFor="let s of MasterList" [ngStyle]="{'align-items': 'baseline' ,'margin': '20px'}">
+
+    <div fxLayout="row">
+      <mat-checkbox
+        [color]="'accent'"
+        [(ngModel)]="s.selected" 
+        [ngModelOptions]="{standalone: true}"
+        (change)="parentServiceSelected(s)"
+      >
+      </mat-checkbox>
+      <div [ngStyle]="{'padding-left': '10px'}">{{s.serviceName}}</div>
+
+      <button mat-icon-button (click)="s.expandable = !s.expandable" *ngIf="s.children.length > 0" [ngStyle]="{'margin-top': '-10px', 'margin-bottom': '-10px'}">
+        <mat-icon color="primary" *ngIf="s.expandable">add_circle</mat-icon>
+        <mat-icon [ngStyle]="{'color': 'red'}" *ngIf="!s.expandable">remove_circle</mat-icon>
+      </button>
+    </div>
+
+    <ng-container *ngIf="!s.expandable">
+      <div fxLayout="column" *ngFor="let l1 of s.children" class="service-child">
+
+        <div fxLayout="row">
+          <mat-checkbox
+            [color]="'accent'"
+            [(ngModel)]="l1.selected" 
+            [ngModelOptions]="{standalone: true}"
+            (change)="parentServiceSelected(l1)"
+          >
+          </mat-checkbox>
+          <div [ngStyle]="{'padding-left': '10px'}">{{l1.serviceName}}</div>
+
+          <button mat-icon-button (click)="l1.expandable = !l1.expandable" *ngIf="l1.children.length > 0" [ngStyle]="{'margin-top': '-10px', 'margin-bottom': '-10px'}">
+            <mat-icon color="primary" *ngIf="l1.expandable">add_circle</mat-icon>
+            <mat-icon [ngStyle]="{'color': 'red'}" *ngIf="!l1.expandable">remove_circle</mat-icon>
+          </button>
+        </div>
+
+      <ng-container *ngIf="!l1.expandable">
+        <div fxLayout="column" *ngFor="let l2 of l1.children" class="service-child">
+
+          <div fxLayout="row">
+            <mat-checkbox
+              [color]="'accent'"
+              [(ngModel)]="l2.selected" 
+              [ngModelOptions]="{standalone: true}"
+              (change)="parentServiceSelected(l2)"
+            >
+            </mat-checkbox>
+            <div [ngStyle]="{'padding-left': '10px'}">{{l2.serviceName}}</div>
+            <button mat-icon-button (click)="l2.expandable = !l2.expandable" *ngIf="l2.children.length > 0" [ngStyle]="{'margin-top': '-10px', 'margin-bottom': '-10px'}">
+              <mat-icon color="primary" *ngIf="l2.expandable">add_circle</mat-icon>
+              <mat-icon [ngStyle]="{'color': 'red'}" *ngIf="!l2.expandable">remove_circle</mat-icon>
+            </button>
+          </div>
+
+          <ng-container *ngIf="!l2.expandable">
+            <div fxLayout="column" *ngFor="let l3 of l2.children" class="service-child">
+              
+              <div fxLayout="row">
+                <mat-checkbox
+                  [color]="'accent'"
+                  [(ngModel)]="l3.selected" 
+                  [ngModelOptions]="{standalone: true}"
+                  (change)="parentServiceSelected(l3)"
+                >
+                </mat-checkbox>
+                <div [ngStyle]="{'padding-left': '10px'}">{{l3.serviceName}}</div>
+                <button mat-icon-button (click)="l3.expandable = !l3.expandable" *ngIf="l3.children.length > 0" [ngStyle]="{'margin-top': '-10px', 'margin-bottom': '-10px'}">
+                  <mat-icon color="primary" *ngIf="l3.expandable">add_circle</mat-icon>
+                  <mat-icon [ngStyle]="{'color': 'red'}" *ngIf="!l3.expandable">remove_circle</mat-icon>
+                </button>
+              </div>
+
+              <ng-container *ngIf="!l3.expandable">
+                <div fxLayout="column" *ngFor="let l4 of l3.children" class="service-child">
+
+                  <div fxLayout="row">
+                    <mat-checkbox
+                      [color]="'accent'"
+                      [(ngModel)]="l4.selected" 
+                      [ngModelOptions]="{standalone: true}"
+                      (change)="parentServiceSelected(l4)"
+                    >
+                    </mat-checkbox>
+                    <div [ngStyle]="{'padding-left': '10px'}">{{l4.serviceName}}</div>
+                    <button mat-icon-button (click)="l4.expandable = !l4.expandable" *ngIf="l4.children.length > 0" [ngStyle]="{'margin-top': '-10px', 'margin-bottom': '-10px'}">
+                      <mat-icon color="primary" *ngIf="l4.expandable">add_circle</mat-icon>
+                      <mat-icon [ngStyle]="{'color': 'red'}" *ngIf="!l4.expandable">remove_circle</mat-icon>
+                    </button>
+                  </div>
+
+                </div>
+              </ng-container>
+
+            </div>
+          </ng-container>
+          
+  
+        </div>
+      </ng-container>
+      
+
+      </div>
+
+    </ng-container>
+
+  </div>
+
+</mat-dialog-content>
+
+<mat-dialog-actions fxLayout="row" fxLayoutAlign="end center">
+  <button mat-raised-button color="primary" (click)="Save()">SAVE</button>
+  <button mat-raised-button color="primary" (click)="CloseModal()">CLOSE</button>
+</mat-dialog-actions>

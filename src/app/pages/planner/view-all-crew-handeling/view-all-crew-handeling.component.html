@@ -1,0 +1,451 @@
+<fury-page-layout mode="card" class="view-all-crew-handeling">
+  <fury-page-layout-header>
+    <form
+      [formGroup]="filterFormGroup"
+      (ngSubmit)="onClickSubmit(filterFormGroup.value)"
+    >
+      <div class="filter-area">
+        <div fxLayout="row" fxLayoutAlign="start">
+          <div fxFlex>
+            <mat-form-field>
+              <mat-label>Principal Name</mat-label>
+              <mat-select formControlName="PRINCIPAL_GUID">
+                <mat-option>
+                  <ngx-mat-select-search
+                    formControlName="principal_Filter"
+                    [placeholderLabel]="'search...'"
+                    [noEntriesFoundLabel]="'no matching found!'"
+                  >
+                  </ngx-mat-select-search>
+                </mat-option>
+
+                <mat-option
+                  *ngFor="let b of filtered_principal | async"
+                  [value]="b.COMPANY_GUID"
+                >
+                  {{ b.COMPANY_NAME }}
+                </mat-option>
+              </mat-select>
+            </mat-form-field>
+          </div>
+          <div fxFlex>
+            <mat-form-field>
+              <mat-label>Vessel</mat-label>
+              <mat-select formControlName="VESSEL_GUID">
+                <mat-option>
+                  <ngx-mat-select-search
+                    formControlName="vessel_Filter"
+                    [placeholderLabel]="'search...'"
+                    [noEntriesFoundLabel]="'no matching found!'"
+                  >
+                  </ngx-mat-select-search>
+                </mat-option>
+
+                <mat-option
+                  *ngFor="let b of filtered_vessel | async"
+                  [value]="b.VESSEL_GUID"
+                >
+                  {{ b.VESSEL_NAME }}
+                </mat-option>
+              </mat-select>
+            </mat-form-field>
+          </div>
+          <div fxFlex>
+            <mat-form-field>
+              <mat-label>Planner</mat-label>
+              <mat-select formControlName="PLANNER_GUID">
+                <mat-option>
+                  <ngx-mat-select-search
+                    formControlName="planner_Filter"
+                    [placeholderLabel]="'search...'"
+                    [noEntriesFoundLabel]="'no matching found!'"
+                  >
+                  </ngx-mat-select-search>
+                </mat-option>
+
+                <mat-option
+                  *ngFor="let b of filtered_planner | async"
+                  [value]="b.GUID"
+                >
+                  {{ b.REF_NUM }} - {{ b.VESSEL_NAME }} -
+                  {{
+                    (b.VESSEL_ACTUAL_ARR ? b.VESSEL_ACTUAL_ARR : b.VESSEL_ETA)
+                      | date: "dd MMM YYYY"
+                  }}
+                </mat-option>
+              </mat-select>
+            </mat-form-field>
+          </div>
+          <div fxFlex>
+            <mat-form-field>
+              <mat-label>PIC</mat-label>
+              <mat-select formControlName="AGENT_GUID">
+                <mat-option>
+                  <ngx-mat-select-search
+                    formControlName="pic_Filter"
+                    [placeholderLabel]="'search...'"
+                    [noEntriesFoundLabel]="'no matching found!'"
+                  >
+                  </ngx-mat-select-search>
+                </mat-option>
+
+                <mat-option
+                  *ngFor="let b of filtered_pic | async"
+                  [value]="b.USER_GUID"
+                >
+                  {{ b.USER_FIRST_NAME }} {{ b.USER_MIDDLE_NAME }}
+                  {{ b.USER_LAST_NAME }}
+                </mat-option>
+              </mat-select>
+            </mat-form-field>
+          </div>
+
+          <div class="filter-btn-area">
+            <button
+              class="create"
+              mat-raised-button
+              color="primary"
+              class="filter-btn"
+            >
+              Search
+            </button>
+            <button
+              class="create"
+              (click)="clearFilter()"
+              mat-raised-button
+              color="warn"
+              class="filter-btn"
+              type="button"
+            >
+              Clear
+            </button>
+          </div>
+        </div>
+      </div>
+    </form>
+  </fury-page-layout-header>
+
+  <fury-page-layout-content [@fadeInUp]>
+    <div #TABLE>
+      <div class="actions-area">
+        <div>
+          <span
+            (click)="SaveData(null, false)"
+            class="create"
+            *ngIf="
+              authGuard.checkPermission(
+                'oPk6Fh2BP24443f12-c950-46b3-c34esrr-crew',
+                'create'
+              )
+            "
+          >
+            <button mat-mini-fab color="primary">
+              <mat-icon>add</mat-icon>
+            </button>
+            Add Crew Log
+          </span>
+        </div>
+        <div>
+          <span
+            (click)="exportAsExcel()"
+            style="cursor: pointer"
+            *ngIf="
+              authGuard.checkPermission(
+                'oPk6Fh2BP24443f12-c950-46b3-c34esrr-crew',
+                'export'
+              )
+            "
+          >
+            <img
+              src="../../../../assets/img/excel.png"
+              class="logo"
+              alt="excel"
+            />
+          </span>
+        </div>
+      </div>
+      <table
+        [dataSource]="dataSource"
+        mat-table
+        matSort
+        #table
+        (matSortChange)="sortData($event)"
+      >
+        <ng-container matColumnDef="Vessel_Name">
+          <th
+            *matHeaderCellDef
+            class="actions-cell"
+            [ngStyle]="{ 'white-space': 'initial' }"
+            mat-header-cell
+            mat-sort-header
+          >
+            Vesssel Name
+          </th>
+          <td
+            *matCellDef="let row; let i = index"
+            [ngStyle]="{ 'white-space': 'initial' }"
+            class="actions-cell"
+            mat-cell
+          >
+            <p class="tbl-row-item">
+              {{ row?.Vessel_Name }}
+            </p>
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="Planner_Name">
+          <th
+            *matHeaderCellDef
+            class="actions-cell"
+            mat-header-cell
+            mat-sort-header
+          >
+            Planner Ref
+          </th>
+          <td
+            *matCellDef="let row; let i = index"
+            class="actions-cell"
+            mat-cell
+          >
+            <p class="tbl-row-item">
+              {{ row?.REF_NUM }}
+            </p>
+          </td>
+        </ng-container>
+        <ng-container matColumnDef="Planner_Pic">
+          <th
+            *matHeaderCellDef
+            class="actions-cell"
+            mat-header-cell
+            mat-sort-header
+          >
+            Planner PIC
+          </th>
+          <td
+            *matCellDef="let row; let i = index"
+            class="actions-cell"
+            mat-cell
+          >
+            <p class="tbl-row-item">
+              {{ getPicName(row.AGENT_GUID) }}
+            </p>
+          </td>
+        </ng-container>
+        <ng-container matColumnDef="Vessel_ETA">
+          <th
+            *matHeaderCellDef
+            class="actions-cell"
+            mat-header-cell
+            mat-sort-header
+          >
+            Vessel ETA
+          </th>
+          <td
+            *matCellDef="let row; let i = index"
+            class="actions-cell"
+            mat-cell
+          >
+            <p class="tbl-row-item">
+              {{ row.VESSEL_ETA | date: "dd MMM YYYY HH:mm" }}
+            </p>
+          </td>
+        </ng-container>
+        <ng-container matColumnDef="Vessel_ARR">
+          <th
+            *matHeaderCellDef
+            class="actions-cell"
+            mat-header-cell
+            mat-sort-header
+          >
+            Vessel Actual Arrival
+          </th>
+          <td
+            *matCellDef="let row; let i = index"
+            class="actions-cell"
+            mat-cell
+          >
+            <p class="tbl-row-item">
+              {{ row.VESSEL_ACTUAL_ARR | date: "dd MMM YYYY HH:mm" }}
+            </p>
+          </td>
+        </ng-container>
+        <ng-container matColumnDef="Crew_On_Plan_Planned">
+          <th
+            *matHeaderCellDef
+            class="actions-cell text-center"
+            [ngStyle]="{ 'white-space': 'initial' }"
+            mat-header-cell
+            mat-sort-header
+          >
+            Crew On Planned
+          </th>
+          <td *matCellDef="let row" class="actions-cell" mat-cell>
+            <p class="tbl-row-item text-center">
+              {{ row?.Crew_Joined_Planned || 0 }}
+            </p>
+          </td>
+        </ng-container>
+        <ng-container matColumnDef="Crew_On_Plan_Actual">
+          <th
+            *matHeaderCellDef
+            class="actions-cell text-center"
+            [ngStyle]="{ 'white-space': 'initial' }"
+            mat-header-cell
+            mat-sort-header
+          >
+            Crew On Actual
+          </th>
+          <td *matCellDef="let row" class="actions-cell" mat-cell>
+            <p class="tbl-row-item text-center">
+              {{ row?.Crew_Joined_Actual || 0 }}
+            </p>
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="Crew_Off_Plan_Planned">
+          <th
+            *matHeaderCellDef
+            class="actions-cell text-center"
+            [ngStyle]="{ 'white-space': 'initial' }"
+            mat-header-cell
+            mat-sort-header
+          >
+            Crew Off Planned
+          </th>
+          <td *matCellDef="let row" class="actions-cell" mat-cell>
+            <p class="tbl-row-item text-center">
+              {{ row?.Crew_Not_Joined_Planned || 0 }}
+            </p>
+          </td>
+        </ng-container>
+        <ng-container matColumnDef="Crew_Off_Plan_Actual">
+          <th
+            *matHeaderCellDef
+            class="actions-cell text-center"
+            [ngStyle]="{ 'white-space': 'initial' }"
+            mat-header-cell
+            mat-sort-header
+          >
+            Crew Off Actual
+          </th>
+          <td *matCellDef="let row" class="actions-cell" mat-cell>
+            <p class="tbl-row-item text-center">
+              {{ row?.Crew_Not_Joined_Actual || 0 }}
+            </p>
+          </td>
+        </ng-container>
+        <ng-container matColumnDef="Currency_Name">
+          <th
+            *matHeaderCellDef
+            class="actions-cell"
+            mat-header-cell
+            mat-sort-header
+          >
+            Currency
+          </th>
+          <td *matCellDef="let row" class="actions-cell text-center" mat-cell>
+            <p class="tbl-row-item text-center">
+              {{ row?.Currency_Name }}
+            </p>
+          </td>
+        </ng-container>
+        <ng-container matColumnDef="Svc_Amount">
+          <th
+            *matHeaderCellDef
+            class="actions-cell"
+            mat-header-cell
+            mat-sort-header
+          >
+            Amount
+          </th>
+          <td *matCellDef="let row" class="actions-cell" mat-cell>
+            <p class="tbl-row-item text-right">
+              {{ row?.Svc_Amount | currency: row?.Currency_Name || "USD" }}
+            </p>
+          </td>
+        </ng-container>
+        <ng-container matColumnDef="Action">
+          <th
+            *matHeaderCellDef
+            class="actions-cell"
+            mat-header-cell
+            mat-sort-header
+          >
+            Action
+          </th>
+          <td *matCellDef="let row" class="actions-cell" mat-cell>
+            <button
+              mat-icon-button
+              (click)="SaveData(row, true)"
+              *ngIf="
+                authGuard.checkPermission(
+                  'oPk6Fh2BP24443f12-c950-46b3-c34esrr-crew',
+                  'edit'
+                )
+              "
+            >
+              <mat-icon class="icon-display">edit</mat-icon>
+            </button>
+            <button
+              mat-icon-button
+              [matTooltip]="
+                'Created By : ' +
+                row.CREATED_BY +
+                ' | ' +
+                (row.DATE_CREATED | date: 'dd MMM yyyy HH:mm:ss') +
+                '&#13;
+                  ' +
+                (row.MODIFIED_BY
+                  ? 'Modified By : ' +
+                    row.MODIFIED_BY +
+                    ' | ' +
+                    (row.DATE_MODIFIED | date: 'd MMM yyyy HH:mm:ss')
+                  : '')
+              "
+            >
+              <mat-icon class="icon-display">info</mat-icon>
+            </button>
+            <button
+              mat-icon-button
+              (click)="ChangeStatus(row)"
+              *ngIf="
+                authGuard.checkPermission(
+                  'oPk6Fh2BP24443f12-c950-46b3-c34esrr-crew',
+                  'delete'
+                )
+              "
+            >
+              <mat-icon color="warn" class="icon-display">{{
+                "close"
+              }}</mat-icon>
+            </button>
+          </td>
+        </ng-container>
+
+        <tr *matHeaderRowDef="visibleColumns" mat-header-row></tr>
+        <tr
+          *matRowDef="let row; columns: visibleColumns"
+          class="clickable route-animations-elements"
+          mat-row
+        ></tr>
+        <tr class="mat-row" *matNoDataRow>
+          <td class="mat-cell" colspan="9999">No data found</td>
+        </tr>
+      </table>
+    </div>
+    <mat-paginator
+      class="paginator"
+      [pageSizeOptions]="[10, 25, 50, 100]"
+      [pageSize]="pageSize"
+    ></mat-paginator>
+    <!-- </fury-list> -->
+    <table class="mat-table details-table">
+      <tr class="mat-row" *ngFor="let row of dataSourceBoatCount">
+        <td class="mat-cell">Total {{ row.BOAT_TYPE }}</td>
+        <td class="mat-cell">
+          <b>{{ row.BOAT_COUNT }}</b>
+        </td>
+      </tr>
+    </table>
+  </fury-page-layout-content>
+</fury-page-layout>

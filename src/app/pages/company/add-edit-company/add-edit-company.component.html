@@ -1,0 +1,334 @@
+<div mat-dialog-title>Company</div>
+
+<mat-dialog-content
+  style="height: 100% !important"
+  #editcompanypage
+  class="editcompanypage"
+>
+  <form [formGroup]="firstFormGroup" [ngStyle]="{ 'margin-top': '7px' }">
+    <div class="container">
+      <div class="width-30">
+        <div fxLayout="column" fxLayout.gt-sm="row" fxLayoutGap.gt-sm="24px">
+          <mat-form-field fxFlex>
+            <mat-label>Company Name</mat-label>
+            <input
+              type="text"
+              formControlName="COMPANY_NAME"
+              [ngStyle]="{ 'justify-content': 'center' }"
+              matInput
+            />
+            <mat-error
+              *ngIf="firstFormGroup.get('COMPANY_NAME').hasError('required')"
+              >Company name is required</mat-error
+            >
+          </mat-form-field>
+
+          <mat-form-field fxFlex>
+            <mat-label>Short Name</mat-label>
+            <input type="text" formControlName="SHORT_NAME" matInput />
+            <mat-error
+              *ngIf="firstFormGroup.get('SHORT_NAME').hasError('required')"
+              >Short name is required</mat-error
+            >
+          </mat-form-field>
+        </div>
+
+        <div fxLayout="column" fxLayout.gt-sm="row" fxLayoutGap.gt-sm="24px">
+          <!-- <mat-form-field  fxFlex>
+                    <mat-label>Company Type</mat-label>
+                    <input type="text" formControlName="COMPANY_TYPE" matInput>
+                    <mat-error *ngIf="firstFormGroup.get('COMPANY_TYPE').hasError('required')">Company type is required</mat-error>
+                </mat-form-field> -->
+
+          <mat-form-field fxFlex>
+            <mat-label>Registration No</mat-label>
+            <input type="text" formControlName="REGISTRATION_NUM" matInput />
+            <mat-error
+              *ngIf="
+                firstFormGroup.get('REGISTRATION_NUM').hasError('required')
+              "
+              >Registration no is required</mat-error
+            >
+          </mat-form-field>
+        </div>
+
+        <div fxLayout="column" fxLayout.gt-sm="row" fxLayoutGap.gt-sm="24px">
+          <!-- <mat-form-field  fxFlex>
+                    <mat-label>Incorporated On</mat-label>
+                    <input type="date" formControlName="INCORPORATED_ON" matInput>
+                    <mat-error *ngIf="firstFormGroup.get('INCORPORATED_ON').hasError('required')">Incorporated on is required</mat-error>
+                </mat-form-field> -->
+
+          <!-- <mat-form-field appearance="outline" fxFlex>
+                    <mat-label>Base Currency</mat-label>
+                    <input type="text" formControlName="BASE_CURRENCY" matInput>
+                    <mat-error *ngIf="firstFormGroup.get('BASE_CURRENCY').hasError('required')">Base currency is required</mat-error>
+                </mat-form-field> -->
+
+          <mat-form-field fxFlex>
+            <mat-label>Base Currency</mat-label>
+            <mat-select formControlName="BASE_CURRENCY">
+              <mat-option>
+                <ngx-mat-select-search
+                  formControlName="currency_filter"
+                  [placeholderLabel]="'search...'"
+                  [noEntriesFoundLabel]="'no matching found!'"
+                >
+                </ngx-mat-select-search>
+              </mat-option>
+
+              <mat-option
+                *ngFor="let b of filteredCurrency | async"
+                [value]="b.CURRENCY_GUID"
+              >
+                {{ b.SHORT_CODE }}
+              </mat-option>
+            </mat-select>
+            <mat-error
+              *ngIf="firstFormGroup.get('BASE_CURRENCY').hasError('required')"
+              >Currency is required</mat-error
+            >
+          </mat-form-field>
+        </div>
+
+        <div fxLayout="column" fxLayout.gt-sm="row" fxLayoutGap.gt-sm="24px">
+          <!-- <mat-form-field  fxFlex>
+                    <mat-label>Office Type</mat-label>
+                    <input type="text" formControlName="OFF_CITY" matInput>
+                    <mat-error *ngIf="firstFormGroup.get('OFF_CITY').hasError('required')">Office type is required</mat-error>
+                </mat-form-field> -->
+
+          <!-- <mat-form-field appearance="outline" fxFlex>
+                    <mat-label>Office Country</mat-label>
+                    <input type="text" formControlName="OFF_COUNTRY" matInput>
+                    <mat-error *ngIf="firstFormGroup.get('OFF_COUNTRY').hasError('required')">Office country is required</mat-error>
+                </mat-form-field> -->
+          <mat-form-field fxFlex>
+            <mat-label>Office Country</mat-label>
+            <mat-select formControlName="OFF_COUNTRY">
+              <mat-option>
+                <ngx-mat-select-search
+                  formControlName="country_filter"
+                  [placeholderLabel]="'search...'"
+                  [noEntriesFoundLabel]="'no matching found!'"
+                >
+                </ngx-mat-select-search>
+              </mat-option>
+
+              <mat-option
+                *ngFor="let b of filteredCountry | async"
+                [value]="b.COUNTRY_GUID"
+              >
+                {{ b.COUNTRY_NAME }}
+              </mat-option>
+            </mat-select>
+            <mat-error
+              *ngIf="firstFormGroup.get('OFF_COUNTRY').hasError('required')"
+              >Country is required</mat-error
+            >
+          </mat-form-field>
+        </div>
+
+        <div fxLayout="column" fxLayout.gt-sm="row" fxLayoutGap.gt-sm="24px">
+          <mat-form-field fxFlex>
+            <mat-label>Office Address</mat-label>
+            <textarea
+              type="text"
+              formControlName="OFF_ADDRESS"
+              rows="3"
+              matInput
+            ></textarea>
+            <mat-error
+              *ngIf="firstFormGroup.get('OFF_ADDRESS').hasError('required')"
+              >Office address is required</mat-error
+            >
+          </mat-form-field>
+
+          <mat-form-field fxFlex>
+            <mat-label>Office Zipcode</mat-label>
+            <input type="text" formControlName="OFF_ZIP" matInput />
+            <mat-error
+              *ngIf="firstFormGroup.get('OFF_ZIP').hasError('required')"
+              >Office zipcode is required</mat-error
+            >
+          </mat-form-field>
+        </div>
+
+        <div fxLayout="column" fxLayout.gt-sm="row" fxLayoutGap.gt-sm="24px">
+          <mat-form-field fxFlex>
+            <mat-label>Phone No - 1</mat-label>
+            <input
+              type="text"
+              formControlName="OFF_PHONE_1"
+              (input)="ValidNumberInput('OFF_PHONE_1', $event.target.value)"
+              maxlength="14"
+              matInput
+            />
+            <mat-error
+              *ngIf="firstFormGroup.get('OFF_PHONE_1').hasError('required')"
+              >Phone No - 1 is required</mat-error
+            >
+            <mat-error
+              *ngIf="firstFormGroup.get('OFF_PHONE_1').hasError('maxLength')"
+              >Phone No - 1 can contain upto 10 digits</mat-error
+            >
+          </mat-form-field>
+
+          <!-- <mat-form-field fxFlex>
+                    <mat-label>Phone No - 2</mat-label>
+                    <input type="text" formControlName="OFF_PHONE_2" (input)="ValidNumberInput('OFF_PHONE_2', $event.target.value)" maxlength="14" matInput>
+                    <mat-error *ngIf="firstFormGroup.get('OFF_PHONE_2').hasError('required')">Phone No - 1 is required</mat-error>
+                    <mat-error *ngIf="firstFormGroup.get('OFF_PHONE_2').hasError('maxLength')">Phone No - 1 can contain upto 10 digits</mat-error>
+                </mat-form-field> -->
+        </div>
+
+        <div fxLayout="column" fxLayout.gt-sm="row" fxLayoutGap.gt-sm="24px">
+          <mat-form-field fxFlex>
+            <mat-label>Email - 1</mat-label>
+            <input
+              type="text"
+              formControlName="OFF_EMAIL_1"
+              maxlength="50"
+              pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,3}$"
+              matInput
+            />
+            <mat-error
+              *ngIf="firstFormGroup.get('OFF_EMAIL_1').hasError('required')"
+              >Email - 1 is required</mat-error
+            >
+            <mat-error
+              *ngIf="firstFormGroup.get('OFF_EMAIL_1').hasError('pattern')"
+            >
+              Invalid email - 1 is entered
+            </mat-error>
+          </mat-form-field>
+
+          <!-- <mat-form-field  fxFlex>
+                    <mat-label>Email - 2</mat-label>
+                    <input type="text" formControlName="OFF_EMAIL_2" maxlength="50"  pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,3}$" matInput>
+                    <mat-error *ngIf="firstFormGroup.get('OFF_EMAIL_2').hasError('required')">Email - 2 is required</mat-error>
+                    <mat-error *ngIf="firstFormGroup.get('OFF_EMAIL_2').hasError('pattern')">
+                      Invalid email - 2 is entered
+                    </mat-error>
+                </mat-form-field> -->
+        </div>
+
+        <div fxLayout="column" fxLayout.gt-sm="row" fxLayoutGap.gt-sm="24px">
+          <mat-form-field fxFlex>
+            <mat-label>Fax - 1</mat-label>
+            <input
+              type="text"
+              formControlName="OFF_FAX_1"
+              (input)="ValidNumberInput('OFF_FAX_1', $event.target.value)"
+              maxlength="12"
+              matInput
+            />
+            <mat-error
+              *ngIf="firstFormGroup.get('OFF_FAX_1').hasError('required')"
+              >Fax - 1 is required</mat-error
+            >
+            <mat-error
+              *ngIf="firstFormGroup.get('OFF_FAX_1').hasError('maxLength')"
+              >Fax - 1 can contain upto 10 digits</mat-error
+            >
+          </mat-form-field>
+
+          <mat-form-field fxFlex>
+            <mat-label>Fax - 2</mat-label>
+            <input
+              type="text"
+              formControlName="OFF_FAX_2"
+              (input)="ValidNumberInput('OFF_FAX_2', $event.target.value)"
+              maxlength="12"
+              matInput
+            />
+            <mat-error
+              *ngIf="firstFormGroup.get('OFF_FAX_2').hasError('required')"
+              >Fax - 1 is required</mat-error
+            >
+            <mat-error
+              *ngIf="firstFormGroup.get('OFF_FAX_2').hasError('maxLength')"
+              >Fax - 1 can contain upto 10 digits</mat-error
+            >
+          </mat-form-field>
+        </div>
+
+        <div
+          fxLayout="column"
+          fxLayout.gt-sm="row"
+          fxLayoutGap.gt-sm="24px"
+          *ngIf="ErrorMessage"
+        >
+          <h6 style="color: #ff0000">{{ ErrorMessage }}</h6>
+        </div>
+      </div>
+      <div class="width-30">
+        <table class="details-table demo-table" #denomination>
+          <tr class="mat-row content-left">
+            <th colspan="3" class="mat-cell">
+              <label class="crew-label">Crew Charges Configuration</label>
+            </th>
+          </tr>
+          <tr class="mat-row">
+            <th class="mat-cell">
+              <label class="crew-label">Crew Type</label>
+            </th>
+            <th class="mat-cell"><label class="crew-label">Charges</label></th>
+          </tr>
+          <tr class="mat-row" *ngFor="let dimon of crewServiceArray">
+            <td class="mat-cell" style="padding: 10px">
+              <label class="crew-label text-right">
+                {{ dimon.PARAMETER_NAME }}
+              </label>
+            </td>
+            <td class="mat-cell">
+              <mat-form-field fxFlex class="two-divide">
+                <input
+                  matInput
+                  formControlName="Charge_{{ dimon.index }}"
+                  (keypress)="validateNo($event)"
+                  placeholder="Enter value"
+                />
+              </mat-form-field>
+            </td>
+          </tr>
+        </table>
+      </div>
+      <div class="width-30">
+        <h3>Company Billing Addresses</h3>
+        <div class="row" *ngFor="let address of companyAddresses">
+          <mat-form-field fxFlex class="two-divide">
+            <textarea
+              rows="6"
+              matInput
+              formControlName="Company_{{ address }}"
+              placeholder="Company Address"
+            ></textarea>
+          </mat-form-field>
+        </div>
+        <div><span mat-raised-button color="primary"  class="save-btn add-Address " (click)="addNewAddress()">Add New Address</span></div>
+      </div>
+    </div>
+  </form>
+</mat-dialog-content>
+<mat-dialog-actions fxLayout="row" fxLayoutAlign="end center">
+  <button
+    mat-raised-button
+    color="primary"
+    (click)="SaveCompany(true)"
+    class="save-btn"
+    [disabled]="!firstFormGroup.valid && !IsEdit"
+  >
+    SAVE & ADD NEW
+  </button>
+  <button
+    mat-raised-button
+    color="primary"
+    (click)="SaveCompany()"
+    class="save-btn"
+    [disabled]="!firstFormGroup.valid && !IsEdit"
+  >
+    SAVE
+  </button>
+  <button mat-raised-button color="warn" (click)="CloseModal()">CLOSE</button>
+</mat-dialog-actions>

@@ -1,0 +1,69 @@
+<div mat-dialog-title>Port</div>
+
+<mat-dialog-content style="height: 100% !important;">
+
+
+    <form [formGroup]="firstFormGroup" [ngStyle]="{'margin-top': '7px'}">
+        <div fxLayout="column" fxLayout.gt-sm="row" fxLayoutGap.gt-sm="24px" class="top">
+            <mat-form-field  fxFlex>
+              <mat-label>Country*</mat-label>
+              <mat-select formControlName="Country_GUID">
+                <mat-option>
+                  <ngx-mat-select-search 
+                    formControlName="country_Filter"
+                    [placeholderLabel]="'search...'"
+                    [noEntriesFoundLabel]="'no matching found!'"
+                  >
+                  </ngx-mat-select-search>
+                </mat-option>   
+                                            
+                <mat-option *ngFor="let b of filtered_country | async" [value]="b.COUNTRY_GUID">
+                  {{b.COUNTRY_NAME}}
+                </mat-option>
+              </mat-select>
+              <mat-error *ngIf="firstFormGroup.get('Country_GUID').hasError('required')">Country is required</mat-error>
+            </mat-form-field>
+          </div>
+        <div fxLayout="column" fxLayout.gt-sm="row" fxLayoutGap.gt-sm="24px" class="top">
+
+            <mat-form-field fxFlex>
+                <mat-label>Port Name*</mat-label>
+                <input type="text" formControlName="Port_Name" maxlength="200" matInput>
+                <mat-error *ngIf="firstFormGroup.get('Port_Name').hasError('required')">Port name is required</mat-error>
+            </mat-form-field>
+
+        </div>
+
+        <div fxLayout="column" fxLayout.gt-sm="row" fxLayoutGap.gt-sm="24px" class="top">
+
+            <mat-form-field  fxFlex>
+                <mat-label>Port Short Code*</mat-label>
+                <input type="text" formControlName="PORT_SHORT_CODE" maxlength="5" matInput>
+                <mat-error *ngIf="firstFormGroup.get('PORT_SHORT_CODE').hasError('required')">Port short code is required</mat-error>
+            </mat-form-field>
+
+        </div>
+
+        <div fxLayout="column" fxLayout.gt-sm="row" fxLayoutGap.gt-sm="24px" class="top">
+
+            <mat-form-field  fxFlex>
+                <mat-label>World Port Index</mat-label>
+                <input type="text" formControlName="World_port_index_number" maxlength="5" matInput>
+                <mat-error *ngIf="firstFormGroup.get('World_port_index_number').hasError('required')">World port index is required</mat-error>
+            </mat-form-field>
+
+        </div>
+
+        <div fxLayout="column" fxLayout.gt-sm="row" fxLayoutGap.gt-sm="24px" *ngIf="ErrorMessage" class="top">
+            <h6 style="color: #ff0000;">{{ErrorMessage}}</h6>
+        </div>
+
+    </form>
+
+</mat-dialog-content>
+<mat-dialog-actions fxLayout="row" fxLayoutAlign="end center">
+  <button mat-raised-button color="primary" (click)="SaveCountry(true)" class="save-btn" [disabled]="!firstFormGroup.valid">SAVE & ADD NEW</button>
+  <button mat-raised-button color="primary" (click)="SaveCountry()" class="save-btn" [disabled]="!firstFormGroup.valid">SAVE</button>
+  <button mat-raised-button color="warn" (click)="CloseModal()">CLOSE</button>
+</mat-dialog-actions>
+

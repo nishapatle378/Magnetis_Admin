@@ -1,0 +1,309 @@
+<fury-page-layout mode="card">
+  <fury-page-layout-header>
+    <fury-breadcrumbs [@fadeInRight] current="Users"></fury-breadcrumbs>
+  </fury-page-layout-header>
+
+  <fury-page-layout-content [@fadeInUp]>
+    <div class="actions-area">
+      <div>
+        <span
+          class="create"
+          *ngIf="
+            authGuard.checkPermission(
+              '8rOQRUXHO23358236-982e-4cc0-a482-d111ffcf1777',
+              'create'
+            )
+          "
+        >
+          <button
+            class="create"
+            [matTooltip]="'Add a New User'"
+            [ngStyle]="{ 'margin-top': '10px' }"
+            (click)="SaveUser(null, false)"
+            type="button"
+            mat-mini-fab
+            color="primary"
+          >
+            <mat-icon>add</mat-icon>
+          </button>
+          Add User
+        </span>
+      </div>
+
+      <div>
+        <span
+          (click)="exportAsExcel()"
+          style="cursor: pointer"
+          *ngIf="
+            authGuard.checkPermission(
+              '8rOQRUXHO23358236-982e-4cc0-a482-d111ffcf1777',
+              'export'
+            )
+          "
+        >
+          <img
+            src="../../../../assets/img/excel.png"
+            class="logo"
+            alt="excel"
+          />
+        </span>
+      </div>
+    </div>
+    <!-- <fury-list
+      name="Users"
+      [columns]="columns"
+      (filterChange)="onFilterChange($event)"
+    > -->
+    <!-- <div class="actions">
+        <div
+          style="background-color: #ffffff; padding: 10px"
+          fxLayout="row"
+          fxFlex
+          fxLayoutAlign="end"
+        >
+          <select
+            class="filter-select"
+            (change)="FilterDataStatus($event.target.value)"
+          >
+            <option value="All">All</option>
+            <option value="Activated" selected>Active</option>
+            <option value="Deleted">Deleted</option>
+          </select>
+          <span (click)="exportAsExcel()" style="cursor: pointer;">
+            <img
+              src="../../../../assets/img/excel.png"
+             class="logo"
+              alt="excel"
+            />
+          </span>
+          <button
+            mat-mini-fab
+            color="primary"
+            [matTooltip]="'Export Excel of User List'"
+            (click)="exportAsExcel()"
+          >
+            <mat-icon>sticky_note_2</mat-icon>
+          </button> -->
+
+    <!-- <div style="background-color: #ffffff; padding: 10px;" fxLayout="row" fxFlex  fxLayoutAlign="end">
+
+            <select  class="filter-select" (change)="FilterDataStatus($event.target.value)">
+              <option value="All">All</option>
+              <option value="Activated" selected>Active</option>
+              <option value="Deleted">Deleted</option>
+            </select>
+
+            <button mat-mini-fab color="primary" [matTooltip]="'Export Excel of User List'" (click)="exportAsExcel()"><mat-icon>sticky_note_2</mat-icon></button>
+          </div> -->
+
+    <div #TABLE class="main-container-table">
+      <table [dataSource]="dataSource" mat-table matSort #table>
+        <ng-container matColumnDef="user_name">
+          <th
+            *matHeaderCellDef
+            class="actions-cell"
+            mat-header-cell
+            mat-sort-header
+          >
+            User Name
+          </th>
+          <td
+            *matCellDef="let row"
+            [ngStyle]="{ 'white-space': 'initial' }"
+            class="actions-cell"
+            mat-cell
+          >
+            <p class="tbl-row-item">
+              <label [matTooltip]="row.user_name">{{
+                row.user_name && row.user_name.length > 30
+                  ? row.user_name.substring(0, 30) + "...."
+                  : row.user_name
+              }}</label>
+            </p>
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="PHONE_NUMBER">
+          <th
+            *matHeaderCellDef
+            class="actions-cell"
+            mat-header-cell
+            mat-sort-header
+          >
+            Phone Number
+          </th>
+          <td *matCellDef="let row" class="actions-cell" mat-cell>
+            <p class="tbl-row-item">
+              {{ row.PHONE_NUMBER }}
+            </p>
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="EMAIL_ID">
+          <th
+            *matHeaderCellDef
+            class="actions-cell"
+            mat-header-cell
+            mat-sort-header
+          >
+            Email
+          </th>
+          <td *matCellDef="let row" class="actions-cell" mat-cell>
+            <p class="tbl-row-item">
+              {{ row.EMAIL_ID }}
+            </p>
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="USER_DESIGNATION">
+          <th
+            *matHeaderCellDef
+            class="actions-cell"
+            mat-header-cell
+            mat-sort-header
+          >
+            Designation
+          </th>
+          <td *matCellDef="let row" class="actions-cell" mat-cell>
+            <p class="tbl-row-item">
+              {{ row.USER_DESIGNATION }}
+            </p>
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="DOB">
+          <th
+            *matHeaderCellDef
+            class="actions-cell"
+            mat-header-cell
+            mat-sort-header
+          >
+            DOB
+          </th>
+          <td *matCellDef="let row" class="actions-cell" mat-cell>
+            <p class="tbl-row-item">
+              <!-- {{row.VIEW_DATE_OF_BIRTH}} -->
+              {{ row.DOB | date: "dd MMM yyyy" }}
+            </p>
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="PRESENT_ADDRESS">
+          <th
+            *matHeaderCellDef
+            class="actions-cell"
+            mat-header-cell
+            mat-sort-header
+          >
+            Present Address
+          </th>
+          <td *matCellDef="let row" class="actions-cell" mat-cell>
+            <p class="tbl-row-item">
+              <label [matTooltip]="row.PRESENT_ADDRESS">{{
+                row.PRESENT_ADDRESS && row.PRESENT_ADDRESS.length > 30
+                  ? row.PRESENT_ADDRESS.substring(0, 30) + "...."
+                  : row.PRESENT_ADDRESS
+              }}</label>
+            </p>
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="Action">
+          <th
+            *matHeaderCellDef
+            class="actions-cell"
+            mat-header-cell
+            mat-sort-header
+          >
+            Action
+          </th>
+          <td *matCellDef="let row" class="actions-cell" mat-cell>
+            <button
+              *ngIf="
+                authGuard.checkPermission(
+                  '8rOQRUXHO23358236-982e-4cc0-a482-d111ffcf1777',
+                  'edit'
+                )
+              "
+              mat-icon-button
+              (click)="SaveUser(row, true)"
+              [matTooltip]="'Edit User'"
+            >
+              <mat-icon class="icon-display">edit</mat-icon>
+            </button>
+
+            <button
+              mat-icon-button
+              (click)="ChangeStatus(row)"
+              *ngIf="
+                row.ACTIVE_STATUS &&
+                authGuard.checkPermission(
+                  '8rOQRUXHO23358236-982e-4cc0-a482-d111ffcf1777',
+                  'delete'
+                )
+              "
+              [matTooltip]="'Delete User'"
+            >
+              <mat-icon
+                class="icon-display"
+                [ngStyle]="{ color: 'red', 'font-weight': 'bold' }"
+                >{{ "close" }}</mat-icon
+              >
+            </button>
+            <button
+              mat-icon-button
+              (click)="ChangeStatus(row)"
+              *ngIf="
+                !row.ACTIVE_STATUS &&
+                authGuard.checkPermission(
+                  '8rOQRUXHO23358236-982e-4cc0-a482-d111ffcf1777',
+                  'edit'
+                )
+              "
+              [matTooltip]="'Reactivate  User'"
+            >
+              <mat-icon class="icon-display">{{ "verified_user" }}</mat-icon>
+            </button>
+
+            <button
+              mat-icon-button
+              [matTooltip]="
+                'Created By : ' +
+                row.CREATED_BY +
+                ' | ' +
+                (row.DATE_CREATED | date: 'dd MMM yyyy HH:mm:ss') +
+                '&#13;
+                ' +
+                (row.MODIFIED_BY
+                  ? 'Modified By : ' +
+                    row.MODIFIED_BY +
+                    ' | ' +
+                    (row.DATE_MODIFIED | date: 'd MMM yyyy HH:mm:ss')
+                  : '')
+              "
+            >
+              <mat-icon class="icon-display">info</mat-icon>
+            </button>
+          </td>
+        </ng-container>
+
+        <tr *matHeaderRowDef="visibleColumns" mat-header-row></tr>
+        <tr
+          *matRowDef="let row; columns: visibleColumns"
+          class="clickable route-animations-elements"
+          mat-row
+        ></tr>
+        <tr class="mat-row" *matNoDataRow>
+          <td class="mat-cell" colspan="9999">No data found</td>
+        </tr>
+      </table>
+    </div>
+
+    <mat-paginator
+      class="paginator"
+      [pageSizeOptions]="[10, 25, 50, 100]"
+      [pageSize]="pageSize"
+    ></mat-paginator>
+    <!-- </fury-list> -->
+  </fury-page-layout-content>
+</fury-page-layout>

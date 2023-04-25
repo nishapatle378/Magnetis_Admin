@@ -1,0 +1,8 @@
+// @import "var";
+@import "/src/styles/var";
+
+.button {
+  border-radius: 0;
+  padding: 0;
+  min-width: $toolbar-button-width;
+}
